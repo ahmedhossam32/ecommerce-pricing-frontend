@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { FiShoppingCart, FiHeart, FiSearch, FiUser, FiChevronDown, FiLogOut, FiPackage, FiMenu, FiX, FiTrendingUp } from 'react-icons/fi'
 import { useState } from 'react'
+import AuthModal from './AuthModal'
 
 function Navbar() {
   const { user, logout } = useAuth()
@@ -10,6 +11,7 @@ function Navbar() {
   const [accountOpen, setAccountOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [authOpen, setAuthOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -55,20 +57,18 @@ function Navbar() {
                 <div className="absolute right-0 top-full mt-1 bg-white border border-[#E8E0D5] shadow-lg rounded-xl w-44 py-2 z-50">
                   {!user ? (
                     <>
-                      <Link
-                        to="/login"
-                        onClick={() => setAccountOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs"
+                      <button
+                        onClick={() => { setAccountOpen(false); setAuthOpen(true) }}
+                        className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs w-full text-left"
                       >
                         <FiUser className="w-3.5 h-3.5" /> Sign In
-                      </Link>
-                      <Link
-                        to="/register"
-                        onClick={() => setAccountOpen(false)}
-                        className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs"
+                      </button>
+                      <button
+                        onClick={() => { setAccountOpen(false); setAuthOpen(true) }}
+                        className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs w-full text-left"
                       >
                         <FiUser className="w-3.5 h-3.5" /> Create Account
-                      </Link>
+                      </button>
                     </>
                   ) : (
                     <>
@@ -264,14 +264,22 @@ function Navbar() {
               </Link>
             )}
 
-            {/* Sign up button — not logged in */}
+            {/* Auth buttons — not logged in */}
             {!user && (
-              <Link
-                to="/register"
-                className="bg-[#1C1F2E] hover:bg-[#2E3452] text-white text-sm px-5 py-2 rounded-full font-medium transition-colors"
-              >
-                Sign Up
-              </Link>
+              <>
+                <button
+                  onClick={() => setAuthOpen(true)}
+                  className="text-[#6B6560] hover:text-[#1C1F2E] text-sm transition-colors px-3 py-2"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => setAuthOpen(true)}
+                  className="bg-[#1C1F2E] hover:bg-[#2E3452] text-white text-sm px-5 py-2 rounded-full font-semibold transition-colors"
+                >
+                  Sign Up
+                </button>
+              </>
             )}
           </div>
 
@@ -333,8 +341,8 @@ function Navbar() {
           <div className="pt-3 border-t border-[#E8E0D5] flex gap-4">
             {!user ? (
               <>
-                <Link to="/login" onClick={() => setMobileOpen(false)} className="text-[#6B6560] hover:text-[#1C1F2E]">Login</Link>
-                <Link to="/register" onClick={() => setMobileOpen(false)} className="text-[#C9A96E] font-semibold">Sign Up</Link>
+                <button onClick={() => { setAuthOpen(true); setMobileOpen(false) }} className="text-[#6B6560] hover:text-[#1C1F2E]">Login</button>
+                <button onClick={() => { setAuthOpen(true); setMobileOpen(false) }} className="text-[#C9A96E] font-semibold">Sign Up</button>
               </>
             ) : (
               <button onClick={handleLogout} className="text-red-500 hover:text-red-600">Sign Out</button>
@@ -342,6 +350,7 @@ function Navbar() {
           </div>
         </div>
       )}
+      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
     </header>
   )
 }
