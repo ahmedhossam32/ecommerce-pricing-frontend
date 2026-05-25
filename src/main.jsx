@@ -11,16 +11,10 @@ createRoot(document.getElementById('root')).render(
     <ToastContainer
       position="top-right"
       autoClose={3000}
-      hideProgressBar={false}
-      closeOnClick
-      pauseOnHover
-      toastStyle={{
-        background: '#1C1F2E',
-        color: '#ffffff',
-        borderLeft: '4px solid #C9A96E',
-        borderRadius: '12px',
-        fontSize: '14px',
-      }}
+      closeButton={true}
+      pauseOnHover={true}
+      draggable={true}
+      theme="dark"
     />
   </StrictMode>,
 )

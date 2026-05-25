@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { FiArrowLeft, FiHeart, FiShoppingCart, FiPackage, FiTag, FiTrendingUp, FiChevronLeft, FiChevronRight, FiZap } from 'react-icons/fi'
+import { FiHeart, FiShoppingCart, FiPackage, FiTag, FiTrendingUp, FiChevronLeft, FiChevronRight, FiZap } from 'react-icons/fi'
+import BackButton from '../../components/BackButton'
 import { toast } from 'react-toastify'
 import { format } from 'date-fns'
 import PriceHistoryChart from '../../components/PriceHistoryChart'
@@ -51,13 +52,7 @@ function ProductDetail() {
       {/* ── TOP BAR ─────────────────────────────────────────── */}
       <div className="bg-white border-b border-[#E8E0D5] sticky top-16 z-20">
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          <Link
-            to="/products"
-            className="inline-flex items-center gap-2 text-[#6B6560] hover:text-[#1C1F2E] text-sm transition-colors group"
-          >
-            <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            Back to Products
-          </Link>
+          <BackButton label="Back" />
           <p className="text-xs text-[#6B6560] truncate max-w-xs text-right">
             Products / {product.category?.replace(/_/g, ' ')} / {product.name}
           </p>

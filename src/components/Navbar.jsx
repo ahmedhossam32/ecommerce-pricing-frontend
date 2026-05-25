@@ -1,17 +1,18 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { FiShoppingCart, FiHeart, FiSearch, FiUser, FiChevronDown, FiLogOut, FiPackage, FiMenu, FiX, FiTrendingUp } from 'react-icons/fi'
+import { FiShoppingCart, FiHeart, FiUser, FiChevronDown, FiLogOut, FiPackage, FiMenu, FiX, FiTrendingUp } from 'react-icons/fi'
 import { useState } from 'react'
 import AuthModal from './AuthModal'
 
 function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const isOnCart = location.pathname === '/cart'
+  const isOnWishlist = location.pathname === '/wishlist'
   const [mobileOpen, setMobileOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const [avatarOpen, setAvatarOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const [authOpen, setAuthOpen] = useState(false)
 
   const handleLogout = () => {
@@ -19,15 +20,6 @@ function Navbar() {
     navigate('/')
     setAccountOpen(false)
     setAvatarOpen(false)
-  }
-
-  const handleSearch = (e) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${searchQuery.trim()}`)
-      setSearchOpen(false)
-      setSearchQuery('')
-    }
   }
 
   return (
@@ -214,75 +206,60 @@ function Navbar() {
           {/* Right icons */}
           <div className="hidden md:flex items-center gap-4">
 
-            {/* Search */}
-            <div className="relative">
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1"
-              >
-                <FiSearch className="w-5 h-5" />
-              </button>
-              {searchOpen && (
-                <form
-                  onSubmit={handleSearch}
-                  className="absolute right-0 top-full mt-3 bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl shadow-xl flex overflow-hidden z-50"
-                >
-                  <input
-                    autoFocus
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products..."
-                    className="bg-transparent text-[#1C1F2E] text-sm px-4 py-2.5 outline-none w-56 placeholder-[#9E9590]"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-[#1C1F2E] hover:bg-[#2E3452] text-white px-4 transition-colors"
-                  >
-                    <FiSearch className="w-4 h-4" />
-                  </button>
-                </form>
-              )}
-            </div>
-
             {/* Wishlist — always visible (guest opens auth modal) */}
             {user?.role !== 'SELLER' && user?.role !== 'ADMIN' && (
               user?.role === 'BUYER' ? (
-                <Link to="/wishlist" className="relative text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/wl">
-                  <FiHeart className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C9A96E] text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">1</span>
+                <div className="relative group/wl">
+                  <Link to="/wishlist" className="p-1 block transition-colors">
+                    <FiHeart
+                      className="w-5 h-5 transition-colors"
+                      style={{ color: isOnWishlist ? '#C9A96E' : '#6B6560' }}
+                      fill={isOnWishlist ? '#C9A96E' : 'none'}
+                    />
+                  </Link>
                   <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
-                </Link>
+                </div>
               ) : (
-                <button onClick={() => setAuthOpen(true)} className="relative text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/wl">
-                  <FiHeart className="w-5 h-5" />
+                <div className="relative group/wl">
+                  <button onClick={() => setAuthOpen(true)} className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
+                    <FiHeart className="w-5 h-5" />
+                  </button>
                   <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
-                </button>
+                </div>
               )
             )}
 
             {/* Cart — always visible (guest opens auth modal) */}
             {user?.role !== 'SELLER' && user?.role !== 'ADMIN' && (
               user?.role === 'BUYER' ? (
-                <Link to="/cart" className="relative text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/ct">
-                  <FiShoppingCart className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#1C1F2E] text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">2</span>
+                <div className="relative group/ct">
+                  <Link to="/cart" className="p-1 block transition-colors">
+                    <FiShoppingCart
+                      className="w-5 h-5 transition-colors"
+                      style={{ color: isOnCart ? '#C9A96E' : '#6B6560' }}
+                      fill={isOnCart ? '#C9A96E' : 'none'}
+                    />
+                  </Link>
                   <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
-                </Link>
+                </div>
               ) : (
-                <button onClick={() => setAuthOpen(true)} className="relative text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/ct">
-                  <FiShoppingCart className="w-5 h-5" />
+                <div className="relative group/ct">
+                  <button onClick={() => setAuthOpen(true)} className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
+                    <FiShoppingCart className="w-5 h-5" />
+                  </button>
                   <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
-                </button>
+                </div>
               )
             )}
 
             {/* Orders — buyer only */}
             {user?.role === 'BUYER' && (
-              <Link to="/orders" className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/ord">
-                <FiPackage className="w-5 h-5" />
+              <div className="relative group/ord">
+                <Link to="/orders" className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
+                  <FiPackage className="w-5 h-5" />
+                </Link>
                 <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ord:opacity-100 transition-opacity">Orders</span>
-              </Link>
+              </div>
             )}
 
             {/* Auth / Avatar */}
@@ -322,10 +299,13 @@ function Navbar() {
                   <div className="absolute right-0 top-full mt-2 bg-white border border-[#E8E0D5] shadow-lg rounded-xl w-48 py-2 z-50">
                     <div className="px-4 py-2.5 border-b border-[#E8E0D5]">
                       <p className="text-[#1C1F2E] text-xs font-medium">{user.name}</p>
-                      <p className="text-[#6B6560] text-xs capitalize">{user.role.toLowerCase()}</p>
+                      <p className="text-[#6B6560] text-xs">{user.email}</p>
                     </div>
                     {user.role === 'BUYER' && (
                       <>
+                        <Link to="/cart" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] text-xs transition-colors">
+                          <FiShoppingCart className="w-3.5 h-3.5" /> My Cart
+                        </Link>
                         <Link to="/orders" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
                           <FiPackage className="w-3.5 h-3.5" /> My Orders
                         </Link>
@@ -362,24 +342,6 @@ function Navbar() {
           </button>
         </div>
 
-        {/* Search bar — full width on mobile */}
-        {searchOpen && (
-          <div className="md:hidden px-6 pb-3">
-            <form onSubmit={handleSearch} className="flex bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl overflow-hidden">
-              <input
-                autoFocus
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="bg-transparent text-[#1C1F2E] text-sm px-4 py-2.5 outline-none flex-1 placeholder-[#9E9590]"
-              />
-              <button type="submit" className="bg-[#1C1F2E] text-white px-4">
-                <FiSearch className="w-4 h-4" />
-              </button>
-            </form>
-          </div>
-        )}
       </div>
 
       {/* MOBILE MENU */}
