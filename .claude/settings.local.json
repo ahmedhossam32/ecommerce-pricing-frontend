@@ -9,7 +9,11 @@
       "Read(//c/$Recycle.Bin/S-1-5-21-594015895-3786003975-2863468396-1001/**)",
       "Bash(git init *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(npm install *)"
     ]
   }
 }

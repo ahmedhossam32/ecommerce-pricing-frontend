@@ -243,24 +243,43 @@ function Navbar() {
               )}
             </div>
 
-            {/* Wishlist — buyer only */}
-            {user?.role === 'BUYER' && (
-              <Link to="/wishlist" className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 relative">
-                <FiHeart className="w-5 h-5" />
-              </Link>
+            {/* Wishlist — always visible (guest opens auth modal) */}
+            {user?.role !== 'SELLER' && user?.role !== 'ADMIN' && (
+              user?.role === 'BUYER' ? (
+                <Link to="/wishlist" className="relative text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/wl">
+                  <FiHeart className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C9A96E] text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">1</span>
+                  <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
+                </Link>
+              ) : (
+                <button onClick={() => setAuthOpen(true)} className="relative text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/wl">
+                  <FiHeart className="w-5 h-5" />
+                  <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
+                </button>
+              )
             )}
 
-            {/* Cart — buyer only */}
-            {user?.role === 'BUYER' && (
-              <Link to="/cart" className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 relative">
-                <FiShoppingCart className="w-5 h-5" />
-              </Link>
+            {/* Cart — always visible (guest opens auth modal) */}
+            {user?.role !== 'SELLER' && user?.role !== 'ADMIN' && (
+              user?.role === 'BUYER' ? (
+                <Link to="/cart" className="relative text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/ct">
+                  <FiShoppingCart className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#1C1F2E] text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">2</span>
+                  <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
+                </Link>
+              ) : (
+                <button onClick={() => setAuthOpen(true)} className="relative text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/ct">
+                  <FiShoppingCart className="w-5 h-5" />
+                  <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
+                </button>
+              )
             )}
 
             {/* Orders — buyer only */}
             {user?.role === 'BUYER' && (
-              <Link to="/orders" className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1">
+              <Link to="/orders" className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 group/ord">
                 <FiPackage className="w-5 h-5" />
+                <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ord:opacity-100 transition-opacity">Orders</span>
               </Link>
             )}
 
