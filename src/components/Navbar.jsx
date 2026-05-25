@@ -10,6 +10,7 @@ function Navbar() {
   const location = useLocation()
   const isOnCart = location.pathname === '/cart'
   const isOnWishlist = location.pathname === '/wishlist'
+  const isOnOrders = location.pathname === '/orders'
   const [mobileOpen, setMobileOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const [avatarOpen, setAvatarOpen] = useState(false)
@@ -255,8 +256,12 @@ function Navbar() {
             {/* Orders — buyer only */}
             {user?.role === 'BUYER' && (
               <div className="relative group/ord">
-                <Link to="/orders" className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
-                  <FiPackage className="w-5 h-5" />
+                <Link to="/orders" className="p-1 block transition-colors">
+                  <FiPackage
+                    className="w-5 h-5 transition-colors"
+                    style={{ color: isOnOrders ? '#C9A96E' : '#6B6560' }}
+                    fill={isOnOrders ? '#C9A96E' : 'none'}
+                  />
                 </Link>
                 <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ord:opacity-100 transition-opacity">Orders</span>
               </div>
@@ -324,6 +329,9 @@ function Navbar() {
                         <FiPackage className="w-3.5 h-3.5" /> Admin Panel
                       </Link>
                     )}
+                    <Link to="/profile" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] text-xs transition-colors">
+                      <FiUser className="w-3.5 h-3.5" /> Profile Settings
+                    </Link>
                     <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 text-red-500 hover:text-red-600 hover:bg-[#FAF8F5] transition-colors text-xs w-full text-left">
                       <FiLogOut className="w-3.5 h-3.5" /> Sign Out
                     </button>
