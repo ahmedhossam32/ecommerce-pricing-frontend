@@ -62,6 +62,7 @@ function AuthModal({ onClose }) {
         email: loginForm.email,
         role: loginForm.email.includes('admin') ? 'ADMIN'
             : loginForm.email.includes('seller') ? 'SELLER' : 'BUYER',
+        profilePicture: null,
       }
       login(userData, 'dummy-token')
       toast.success(`Welcome back, ${userData.name}!`)

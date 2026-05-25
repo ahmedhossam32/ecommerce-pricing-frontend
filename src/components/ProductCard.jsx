@@ -26,7 +26,7 @@ const categoryGradients = {
 }
 
 function ProductCard({ product }) {
-  const { productId, name, category, brand, price, sellerName, createdAt, imageUrls } = product
+  const { productId, name, category, brand, price, sellerName, createdAt, imageUrls, sellerProfilePictureUrl } = product
   const [imgIndex, setImgIndex] = useState(0)
   const [imgLoaded, setImgLoaded] = useState(false)
   const [imgError, setImgError] = useState(false)
@@ -63,6 +63,7 @@ function ProductCard({ product }) {
   }, [name])
 
   return (
+    <Link to={`/products/${productId}`} className="block">
     <div className="group bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden hover:shadow-xl hover:border-[#C9A96E]/50 transition-shadow duration-200 flex flex-col cursor-pointer">
 
       {/* ── IMAGE AREA ─────────────────────────────────────── */}
@@ -163,11 +164,19 @@ function ProductCard({ product }) {
           {name}
         </h3>
 
-        {/* Brand · Seller */}
-        <p className="text-[#9E9590] text-xs mb-3">
-          {brand}
-          {sellerName && <span className="text-[#C9A96E]/70"> · {sellerName}</span>}
-        </p>
+        {/* Seller */}
+        <div className="flex items-center gap-2 mb-3">
+          {sellerProfilePictureUrl ? (
+            <img src={sellerProfilePictureUrl} alt={sellerName} className="w-5 h-5 rounded-full object-cover border border-[#E8E0D5] shrink-0" />
+          ) : (
+            <div className="w-5 h-5 rounded-full bg-[#C9A96E]/20 text-[#C9A96E] text-[9px] font-bold flex items-center justify-center shrink-0">
+              {sellerName?.[0]?.toUpperCase()}
+            </div>
+          )}
+          <p className="text-[#9E9590] text-xs truncate">
+            {brand}<span className="text-[#C9A96E]/70"> · {sellerName}</span>
+          </p>
+        </div>
 
         {/* Price + View button */}
         <div className="flex items-center justify-between pt-3 border-t border-[#F0EBE3]">
@@ -179,12 +188,9 @@ function ProductCard({ product }) {
           </div>
 
           <div className="relative group/view">
-            <Link
-              to={`/products/${productId}`}
-              className="flex items-center gap-1.5 bg-[#FAF8F5] hover:bg-[#1C1F2E] text-[#6B6560] hover:text-white text-xs font-bold px-3 py-2 rounded-full transition-all duration-200 border border-[#E8E0D5] hover:border-[#1C1F2E] group-hover/view:shadow-md"
-            >
+            <div className="flex items-center gap-1.5 bg-[#FAF8F5] hover:bg-[#1C1F2E] text-[#6B6560] hover:text-white text-xs font-bold px-3 py-2 rounded-full transition-all duration-200 border border-[#E8E0D5] hover:border-[#1C1F2E] group-hover/view:shadow-md">
               View <FiArrowRight className="w-3 h-3 group-hover/view:translate-x-0.5 transition-transform" />
-            </Link>
+            </div>
             <span className="pointer-events-none absolute -top-8 right-0 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] font-medium px-2.5 py-1.5 rounded-lg opacity-0 group-hover/view:opacity-100 transition-opacity duration-150 shadow-xl">
               View details
             </span>
@@ -192,6 +198,7 @@ function ProductCard({ product }) {
         </div>
       </div>
     </div>
+    </Link>
   )
 }
 

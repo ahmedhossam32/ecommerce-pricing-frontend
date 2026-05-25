@@ -9,6 +9,7 @@ function Navbar() {
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
+  const [avatarOpen, setAvatarOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [authOpen, setAuthOpen] = useState(false)
@@ -17,6 +18,7 @@ function Navbar() {
     logout()
     navigate('/')
     setAccountOpen(false)
+    setAvatarOpen(false)
   }
 
   const handleSearch = (e) => {
@@ -51,7 +53,7 @@ function Navbar() {
               onMouseLeave={() => setAccountOpen(false)}
             >
               <button className="flex items-center gap-1 hover:text-white transition-colors">
-                My Account <FiChevronDown className="w-3 h-3" />
+                {user ? user.name.split(' ')[0] : 'My Account'} <FiChevronDown className="w-3 h-3" />
               </button>
               {accountOpen && (
                 <div className="absolute right-0 top-full mt-1 bg-white border border-[#E8E0D5] shadow-lg rounded-xl w-44 py-2 z-50">
@@ -283,8 +285,8 @@ function Navbar() {
               </Link>
             )}
 
-            {/* Auth buttons — not logged in */}
-            {!user && (
+            {/* Auth / Avatar */}
+            {!user ? (
               <>
                 <button
                   onClick={() => setAuthOpen(true)}
@@ -299,6 +301,55 @@ function Navbar() {
                   Sign Up
                 </button>
               </>
+            ) : (
+              <div
+                className="relative"
+                onMouseEnter={() => setAvatarOpen(true)}
+                onMouseLeave={() => setAvatarOpen(false)}
+              >
+                <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                  {user.profilePicture ? (
+                    <img src={user.profilePicture} alt={user.name} className="w-8 h-8 rounded-full object-cover border-2 border-[#E8E0D5]" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-[#C9A96E] text-white text-xs font-bold flex items-center justify-center">
+                      {user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-sm font-medium text-[#1C1F2E]">{user.name.split(' ')[0]}</span>
+                  <FiChevronDown className="w-3.5 h-3.5 text-[#6B6560]" />
+                </button>
+                {avatarOpen && (
+                  <div className="absolute right-0 top-full mt-2 bg-white border border-[#E8E0D5] shadow-lg rounded-xl w-48 py-2 z-50">
+                    <div className="px-4 py-2.5 border-b border-[#E8E0D5]">
+                      <p className="text-[#1C1F2E] text-xs font-medium">{user.name}</p>
+                      <p className="text-[#6B6560] text-xs capitalize">{user.role.toLowerCase()}</p>
+                    </div>
+                    {user.role === 'BUYER' && (
+                      <>
+                        <Link to="/orders" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
+                          <FiPackage className="w-3.5 h-3.5" /> My Orders
+                        </Link>
+                        <Link to="/wishlist" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
+                          <FiHeart className="w-3.5 h-3.5" /> Wishlist
+                        </Link>
+                      </>
+                    )}
+                    {user.role === 'SELLER' && (
+                      <Link to="/seller/dashboard" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
+                        <FiPackage className="w-3.5 h-3.5" /> Dashboard
+                      </Link>
+                    )}
+                    {user.role === 'ADMIN' && (
+                      <Link to="/admin/dashboard" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
+                        <FiPackage className="w-3.5 h-3.5" /> Admin Panel
+                      </Link>
+                    )}
+                    <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 text-red-500 hover:text-red-600 hover:bg-[#FAF8F5] transition-colors text-xs w-full text-left">
+                      <FiLogOut className="w-3.5 h-3.5" /> Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 

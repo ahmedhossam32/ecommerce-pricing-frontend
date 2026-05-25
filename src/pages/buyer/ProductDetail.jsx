@@ -1,97 +1,170 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { FiArrowLeft, FiHeart, FiShoppingCart, FiPackage, FiTag, FiUser } from 'react-icons/fi'
+import { FiArrowLeft, FiHeart, FiShoppingCart, FiPackage, FiTag, FiTrendingUp, FiChevronLeft, FiChevronRight, FiZap } from 'react-icons/fi'
 import { toast } from 'react-toastify'
+import { format } from 'date-fns'
 import PriceHistoryChart from '../../components/PriceHistoryChart'
-
-const DUMMY_PRODUCTS = [
-  { productId: 1, name: 'iPhone 17 Pro Max 256GB', category: 'telephony', brand: 'Apple', price: 977, sellerName: 'Tech Store', description: 'The latest iPhone 17 Pro Max featuring a titanium design, A19 Pro chip, and the most advanced camera system ever in an iPhone. Available in 256GB storage.', weight: 221 },
-  { productId: 2, name: 'Sony WH-1000XM5 Headphones', category: 'audio', brand: 'Sony', price: 280, sellerName: 'Audio World', description: 'Industry-leading noise canceling headphones with Auto NC Optimizer, precise voice pickup technology, and up to 30-hour battery life.', weight: 250 },
-  { productId: 3, name: 'MacBook Pro 14 M3', category: 'computers', brand: 'Apple', price: 1999, sellerName: 'Apple Store', description: 'MacBook Pro with M3 chip delivers exceptional performance for professionals. Features a stunning Liquid Retina XDR display and all-day battery life.', weight: 1550 },
-  { productId: 4, name: 'Rolex Submariner', category: 'watches_gifts', brand: 'Rolex', price: 7500, sellerName: 'Luxury Watch Co', description: 'The Rolex Submariner is the reference among divers watches. Waterproof to a depth of 300 metres, it features a rotatable bezel with a 60-minute scale.', weight: 155 },
-  { productId: 5, name: 'Nike Air Force 1 White', category: 'fashion_shoes', brand: 'Nike', price: 120, sellerName: 'Sneaker Hub', description: 'The Nike Air Force 1 is the first basketball shoe to use Nike Air technology. Clean white leather upper with Air cushioning for all-day comfort.', weight: 400 },
-  { productId: 6, name: 'PlayStation 5 Console', category: 'consoles_games', brand: 'Sony', price: 499, sellerName: 'Game Zone', description: 'PlayStation 5 console with ultra-high speed SSD, ray tracing, 4K gaming, and the new DualSense wireless controller with haptic feedback.', weight: 4500 },
-]
+import { DUMMY_PRODUCTS } from '../../data/dummyData'
 
 const DUMMY_HISTORY = [
-  { price: 850, event: 'Seller accepted', date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
-  { price: 920, event: 'Admin approved', date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString() },
-  { price: 977, event: 'Admin override', date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+  { price: 850, event: 'Seller accepted', date: '2026-04-25T10:00:00.000Z' },
+  { price: 920, event: 'Admin approved',  date: '2026-05-05T10:00:00.000Z' },
+  { price: 977, event: 'Admin override',  date: '2026-05-20T10:00:00.000Z' },
 ]
 
 const categoryEmojis = {
   telephony: '📱', audio: '🎧', computers: '💻',
   watches_gifts: '⌚', fashion_shoes: '👟',
   fashion_bags_accessories: '👜', consoles_games: '🎮',
-  default: '📦'
+  health_beauty: '💄', sports_leisure: '⚽',
+  furniture_decor: '🛋', default: '📦',
 }
 
 function ProductDetail() {
   const { id } = useParams()
   const [activeTab, setActiveTab] = useState('details')
+  const [activeImg, setActiveImg] = useState(0)
+  const [imgLoaded, setImgLoaded] = useState(false)
 
   const product = DUMMY_PRODUCTS.find(p => p.productId === parseInt(id)) || DUMMY_PRODUCTS[0]
   const emoji = categoryEmojis[product.category] || categoryEmojis.default
+  const hasImages = product.imageUrls?.length > 0
+  const multiImage = product.imageUrls?.length > 1
 
+  const handlePrev = () => { setImgLoaded(false); setActiveImg(i => (i === 0 ? product.imageUrls.length - 1 : i - 1)) }
+  const handleNext = () => { setImgLoaded(false); setActiveImg(i => (i === product.imageUrls.length - 1 ? 0 : i + 1)) }
+  const handleThumb = (i) => { setImgLoaded(false); setActiveImg(i) }
+
+  const handleBuyNow    = () => toast.success(`Order placed for ${product.name}!`)
   const handleAddToCart = () => toast.success(`${product.name} added to cart!`)
-  const handleWishlist = () => toast.success(`${product.name} saved to wishlist!`)
+  const handleWishlist  = () => toast.success(`${product.name} saved to wishlist!`)
+
+  const TABS = [
+    { key: 'details', label: 'Product Details', icon: FiPackage },
+    { key: 'history', label: 'Price History',   icon: FiTrendingUp },
+    { key: 'specs',   label: 'Specifications',  icon: FiTag },
+  ]
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
+
+      {/* ── TOP BAR ─────────────────────────────────────────── */}
+      <div className="bg-white border-b border-[#E8E0D5] sticky top-16 z-20">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <Link
+            to="/products"
+            className="inline-flex items-center gap-2 text-[#6B6560] hover:text-[#1C1F2E] text-sm transition-colors group"
+          >
+            <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Back to Products
+          </Link>
+          <p className="text-xs text-[#6B6560] truncate max-w-xs text-right">
+            Products / {product.category?.replace(/_/g, ' ')} / {product.name}
+          </p>
+        </div>
+      </div>
+
+      {/* ── MAIN CONTENT ────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_480px] gap-10 mb-8">
 
-        {/* Back button */}
-        <Link
-          to="/products"
-          className="inline-flex items-center gap-2 text-[#6B6560] hover:text-[#1C1F2E] text-sm mb-8 transition-colors group"
-        >
-          <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Back to Products
-        </Link>
+          {/* ── LEFT — Image gallery ─────────────────────────── */}
+          <div>
+            {/* Main image */}
+            <div className="bg-white border border-[#E8E0D5] rounded-3xl overflow-hidden aspect-square relative">
+              {hasImages ? (
+                <>
+                  {!imgLoaded && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#F5F0EA] to-[#EDE5D8] animate-pulse" />
+                  )}
+                  <img
+                    key={activeImg}
+                    src={product.imageUrls[activeImg]}
+                    alt={product.name}
+                    onLoad={() => setImgLoaded(true)}
+                    className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  />
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-9xl opacity-40 select-none">{emoji}</span>
+                </div>
+              )}
 
-        {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+              {multiImage && (
+                <>
+                  <button
+                    onClick={handlePrev}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center transition-colors"
+                  >
+                    <FiChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center transition-colors"
+                  >
+                    <FiChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
 
-          {/* Left — Image */}
-          <div className="bg-white border border-[#E8E0D5] rounded-3xl overflow-hidden aspect-square flex items-center justify-center">
-            <span className="text-9xl opacity-50">{emoji}</span>
+            {/* Thumbnail strip */}
+            {multiImage && (
+              <div className="flex gap-2 mt-3">
+                {product.imageUrls.map((url, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleThumb(i)}
+                    className={`w-16 h-16 rounded-xl overflow-hidden border-2 cursor-pointer shrink-0 transition-colors ${
+                      i === activeImg ? 'border-[#1C1F2E]' : 'border-[#E8E0D5] hover:border-[#C9A96E]'
+                    }`}
+                  >
+                    <img src={url} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Right — Info */}
-          <div className="flex flex-col justify-center">
+          {/* ── RIGHT — Product info ─────────────────────────── */}
+          <div className="flex flex-col">
 
-            {/* Category + Brand */}
-            <div className="flex items-center gap-3 mb-4">
-              <span className="bg-[#FAF8F5] border border-[#E8E0D5] text-[#C9A96E] text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+            {/* Category + Brand badges */}
+            <div className="flex gap-2 mb-3">
+              <span className="bg-[#FAF8F5] border border-[#E8E0D5] text-[#C9A96E] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
                 {product.category?.replace(/_/g, ' ')}
               </span>
-              <span className="text-[#6B6560] text-xs">{product.brand}</span>
+              <span className="bg-[#FAF8F5] border border-[#E8E0D5] text-[#6B6560] text-xs px-3 py-1 rounded-full">
+                {product.brand}
+              </span>
             </div>
 
             {/* Name */}
-            <h1 className="text-3xl font-bold text-[#1C1F2E] mb-4 leading-tight">
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-[#1C1F2E] leading-tight mb-3">
               {product.name}
             </h1>
 
-            {/* Price */}
-            <div className="flex items-baseline gap-3 mb-6">
-              <span className="text-4xl font-bold text-[#1C1F2E]">
+            {/* Price row */}
+            <div className="flex items-baseline gap-3 mb-2">
+              <span className="text-4xl font-extrabold text-[#1C1F2E]">
                 ${product.price?.toFixed(2)}
               </span>
-              <span className="text-green-600 text-sm font-medium bg-green-50 px-2 py-0.5 rounded-full">
-                AI Verified ✓
+              <span className="text-xs text-[#6B6560] bg-[#FAF8F5] border border-[#E8E0D5] px-2 py-0.5 rounded-full">
+                Fair Price
               </span>
             </div>
 
-            {/* Description */}
-            <p className="text-[#6B6560] text-sm leading-relaxed mb-6">
-              {product.description}
-            </p>
-
             {/* Seller + Weight */}
-            <div className="flex flex-wrap gap-4 mb-8 pb-8 border-b border-[#E8E0D5]">
+            <div className="flex flex-wrap gap-4 mb-5 pb-5 border-b border-[#E8E0D5]">
               <div className="flex items-center gap-2 text-sm text-[#6B6560]">
-                <FiUser className="w-4 h-4 text-[#C9A96E]" />
+                {product.sellerProfilePictureUrl ? (
+                  <img src={product.sellerProfilePictureUrl} alt={product.sellerName} className="w-7 h-7 rounded-full object-cover border border-[#E8E0D5] shrink-0" />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-[#C9A96E]/20 text-[#C9A96E] text-xs font-bold flex items-center justify-center shrink-0">
+                    {product.sellerName?.[0]?.toUpperCase()}
+                  </div>
+                )}
                 Sold by <span className="text-[#1C1F2E] font-medium ml-1">{product.sellerName}</span>
               </div>
               {product.weight && (
@@ -100,48 +173,64 @@ function ProductDetail() {
                   {product.weight}g
                 </div>
               )}
-              <div className="flex items-center gap-2 text-sm text-[#6B6560]">
-                <FiTag className="w-4 h-4 text-[#C9A96E]" />
-                {product.category?.replace(/_/g, ' ')}
+            </div>
+
+            {/* Description */}
+            <p className="text-[#6B6560] text-sm leading-relaxed mb-6">
+              {product.description}
+            </p>
+
+            {/* Action buttons */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleBuyNow}
+                className="w-full flex items-center justify-center gap-2 bg-[#C9A96E] hover:bg-[#b8935a] text-white font-bold py-4 rounded-2xl text-sm transition-colors"
+              >
+                <FiZap className="w-4 h-4" /> Buy Now
+              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 flex items-center justify-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] text-white py-3.5 rounded-2xl font-semibold text-sm transition-colors"
+                >
+                  <FiShoppingCart className="w-4 h-4" /> Add to Cart
+                </button>
+                <button
+                  onClick={handleWishlist}
+                  className="flex-1 flex items-center justify-center gap-2 border-2 border-[#1C1F2E] text-[#1C1F2E] hover:bg-[#1C1F2E] hover:text-white py-3.5 rounded-2xl font-semibold text-sm transition-all"
+                >
+                  <FiHeart className="w-4 h-4" /> Save
+                </button>
               </div>
             </div>
 
-            {/* Action buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] text-white py-3.5 rounded-full font-semibold text-sm transition-colors"
-              >
-                <FiShoppingCart className="w-4 h-4" /> Add to Cart
-              </button>
-              <button
-                onClick={handleWishlist}
-                className="flex-1 flex items-center justify-center gap-2 border-2 border-[#1C1F2E] text-[#1C1F2E] hover:bg-[#1C1F2E] hover:text-white py-3.5 rounded-full font-semibold text-sm transition-all"
-              >
-                <FiHeart className="w-4 h-4" /> Save
-              </button>
+            {/* AI Pricing info box */}
+            <div className="mt-4 bg-[#FAF8F5] border border-[#E8E0D5] rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <FiTrendingUp className="w-4 h-4 text-[#C9A96E]" />
+                <span className="text-sm font-bold text-[#1C1F2E]">AI-Verified Pricing</span>
+              </div>
+              <p className="text-xs text-[#6B6560]">
+                This price was reviewed and verified by our AI engine to ensure it's fair and competitive.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* ── TABS ────────────────────────────────────────────── */}
         <div className="bg-white border border-[#E8E0D5] rounded-3xl overflow-hidden">
 
           {/* Tab headers */}
           <div className="flex border-b border-[#E8E0D5]">
-            {[
-              { key: 'details', label: 'Product Details' },
-              { key: 'history', label: 'Price History' },
-            ].map(tab => (
+            {TABS.map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex-1 py-4 text-sm font-semibold transition-colors relative ${
-                  activeTab === tab.key
-                    ? 'text-[#1C1F2E]'
-                    : 'text-[#6B6560] hover:text-[#1C1F2E]'
+                className={`flex-1 py-4 flex items-center justify-center gap-2 text-sm font-semibold relative transition-colors ${
+                  activeTab === tab.key ? 'text-[#1C1F2E]' : 'text-[#6B6560] hover:text-[#1C1F2E]'
                 }`}
               >
+                <tab.icon className="w-4 h-4" />
                 {tab.label}
                 {activeTab === tab.key && (
                   <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-[#C9A96E] rounded-full" />
@@ -152,15 +241,16 @@ function ProductDetail() {
 
           {/* Tab content */}
           <div className="p-8">
+
             {activeTab === 'details' && (
-              <div className="space-y-4">
+              <div className="space-y-1">
                 {[
-                  { label: 'Brand', value: product.brand },
+                  { label: 'Brand',    value: product.brand },
                   { label: 'Category', value: product.category?.replace(/_/g, ' ') },
-                  { label: 'Weight', value: product.weight ? `${product.weight}g` : 'N/A' },
-                  { label: 'Seller', value: product.sellerName },
-                  { label: 'Price', value: `$${product.price?.toFixed(2)}` },
-                  { label: 'Pricing', value: 'AI-Verified Fair Price' },
+                  { label: 'Weight',   value: product.weight ? `${product.weight}g` : 'N/A' },
+                  { label: 'Seller',   value: product.sellerName },
+                  { label: 'Price',    value: `$${product.price?.toFixed(2)}` },
+                  { label: 'Pricing',  value: 'AI-Verified Fair Price' },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center justify-between py-3 border-b border-[#FAF8F5] last:border-0">
                     <span className="text-[#6B6560] text-sm">{item.label}</span>
@@ -173,6 +263,26 @@ function ProductDetail() {
             {activeTab === 'history' && (
               <PriceHistoryChart history={DUMMY_HISTORY} />
             )}
+
+            {activeTab === 'specs' && (
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Category',  value: product.category?.replace(/_/g, ' ') },
+                  { label: 'Brand',     value: product.brand },
+                  { label: 'Weight',    value: product.weight ? `${product.weight}g` : 'N/A' },
+                  { label: 'Condition', value: 'New' },
+                  { label: 'Seller',    value: product.sellerName },
+                  { label: 'Photos',    value: product.photosQty ?? 0 },
+                  { label: 'Listed',    value: product.createdAt ? format(new Date(product.createdAt), 'MMM d, yyyy') : 'N/A' },
+                ].map((item, i) => (
+                  <div key={i} className="bg-[#FAF8F5] rounded-2xl p-4">
+                    <p className="text-[#6B6560] text-xs mb-1">{item.label}</p>
+                    <p className="text-[#1C1F2E] font-bold text-sm">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
           </div>
         </div>
       </div>
