@@ -1,10 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import SellerLayout from './layouts/SellerLayout'
 
 import Home from './pages/public/Home'
 import Login from './pages/public/Login'
@@ -22,6 +23,14 @@ import PricingDecision from './pages/seller/PricingDecision'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminRequests from './pages/admin/AdminRequests'
 
+const DefaultLayout = () => (
+  <>
+    <Navbar />
+    <Outlet />
+    <Footer />
+  </>
+)
+
 const Unauthorized = () => (
   <div className="min-h-screen flex items-center justify-center">
     <div className="text-center">
@@ -36,56 +45,51 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <ToastContainer position="top-right" autoClose={3000} />
-        <Navbar />
         <Routes>
-          {/* Public */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* Buyer */}
-          <Route path="/cart" element={
-            <ProtectedRoute role="BUYER"><Cart /></ProtectedRoute>
-          } />
-          <Route path="/wishlist" element={
-            <ProtectedRoute role="BUYER"><Wishlist /></ProtectedRoute>
-          } />
-          <Route path="/orders" element={
-            <ProtectedRoute role="BUYER"><Orders /></ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute><Profile /></ProtectedRoute>
-          } />
+          {/* Public + Buyer + Admin — share Navbar/Footer */}
+          <Route element={<DefaultLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* Seller */}
-          <Route path="/seller/dashboard" element={
-            <ProtectedRoute role="SELLER"><SellerDashboard /></ProtectedRoute>
-          } />
-          <Route path="/seller/products" element={
-            <ProtectedRoute role="SELLER"><SellerProducts /></ProtectedRoute>
-          } />
-          <Route path="/seller/products/new" element={
-            <ProtectedRoute role="SELLER"><ListProduct /></ProtectedRoute>
-          } />
-          <Route path="/seller/products/:id/decision" element={
-            <ProtectedRoute role="SELLER"><PricingDecision /></ProtectedRoute>
-          } />
+            <Route path="/cart" element={
+              <ProtectedRoute role="BUYER"><Cart /></ProtectedRoute>
+            } />
+            <Route path="/wishlist" element={
+              <ProtectedRoute role="BUYER"><Wishlist /></ProtectedRoute>
+            } />
+            <Route path="/orders" element={
+              <ProtectedRoute role="BUYER"><Orders /></ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute><Profile /></ProtectedRoute>
+            } />
 
-          {/* Admin */}
-          <Route path="/admin/dashboard" element={
-            <ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>
-          } />
-          <Route path="/admin/requests" element={
-            <ProtectedRoute role="ADMIN"><AdminRequests /></ProtectedRoute>
-          } />
+            <Route path="/admin/dashboard" element={
+              <ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>
+            } />
+            <Route path="/admin/requests" element={
+              <ProtectedRoute role="ADMIN"><AdminRequests /></ProtectedRoute>
+            } />
+          </Route>
 
-          {/* Fallback */}
+          {/* Seller — own layout with sidebar */}
+          <Route element={<ProtectedRoute role="SELLER" />}>
+            <Route element={<SellerLayout />}>
+              <Route path="/seller/dashboard" element={<SellerDashboard />} />
+              <Route path="/seller/products" element={<SellerProducts />} />
+              <Route path="/seller/products/new" element={<ListProduct />} />
+              <Route path="/seller/products/:id/decision" element={<PricingDecision />} />
+            </Route>
+          </Route>
+
           <Route path="*" element={<Navigate to="/" replace />} />
+
         </Routes>
-        <Footer />
       </BrowserRouter>
     </AuthProvider>
   )
