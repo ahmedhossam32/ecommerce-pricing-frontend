@@ -38,7 +38,6 @@ const statCards = [
 
 function SellerDashboard() {
   const { user } = useAuth()
-  const firstName = user?.name?.split(' ')[0] || 'Seller'
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -64,10 +63,24 @@ function SellerDashboard() {
       {/* ── DARK HEADER ───────────────────────────────────── */}
       <div className="bg-[#1C1F2E] py-10 px-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-extrabold text-white">
-            Welcome back, {firstName}
-          </h1>
-          <p className="text-[#C9A96E] text-sm mt-1">Here's how your store is performing today.</p>
+          <div className="flex items-center gap-4">
+            {/* Avatar */}
+            <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/20 bg-white/10 flex items-center justify-center shrink-0">
+              {user?.profilePicture ? (
+                <img src={user.profilePicture} className="w-full h-full object-cover" alt={user.name} />
+              ) : (
+                <span className="text-white text-xl font-bold">
+                  {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                </span>
+              )}
+            </div>
+            {/* Welcome text */}
+            <div>
+              <p className="text-[#C9A96E] text-sm font-medium">Welcome back,</p>
+              <p className="text-3xl font-extrabold text-white mt-1">{user?.name}</p>
+              <p className="text-gray-400 text-sm mt-1">Here's what's happening with your store.</p>
+            </div>
+          </div>
 
           {/* Quick store pills */}
           <div className="flex flex-wrap gap-3 mt-5">
