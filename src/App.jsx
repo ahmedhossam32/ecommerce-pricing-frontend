@@ -20,6 +20,7 @@ import SellerDashboard from './pages/seller/SellerDashboard'
 import SellerProducts from './pages/seller/SellerProducts'
 import ListProduct from './pages/seller/ListProduct'
 import PricingDecision from './pages/seller/PricingDecision'
+import SellerDecisions from './pages/seller/SellerDecisions'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminRequests from './pages/admin/AdminRequests'
 
@@ -84,6 +85,7 @@ function App() {
               <Route path="/seller/products" element={<SellerProducts />} />
               <Route path="/seller/products/new" element={<ListProduct />} />
               <Route path="/seller/products/:id/decision" element={<PricingDecision />} />
+              <Route path="/seller/decisions" element={<SellerDecisions />} />
             </Route>
           </Route>
 
