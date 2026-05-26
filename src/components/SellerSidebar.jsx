@@ -1,13 +1,14 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { FiPackage, FiPlus, FiTag, FiUser, FiLogOut } from 'react-icons/fi'
+import { FiGrid, FiPackage, FiPlus, FiTag, FiUser, FiLogOut } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
 
 const DRAFT_COUNT = 2
 
 const NAV_ITEMS = [
+  { to: '/seller/dashboard',    icon: FiGrid,    label: 'Dashboard',       end: true,  badge: null        },
   { to: '/seller/products',     icon: FiPackage, label: 'My Products',     end: false, badge: null        },
   { to: '/seller/products/new', icon: FiPlus,    label: 'List Product',    end: true,  badge: null        },
-  { to: '/seller/decisions',    icon: FiTag,     label: 'Price Decisions', end: true,  badge: DRAFT_COUNT },
+  { to: '/seller/decisions',    icon: FiTag,     label: 'Decisions',       end: true,  badge: DRAFT_COUNT },
   { to: '/profile',             icon: FiUser,    label: 'Profile',         end: true,  badge: null        },
 ]
 

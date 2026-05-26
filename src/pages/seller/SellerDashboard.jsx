@@ -5,6 +5,7 @@ import {
 } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { DUMMY_PRODUCTS } from '../../data/dummyData'
+import SellerProductRow from '../../components/seller/SellerProductRow'
 
 const DUMMY_STATS = {
   total: 12,
@@ -20,12 +21,6 @@ const RECENT_PRODUCTS = DUMMY_PRODUCTS.slice(0, 5).map((p, i) => ({
   status: ['LIVE', 'LIVE', 'PENDING_REVIEW', 'REJECTED', 'LIVE'][i],
 }))
 
-const statusConfig = {
-  LIVE:           { label: 'Live',           cls: 'bg-green-50 text-green-600 border-green-200'    },
-  PENDING_REVIEW: { label: 'Pending Review', cls: 'bg-yellow-50 text-yellow-600 border-yellow-200' },
-  DRAFT:          { label: 'Draft',          cls: 'bg-gray-50 text-gray-500 border-gray-200'        },
-  REJECTED:       { label: 'Rejected',       cls: 'bg-red-50 text-red-500 border-red-200'           },
-}
 
 const statCards = [
   { label: 'Total Products', value: DUMMY_STATS.total,    icon: FiPackage,     color: 'text-[#C9A96E]',  bg: 'bg-[#C9A96E]/10' },
@@ -42,7 +37,6 @@ const statCards = [
   },
 ]
 
-const fmtCat = cat => cat?.replace(/_/g, ' ') ?? ''
 
 function SellerDashboard() {
   const { user } = useAuth()
@@ -134,35 +128,10 @@ function SellerDashboard() {
               </Link>
             </div>
 
-            <div className="bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden">
-              {RECENT_PRODUCTS.map((product, idx) => {
-                const hasImage = product.imageUrls?.length > 0
-                const cfg = statusConfig[product.status] ?? statusConfig.DRAFT
-                return (
-                  <div
-                    key={product.productId}
-                    className={`flex items-center gap-4 px-5 py-4 hover:bg-[#FAF8F5] transition-colors ${
-                      idx !== RECENT_PRODUCTS.length - 1 ? 'border-b border-[#E8E0D5]' : ''
-                    }`}
-                  >
-                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#FAF8F5] border border-[#E8E0D5] shrink-0 flex items-center justify-center">
-                      {hasImage ? (
-                        <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <FiPackage className="w-5 h-5 text-[#C9A96E]" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[#1C1F2E] font-semibold text-sm leading-snug truncate">{product.name}</p>
-                      <p className="text-[#9E9590] text-xs mt-0.5">{product.brand} · {fmtCat(product.category)}</p>
-                    </div>
-                    <p className="text-[#1C1F2E] font-bold text-sm shrink-0">${product.price?.toFixed(2)}</p>
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border shrink-0 ${cfg.cls}`}>
-                      {cfg.label}
-                    </span>
-                  </div>
-                )
-              })}
+            <div className="flex flex-col gap-3">
+              {RECENT_PRODUCTS.map(product => (
+                <SellerProductRow key={product.productId} product={product} />
+              ))}
             </div>
           </div>
 
