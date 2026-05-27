@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { FiUpload, FiX, FiZap, FiCheckCircle, FiCircle, FiMessageSquare, FiTrendingUp, FiClock, FiAlertCircle } from 'react-icons/fi'
+import { FiUpload, FiX, FiZap, FiCheckCircle, FiCircle, FiMessageSquare, FiTrendingUp, FiClock, FiAlertCircle, FiPackage, FiTruck } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import Cropper from 'react-easy-crop'
 
@@ -174,10 +174,14 @@ function ListProduct() {
           <p className="text-xs text-[#9CA3AF] mb-4">Up to 5 images. First is thumbnail.</p>
 
           <label className="block cursor-pointer">
-            <div className="border-2 border-dashed border-[#E8E0D5] rounded-xl p-6 text-center hover:border-[#C9A96E] transition-colors bg-[#FAF8F5]">
-              <FiUpload className="w-6 h-6 text-[#C9A96E] mx-auto mb-2" />
-              <p className="text-xs font-semibold text-[#6B6560]">Click to upload</p>
-              <p className="text-[10px] text-[#9CA3AF] mt-1">JPG PNG max 5</p>
+            <div className="border-2 border-dashed border-[#E8E0D5] hover:border-[#C9A96E] rounded-2xl p-8 flex flex-col items-center gap-3 transition-colors bg-[#FAF8F5] hover:bg-[#FDF6EC] group">
+              <div className="w-10 h-10 bg-[#C9A96E]/10 rounded-xl flex items-center justify-center group-hover:bg-[#C9A96E]/20 transition-colors">
+                <FiUpload className="w-5 h-5 text-[#C9A96E]" />
+              </div>
+              <div className="text-center">
+                <p className="text-[#1C1F2E] font-semibold text-sm">Click to upload</p>
+                <p className="text-[#9E9590] text-xs mt-0.5">JPG, PNG — max 5 images</p>
+              </div>
             </div>
             <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
           </label>
@@ -217,71 +221,79 @@ function ListProduct() {
             </p>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
-              Product Name <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="text" name="name" value={form.name} onChange={handleChange}
-              placeholder="e.g. Sony WH-1000XM5 Headphones"
-              className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
-              Category <span className="text-red-400">*</span>
-            </label>
-            <select
-              name="category" value={form.category} onChange={handleChange}
-              className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
-            >
-              <option value="">Select a category...</option>
-              {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-            </select>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-[#6B6560]">
-                Description <span className="text-red-400">*</span>
-              </label>
-              <span className="text-[10px] text-[#9CA3AF]">{form.description.length} chars</span>
-            </div>
-            <textarea
-              name="description" value={form.description} onChange={handleChange}
-              placeholder="Describe your product in detail. Include the brand name — AI extracts it automatically."
-              className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors resize-none overflow-y-auto h-24"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white border border-[#E8E0D5] rounded-2xl p-5 space-y-4">
+            <h3 className="text-[#1C1F2E] font-bold text-sm flex items-center gap-2">
+              <FiPackage className="w-4 h-4 text-[#C9A96E]" /> Product Info
+            </h3>
             <div>
               <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
-                Weight (g) <span className="text-red-400">*</span>
+                Product Name <span className="text-red-400">*</span>
               </label>
               <input
-                type="number" name="weight" value={form.weight} onChange={handleChange}
-                placeholder="e.g. 250"
+                type="text" name="name" value={form.name} onChange={handleChange}
+                placeholder="e.g. Sony WH-1000XM5 Headphones"
                 className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
               />
-              <p className="text-[10px] text-[#9CA3AF] mt-1">Approximate weight in grams. Check the box or product manual.</p>
             </div>
             <div>
               <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
-                Shipping Cost <span className="text-red-400">*</span>
+                Category <span className="text-red-400">*</span>
               </label>
-              <input
-                type="number" name="freightValue" value={form.freightValue} onChange={handleChange}
-                placeholder="0 = free"
+              <select
+                name="category" value={form.category} onChange={handleChange}
                 className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
+              >
+                <option value="">Select a category...</option>
+                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-semibold text-[#6B6560]">
+                  Description <span className="text-red-400">*</span>
+                </label>
+                <span className="text-[10px] text-[#9CA3AF]">{form.description.length} chars</span>
+              </div>
+              <textarea
+                name="description" value={form.description} onChange={handleChange}
+                placeholder="Describe your product in detail. Include the brand name — AI extracts it automatically."
+                className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors resize-none overflow-y-auto h-24"
               />
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#E8E0D5] rounded-2xl p-5 space-y-4 mt-4">
+            <h3 className="text-[#1C1F2E] font-bold text-sm flex items-center gap-2">
+              <FiTruck className="w-4 h-4 text-[#C9A96E]" /> Shipping Details
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
+                  Weight (g) <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="number" name="weight" value={form.weight} onChange={handleChange}
+                  placeholder="e.g. 250"
+                  className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
+                />
+                <p className="text-[10px] text-[#9CA3AF] mt-1">Approximate weight in grams. Check the box or product manual.</p>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
+                  Shipping Cost <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="number" name="freightValue" value={form.freightValue} onChange={handleChange}
+                  placeholder="0 = free"
+                  className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Column 3: AI Preview Panel */}
-        <div className="bg-[#1C1F2E] rounded-2xl p-5 flex flex-col gap-4">
+        <div className={`bg-[#1C1F2E] rounded-2xl p-5 flex flex-col gap-4 border ${pricingResult?.confidence === 'HIGH' ? 'border-green-300 shadow-md shadow-green-100' : 'border-transparent'}`}>
           {pricingResult ? (
             <>
               {/* ── ACCEPTED SUCCESS SCREEN ── */}
@@ -340,28 +352,30 @@ function ListProduct() {
                   {/* Confidence Badge */}
                   <div>
                     {pricingResult.confidence === 'HIGH' && (
-                      <span className="inline-flex items-center gap-1.5 bg-green-500/20 text-green-400 text-xs font-bold px-3 py-1 rounded-full">
-                        <FiCheckCircle className="w-3 h-3" /> High Confidence
+                      <span className="inline-flex items-center gap-1.5 bg-green-50 text-green-600 border border-green-200 text-xs font-bold px-3 py-1.5 rounded-full">
+                        <FiCheckCircle className="w-3.5 h-3.5" /> High Confidence
                       </span>
                     )}
                     {pricingResult.confidence === 'MEDIUM' && (
-                      <span className="inline-flex items-center gap-1.5 bg-yellow-500/20 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full">
-                        <FiCheckCircle className="w-3 h-3" /> Medium Confidence
+                      <span className="inline-flex items-center gap-1.5 bg-yellow-50 text-yellow-600 border border-yellow-200 text-xs font-bold px-3 py-1.5 rounded-full">
+                        <FiAlertCircle className="w-3.5 h-3.5" /> Medium Confidence
                       </span>
                     )}
                     {pricingResult.confidence === 'LOW' && (
-                      <span className="inline-flex items-center gap-1.5 bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full">
-                        <FiCheckCircle className="w-3 h-3" /> Low Confidence
+                      <span className="inline-flex items-center gap-1.5 bg-red-50 text-red-500 border border-red-200 text-xs font-bold px-3 py-1.5 rounded-full">
+                        <FiAlertCircle className="w-3.5 h-3.5" /> Low Confidence
                       </span>
                     )}
                   </div>
 
                   {/* Brand */}
-                  <div className="flex items-center gap-2 text-xs text-white/50">
+                  <p className="text-xs text-[#9CA3AF] flex items-center gap-2">
                     <FiTrendingUp className="w-3.5 h-3.5 text-[#C9A96E]" />
                     Brand detected:
-                    <span className="text-white font-semibold">{pricingResult.brand}</span>
-                  </div>
+                    <span className="bg-[#C9A96E]/10 text-[#C9A96E] font-bold px-2 py-0.5 rounded-full text-xs border border-[#C9A96E]/20">
+                      {pricingResult.brand}
+                    </span>
+                  </p>
                   {pricingResult.confidence === 'HIGH' && (
                     <p className="text-green-400/60 text-[10px]">
                       ✓ AI is highly confident in this price — based on known market data
@@ -398,13 +412,13 @@ function ListProduct() {
                         <div className="flex flex-col gap-3">
                           <button
                             onClick={() => setAcceptMode(true)}
-                            className="w-full py-3 rounded-xl bg-[#C9A96E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#b8935a] transition-colors"
+                            className="w-full bg-[#C9A96E] hover:bg-[#b8935a] text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-base shadow-md shadow-[#C9A96E]/20"
                           >
                             <FiCheckCircle className="w-4 h-4" /> Accept Price
                           </button>
                           <button
                             onClick={() => setDisputeModalOpen(true)}
-                            className="w-full py-2.5 rounded-xl border border-white/20 text-white/70 text-sm font-semibold flex items-center justify-center gap-2 hover:border-white/40 hover:text-white transition-colors"
+                            className="w-full bg-white border-2 border-[#1C1F2E] hover:bg-[#1C1F2E] text-[#1C1F2E] hover:text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-base"
                           >
                             <FiMessageSquare className="w-4 h-4" /> Dispute Price
                           </button>

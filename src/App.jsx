@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import SellerLayout from './layouts/SellerLayout'
+import AdminLayout from './layouts/AdminLayout'
 
 import Home from './pages/public/Home'
 import Login from './pages/public/Login'
@@ -23,6 +24,7 @@ import PricingDecision from './pages/seller/PricingDecision'
 import SellerDecisions from './pages/seller/SellerDecisions'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminRequests from './pages/admin/AdminRequests'
+import AdminRequestDetail from './pages/admin/AdminRequestDetail'
 
 const DefaultLayout = () => (
   <>
@@ -70,12 +72,15 @@ function App() {
               <ProtectedRoute><Profile /></ProtectedRoute>
             } />
 
-            <Route path="/admin/dashboard" element={
-              <ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>
-            } />
-            <Route path="/admin/requests" element={
-              <ProtectedRoute role="ADMIN"><AdminRequests /></ProtectedRoute>
-            } />
+          </Route>
+
+          {/* Admin — own layout with sidebar */}
+          <Route element={<ProtectedRoute role="ADMIN" />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/requests" element={<AdminRequests />} />
+              <Route path="/admin/requests/:requestId" element={<AdminRequestDetail />} />
+            </Route>
           </Route>
 
           {/* Seller — own layout with sidebar */}
