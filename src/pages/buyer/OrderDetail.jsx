@@ -15,6 +15,9 @@ const categoryEmojis = {
 function OrderDetail() {
   const { orderId } = useParams()
   const [imgLoaded, setImgLoaded] = useState(false)
+  const [activeImg, setActiveImg] = useState(0)
+
+  const handleThumb = (i) => { setImgLoaded(false); setActiveImg(i) }
 
   // Dummy: find order by orderId match
   // When connecting backend: replace with useEffect calling GET /api/orders/:orderId
@@ -60,7 +63,8 @@ function OrderDetail() {
                     <div className="absolute inset-0 bg-gradient-to-br from-[#F5F0EA] to-[#EDE5D8] animate-pulse" />
                   )}
                   <img
-                    src={order.imageUrls[0]}
+                    key={activeImg}
+                    src={order.imageUrls[activeImg]}
                     alt={order.productName}
                     onLoad={() => setImgLoaded(true)}
                     className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
@@ -92,9 +96,17 @@ function OrderDetail() {
             {order.imageUrls?.length > 1 && (
               <div className="flex gap-2 overflow-x-auto scrollbar-none">
                 {order.imageUrls.map((url, i) => (
-                  <div key={i} className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#E8E0D5] shrink-0">
+                  <button
+                    key={i}
+                    onClick={() => handleThumb(i)}
+                    className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all duration-200 cursor-pointer ${
+                      i === activeImg
+                        ? 'border-[#1C1F2E] shadow-md scale-105'
+                        : 'border-[#E8E0D5] hover:border-[#C9A96E] opacity-70 hover:opacity-100'
+                    }`}
+                  >
                     <img src={url} alt={`${order.productName} ${i + 1}`} className="w-full h-full object-cover" />
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
