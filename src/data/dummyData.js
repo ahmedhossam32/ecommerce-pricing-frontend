@@ -23,6 +23,13 @@ export const DUMMY_PRODUCTS = [
   { productId: 12, name: 'Dyson V15 Vacuum',            category: 'health_beauty',            brand: 'Dyson',   price: 650,   sellerName: 'Home Essentials', weight: 3100, photosQty: 1, description: 'Laser dust detection with intelligent suction auto-adjustment.',              createdAt: '2026-05-09T10:00:00.000Z', imageUrls: [],                                      sellerProfilePictureUrl: null },
 ]
 
+export const DUMMY_ORDERS = [
+  { orderId: 1, ...DUMMY_PRODUCTS[0], productName: DUMMY_PRODUCTS[0].name, buyerName: 'Ahmed', price: DUMMY_PRODUCTS[0].price, createdAt: '2026-05-20T10:00:00.000Z', message: 'Order placed successfully' },
+  { orderId: 2, ...DUMMY_PRODUCTS[1], productName: DUMMY_PRODUCTS[1].name, buyerName: 'Ahmed', price: DUMMY_PRODUCTS[1].price, createdAt: '2026-05-18T14:00:00.000Z', message: 'Order placed successfully' },
+  { orderId: 3, ...DUMMY_PRODUCTS[5], productName: DUMMY_PRODUCTS[5].name, buyerName: 'Ahmed', price: DUMMY_PRODUCTS[5].price, createdAt: '2026-05-15T09:00:00.000Z', message: 'Order placed successfully' },
+  { orderId: 4, ...DUMMY_PRODUCTS[3], productName: DUMMY_PRODUCTS[3].name, buyerName: 'Ahmed', price: DUMMY_PRODUCTS[3].price, createdAt: '2026-05-10T16:00:00.000Z', message: 'Order placed successfully' },
+]
+
 export const preloadImages = () => {
   DUMMY_PRODUCTS.forEach(p => {
     p.imageUrls.forEach(src => {

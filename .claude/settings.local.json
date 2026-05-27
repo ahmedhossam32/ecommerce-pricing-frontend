@@ -15,7 +15,9 @@
       "Bash(git push *)",
       "Bash(npm install *)",
       "Bash(node -e \"require\\('date-fns'\\)\")",
-      "Bash(Test-Path \"e:\\\\Uni\\\\GP\\\\ecommerce-frontend\\\\src\\\\pages\\\\buyer\\\\Cart.jsx\")"
+      "Bash(Test-Path \"e:\\\\Uni\\\\GP\\\\ecommerce-frontend\\\\src\\\\pages\\\\buyer\\\\Cart.jsx\")",
+      "Bash(ls -la \"e:\\\\Uni\\\\GP\")",
+      "Read(//e/Uni/GP/**)"
     ]
   }
 }

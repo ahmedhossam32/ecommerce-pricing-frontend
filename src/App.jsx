@@ -14,6 +14,7 @@ import ProductDetail from './pages/buyer/ProductDetail'
 import Cart from './pages/buyer/Cart'
 import Wishlist from './pages/buyer/Wishlist'
 import Orders from './pages/buyer/Orders'
+import OrderDetail from './pages/buyer/OrderDetail'
 import Profile from './pages/buyer/Profile'
 import SellerDashboard from './pages/seller/SellerDashboard'
 import SellerProducts from './pages/seller/SellerProducts'
@@ -66,6 +67,9 @@ function App() {
             } />
             <Route path="/orders" element={
               <ProtectedRoute role="BUYER"><Orders /></ProtectedRoute>
+            } />
+            <Route path="/orders/:orderId" element={
+              <ProtectedRoute role="BUYER"><OrderDetail /></ProtectedRoute>
             } />
             <Route path="/profile" element={
               <ProtectedRoute><Profile /></ProtectedRoute>
