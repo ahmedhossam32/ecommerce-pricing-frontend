@@ -6,17 +6,17 @@ import { FiX, FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiAlertCircle } from 'rea
 import { FiTrendingUp } from 'react-icons/fi'
 // import { login as loginApi, register as registerApi } from '../api/auth'
 
-function AuthModal({ onClose }) {
+function AuthModal({ onClose, initialTab = 'login', initialRole = 'BUYER' }) {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [tab, setTab] = useState('login')
+  const [tab, setTab] = useState(initialTab)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
 
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   const [registerForm, setRegisterForm] = useState({
-    name: '', email: '', password: '', role: 'BUYER'
+    name: '', email: '', password: '', role: initialRole
   })
 
   useEffect(() => {

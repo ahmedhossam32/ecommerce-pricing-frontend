@@ -15,6 +15,10 @@ function Navbar() {
   const [accountOpen, setAccountOpen] = useState(false)
   const [avatarOpen, setAvatarOpen] = useState(false)
   const [authOpen, setAuthOpen] = useState(false)
+  const [authTab, setAuthTab] = useState('login')
+  const [authRole, setAuthRole] = useState('BUYER')
+  const openAuth = (tab = 'login', role = 'BUYER') => { setAuthTab(tab); setAuthRole(role); setAuthOpen(true) }
+  const closeAuth = () => { setAuthOpen(false); setAuthTab('login'); setAuthRole('BUYER') }
 
   const handleLogout = () => {
     logout()
@@ -53,13 +57,13 @@ function Navbar() {
                   {!user ? (
                     <>
                       <button
-                        onClick={() => { setAccountOpen(false); setAuthOpen(true) }}
+                        onClick={() => { setAccountOpen(false); openAuth() }}
                         className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs w-full text-left"
                       >
                         <FiUser className="w-3.5 h-3.5" /> Sign In
                       </button>
                       <button
-                        onClick={() => { setAccountOpen(false); setAuthOpen(true) }}
+                        onClick={() => { setAccountOpen(false); openAuth() }}
                         className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs w-full text-left"
                       >
                         <FiUser className="w-3.5 h-3.5" /> Create Account
@@ -222,7 +226,7 @@ function Navbar() {
                 </div>
               ) : (
                 <div className="relative group/wl">
-                  <button onClick={() => setAuthOpen(true)} className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
+                  <button onClick={() => openAuth('login')} className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
                     <FiHeart className="w-5 h-5" />
                   </button>
                   <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
@@ -245,7 +249,7 @@ function Navbar() {
                 </div>
               ) : (
                 <div className="relative group/ct">
-                  <button onClick={() => setAuthOpen(true)} className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
+                  <button onClick={() => openAuth('login')} className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
                     <FiShoppingCart className="w-5 h-5" />
                   </button>
                   <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
@@ -271,13 +275,13 @@ function Navbar() {
             {!user ? (
               <>
                 <button
-                  onClick={() => setAuthOpen(true)}
+                  onClick={() => openAuth('login')}
                   className="text-[#6B6560] hover:text-[#1C1F2E] text-sm transition-colors px-3 py-2"
                 >
                   Login
                 </button>
                 <button
-                  onClick={() => setAuthOpen(true)}
+                  onClick={() => openAuth('register', 'BUYER')}
                   className="bg-[#1C1F2E] hover:bg-[#2E3452] text-white text-sm px-5 py-2 rounded-full font-semibold transition-colors"
                 >
                   Sign Up
@@ -381,8 +385,8 @@ function Navbar() {
           <div className="pt-3 border-t border-[#E8E0D5] flex gap-4">
             {!user ? (
               <>
-                <button onClick={() => { setAuthOpen(true); setMobileOpen(false) }} className="text-[#6B6560] hover:text-[#1C1F2E]">Login</button>
-                <button onClick={() => { setAuthOpen(true); setMobileOpen(false) }} className="text-[#C9A96E] font-semibold">Sign Up</button>
+                <button onClick={() => { setMobileOpen(false); openAuth('login') }} className="text-[#6B6560] hover:text-[#1C1F2E]">Login</button>
+                <button onClick={() => { setMobileOpen(false); openAuth('register', 'BUYER') }} className="text-[#C9A96E] font-semibold">Sign Up</button>
               </>
             ) : (
               <button onClick={handleLogout} className="text-red-500 hover:text-red-600">Sign Out</button>
@@ -390,7 +394,7 @@ function Navbar() {
           </div>
         </div>
       )}
-      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
+      {authOpen && <AuthModal onClose={closeAuth} initialTab={authTab} initialRole={authRole} />}
     </header>
   )
 }

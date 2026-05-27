@@ -64,7 +64,7 @@ function ProductCard({ product }) {
 
   return (
     <Link to={`/products/${productId}`} className="block">
-    <div className="group bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden hover:shadow-xl hover:border-[#C9A96E]/50 transition-shadow duration-200 flex flex-col cursor-pointer">
+    <div className="group bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden hover:shadow-xl hover:border-[#C9A96E]/50 hover:-translate-y-1.5 hover:scale-[1.02] transition-all duration-300 flex flex-col cursor-pointer">
 
       {/* ── IMAGE AREA ─────────────────────────────────────── */}
       <div className={`relative overflow-hidden bg-gradient-to-br ${gradient}`} style={{ aspectRatio: '1 / 1' }}>

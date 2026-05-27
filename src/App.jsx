@@ -9,8 +9,6 @@ import SellerLayout from './layouts/SellerLayout'
 import AdminLayout from './layouts/AdminLayout'
 
 import Home from './pages/public/Home'
-import Login from './pages/public/Login'
-import Register from './pages/public/Register'
 import ProductsPage from './pages/public/ProductsPage'
 import ProductDetail from './pages/buyer/ProductDetail'
 import Cart from './pages/buyer/Cart'
@@ -54,8 +52,8 @@ function App() {
           {/* Public + Buyer + Admin — share Navbar/Footer */}
           <Route element={<DefaultLayout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/register" element={<Navigate to="/" replace />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/unauthorized" element={<Unauthorized />} />

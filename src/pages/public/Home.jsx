@@ -1,17 +1,51 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import AuthModal from '../../components/AuthModal'
 import heroIllustration from '../../assets/hero-illustration.png'
 import catPhones from '../../assets/cat-phones1.jpg'
 import catFashion from '../../assets/cat-fashion2.jpg'
 import catComputers from '../../assets/cat-computers.jpg'
 import catWatches from '../../assets/cat-watches1.jpg'
-import productPs5 from '../../assets/product-ps5.jpg'
-import productHeadphones from '../../assets/product-headphones1.jpg'
-import productBag from '../../assets/product-bag.jpg'
-import productWatch from '../../assets/product-watch.jpg'
-import { FiShield, FiTrendingUp, FiStar, FiArrowRight, FiPackage, FiHeart, FiShoppingCart } from 'react-icons/fi'
+import { FiShield, FiTrendingUp, FiStar, FiArrowRight, FiPackage, FiCheckCircle } from 'react-icons/fi'
+import ProductCard from '../../components/ProductCard'
+import { DUMMY_PRODUCTS } from '../../data/dummyData'
 
+
+function AnimatedCounter({ target, suffix = '', duration = 1500, delay = 800 }) {
+  const [count, setCount] = useState(0)
+  const [started, setStarted] = useState(false)
+
+  useEffect(() => {
+    const startTimer = setTimeout(() => {
+      setStarted(true)
+    }, delay)
+    return () => clearTimeout(startTimer)
+  }, [delay])
+
+  useEffect(() => {
+    if (!started) return
+    const steps = 40
+    const increment = target / steps
+    const interval = duration / steps
+    let current = 0
+    const timer = setInterval(() => {
+      current += increment
+      if (current >= target) {
+        setCount(target)
+        clearInterval(timer)
+      } else {
+        setCount(Math.floor(current))
+      }
+    }, interval)
+    return () => clearInterval(timer)
+  }, [started, target, duration])
+
+  return <span>{count}{suffix}</span>
+}
 
 function Home() {
+  const [authModal, setAuthModal] = useState(null)
+
     return (
         <div className="min-h-screen bg-[#FAF8F5] text-[#1C1F2E]">
 
@@ -19,72 +53,86 @@ function Home() {
             <section className="bg-[#1C1F2E] min-h-screen flex items-center relative overflow-hidden">
 
                 {/* Subtle background texture */}
-                <div className="absolute inset-0 opacity-5"
+                <div
+                    className="absolute inset-0 opacity-[0.04]"
                     style={{
-                        backgroundImage: `radial-gradient(circle at 25px 25px, #C9A96E 1px, transparent 0)`,
-                        backgroundSize: '50px 50px'
+                        backgroundImage: `
+                          linear-gradient(rgba(201,169,110,0.3) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(201,169,110,0.3) 1px, transparent 1px)
+                        `,
+                        backgroundSize: '60px 60px'
                     }}
                 />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#C9A96E] opacity-[0.04] rounded-full blur-3xl pointer-events-none" />
 
                 <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
 
                     {/* Left — Text */}
                     <div>
                         {/* Badge */}
-                        <div className="inline-flex items-center gap-2 border border-[#C9A96E]/30 bg-[#C9A96E]/10 text-[#C9A96E] text-xs px-4 py-2 rounded-full mb-8">
-                            <span className="w-1.5 h-1.5 bg-[#C9A96E] rounded-full animate-pulse" />
+                        <div className="inline-flex items-center gap-2.5 border border-[#C9A96E]/40 bg-[#C9A96E]/10 backdrop-blur-sm text-[#C9A96E] text-xs px-4 py-2 rounded-full mb-8 animate-fade-up animate-fade-up-1">
+                            <span className="w-1.5 h-1.5 bg-[#C9A96E] rounded-full animate-pulse shrink-0" />
                             AI-Verified Pricing — Every Product, Every Time
+                            <span className="bg-[#C9A96E]/20 text-[#C9A96E] text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                LIVE
+                            </span>
                         </div>
 
                         {/* Headline */}
-                        <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6 text-white">
+                        <h1 className="text-5xl lg:text-7xl font-bold leading-tight mb-6 text-white animate-fade-up animate-fade-up-2">
                             Shop Smart.
                             <br />
                             <span className="text-[#C9A96E]">Price Fair.</span>
                         </h1>
 
                         {/* Subtext */}
-                        <p className="text-gray-400 text-lg leading-relaxed mb-10 max-w-lg">
+                        <p className="text-gray-400 text-lg leading-relaxed mb-10 max-w-lg animate-fade-up animate-fade-up-3">
                             DynaMart is a marketplace where every price is transparent,
                             AI-verified, and fair. Buyers trust every listing.
                             Sellers reach real customers.
                         </p>
 
                         {/* Buttons */}
-                        <div className="flex flex-wrap gap-4 mb-12">
+                        <div className="flex flex-wrap gap-4 mb-12 animate-fade-up animate-fade-up-4">
                             <Link
                                 to="/products"
-                                className="flex items-center gap-2 bg-white text-[#1C1F2E] hover:bg-gray-100 px-8 py-3.5 rounded-full font-semibold text-sm transition-colors duration-200"
+                                className="flex items-center gap-2 bg-white text-[#1C1F2E] hover:bg-gray-50 px-8 py-3.5 rounded-full font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-white/10 hover:-translate-y-0.5"
                             >
                                 Start Shopping <FiArrowRight className="w-4 h-4" />
                             </Link>
-                            <Link
-                                to="/register"
-                                className="flex items-center gap-2 border border-[#C9A96E]/40 hover:border-[#C9A96E] text-[#C9A96E] px-8 py-3.5 rounded-full font-semibold text-sm transition-colors duration-200"
+                            <button
+                                onClick={() => setAuthModal({ tab: 'register', role: 'SELLER' })}
+                                className="flex items-center gap-2 border border-[#C9A96E]/50 hover:border-[#C9A96E] hover:bg-[#C9A96E]/10 text-[#C9A96E] px-8 py-3.5 rounded-full font-semibold text-sm transition-all duration-200 hover:-translate-y-0.5"
                             >
                                 Sell With Us
-                            </Link>
+                            </button>
                         </div>
 
                         {/* Stats row */}
-                        <div className="flex gap-10 pt-8 border-t border-gray-800 mt-6">
+                        <div className="flex gap-10 pt-8 border-t border-gray-800 mt-6 animate-fade-up animate-fade-up-5">
                             <div>
-                                <p className="text-2xl font-bold text-white">10K+</p>
+                                <p className="text-2xl font-bold text-white">
+                                    <AnimatedCounter target={10} suffix="K+" delay={900} />
+                                </p>
                                 <p className="text-gray-500 text-xs mt-1">Products Listed</p>
                             </div>
                             <div className="border-l border-gray-800 pl-10">
-                                <p className="text-2xl font-bold text-white">500+</p>
+                                <p className="text-2xl font-bold text-white">
+                                    <AnimatedCounter target={500} suffix="+" delay={1000} />
+                                </p>
                                 <p className="text-gray-500 text-xs mt-1">Verified Sellers</p>
                             </div>
                             <div className="border-l border-gray-800 pl-10">
-                                <p className="text-2xl font-bold text-white">100%</p>
+                                <p className="text-2xl font-bold text-white">
+                                    <AnimatedCounter target={100} suffix="%" delay={1100} />
+                                </p>
                                 <p className="text-gray-500 text-xs mt-1">Fair Pricing</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Right — Illustration */}
-                    <div className="hidden lg:flex items-center justify-center py-8 relative">
+                    <div className="hidden lg:flex items-center justify-center py-8 relative animate-fade-up animate-fade-up-3">
                         <div className="absolute w-96 h-96 bg-[#C9A96E] opacity-5 rounded-full blur-3xl" />
                         <img
                             src={heroIllustration}
@@ -96,16 +144,16 @@ function Home() {
                 </div>
 
                 {/* Scroll indicator */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-600">
-                    <p className="text-xs">Scroll to explore</p>
-                    <div className="w-5 h-8 border border-gray-700 rounded-full flex items-start justify-center pt-1.5">
-                        <div className="w-1 h-2 bg-gray-600 rounded-full animate-bounce" />
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-600 animate-fade-up animate-fade-up-5">
+                    <p className="text-xs tracking-widest uppercase">Scroll</p>
+                    <div className="w-5 h-9 border border-gray-700 rounded-full flex items-start justify-center pt-2">
+                        <div className="w-1 h-2 bg-[#C9A96E] rounded-full animate-bounce opacity-60" />
                     </div>
                 </div>
             </section>
 
             {/* ── CATEGORIES ───────────────────────────────────────── */}
-            <section className="py-20 bg-[#FAF8F5]">
+            <section className="pt-12 pb-20 bg-[#FAF8F5]">
                 <div className="max-w-7xl mx-auto px-6">
 
                     {/* Header */}
@@ -124,14 +172,14 @@ function Home() {
                     {/* Category Cards Grid */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
-                            { image: catPhones, label: 'Phones & Tablets', subtitle: 'Latest devices', count: '1,200+ products' },
-                            { image: catFashion, label: 'Fashion', subtitle: 'Shoes & Clothing', count: '3,400+ products' },
-                            { image: catComputers, label: 'Computers', subtitle: 'Laptops & Accessories', count: '800+ products' },
-                            { image: catWatches, label: 'Watches', subtitle: 'Luxury & Casual', count: '600+ products' },
+                            { image: catPhones,    label: 'Phones & Tablets', subtitle: 'Latest devices',        count: '1,200+ products', category: 'telephony'    },
+                            { image: catFashion,   label: 'Fashion',           subtitle: 'Shoes & Clothing',      count: '3,400+ products', category: 'fashion_shoes' },
+                            { image: catComputers, label: 'Computers',         subtitle: 'Laptops & Accessories', count: '800+ products',   category: 'computers'    },
+                            { image: catWatches,   label: 'Watches',           subtitle: 'Luxury & Casual',       count: '600+ products',   category: 'watches_gifts' },
                         ].map((cat, i) => (
                             <Link
                                 key={i}
-                                to="/products"
+                                to={`/products?category=${cat.category}`}
                                 className="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer"
                             >
                                 <img
@@ -169,7 +217,7 @@ function Home() {
             </section>
 
             {/* ── FEATURED PRODUCTS ────────────────────────────────── */}
-            <section className="py-20 bg-white">
+            <section className="pt-8 pb-20 bg-white">
                 <div className="max-w-7xl mx-auto px-6">
 
                     {/* Header */}
@@ -187,51 +235,8 @@ function Home() {
 
                     {/* Products Grid */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                            { image: productPs5, name: 'PlayStation 5 Console', category: 'Gaming', price: '$499', badge: 'Popular', badgeColor: 'bg-blue-50 text-blue-600', imgClass: '' },
-                            { image: productHeadphones, name: 'Sony WH-1000XM5', category: 'Audio', price: '$280', badge: 'Top Rated', badgeColor: 'bg-green-50 text-green-600', imgClass: '' },
-                            { image: productBag, name: 'Premium Leather Bag', category: 'Fashion', price: '$320', badge: 'New', badgeColor: 'bg-[#FAF8F5] text-[#C9A96E]', imgClass: '' },
-                            { image: productWatch, name: 'Apple Watch Series 10', category: 'Watches', price: '$399', badge: 'Trending', badgeColor: 'bg-purple-50 text-purple-600', imgClass: '' },
-                        ].map((product, i) => (
-                            <div
-                                key={i}
-                                className="group bg-[#FAF8F5] rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
-                            >
-                                {/* Image container */}
-                                <div className="relative overflow-hidden aspect-square bg-white">
-                                    <img
-                                        src={product.image}
-                                        alt={product.name}
-                                        className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${product.imgClass}`}
-                                    />
-                                    <div className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full ${product.badgeColor}`}>
-                                        {product.badge}
-                                    </div>
-                                    <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
-                                        <button className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#1C1F2E] hover:text-white transition-colors">
-                                            <FiHeart className="w-3.5 h-3.5" />
-                                        </button>
-                                        <button className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#1C1F2E] hover:text-white transition-colors">
-                                            <FiShoppingCart className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Product info */}
-                                <div className="p-4">
-                                    <p className="text-[#C9A96E] text-xs font-medium mb-1">{product.category}</p>
-                                    <h3 className="text-[#1C1F2E] font-semibold text-sm mb-2 leading-tight">{product.name}</h3>
-                                    <div className="flex items-center justify-between">
-                                        <p className="text-[#1C1F2E] font-bold text-lg">{product.price}</p>
-                                        <Link
-                                            to="/products"
-                                            className="text-xs text-[#6B6560] hover:text-[#1C1F2E] flex items-center gap-1 transition-colors"
-                                        >
-                                            View <FiArrowRight className="w-3 h-3" />
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
+                        {DUMMY_PRODUCTS.slice(0, 4).map(product => (
+                            <ProductCard key={product.productId} product={product} />
                         ))}
                     </div>
 
@@ -239,7 +244,7 @@ function Home() {
                     <div className="text-center mt-10">
                         <Link
                             to="/products"
-                            className="inline-flex items-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] text-white px-8 py-3 rounded-full font-semibold text-sm transition-colors duration-200"
+                            className="inline-flex items-center gap-2 border border-[#1C1F2E] text-[#1C1F2E] hover:bg-[#1C1F2E] hover:text-white px-8 py-3 rounded-full font-semibold text-sm transition-all duration-200"
                         >
                             View All Products <FiArrowRight className="w-4 h-4" />
                         </Link>
@@ -248,7 +253,7 @@ function Home() {
             </section>
 
             {/* ── WHY SHOP WITH US ─────────────────────────────────── */}
-            <section className="py-20 bg-[#FAF8F5]">
+            <section className="pt-8 pb-20 bg-[#FAF8F5]">
               <div className="max-w-7xl mx-auto px-6">
 
                 {/* Header */}
@@ -289,9 +294,9 @@ function Home() {
                   ].map((f, i) => (
                     <div
                       key={i}
-                      className="bg-white rounded-2xl p-8 border border-[#E8E0D5] hover:shadow-lg hover:border-[#C9A96E]/30 transition-all duration-300 group"
+                      className="bg-white rounded-2xl p-8 border border-[#E8E0D5] hover:shadow-lg hover:border-[#C9A96E]/30 hover:-translate-y-1 transition-all duration-300 group"
                     >
-                      <div className={`w-12 h-12 ${f.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                      <div className={`w-14 h-14 ${f.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                         {f.icon}
                       </div>
                       <h3 className="text-[#1C1F2E] font-bold text-lg mb-3">{f.title}</h3>
@@ -301,16 +306,17 @@ function Home() {
                 </div>
 
                 {/* Bottom stats strip */}
-                <div className="bg-[#1C1F2E] rounded-3xl p-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div className="bg-[#1C1F2E] rounded-3xl p-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                   {[
-                    { value: '10K+', label: 'Products Listed' },
-                    { value: '500+', label: 'Verified Sellers' },
-                    { value: '50K+', label: 'Happy Buyers' },
-                    { value: '100%', label: 'Fair Pricing' },
+                    { value: '10K+',  label: 'Products Listed'  },
+                    { value: '500+',  label: 'Verified Sellers' },
+                    { value: '50K+',  label: 'Happy Buyers'     },
+                    { value: '100%',  label: 'Fair Pricing'     },
                   ].map((stat, i) => (
-                    <div key={i}>
-                      <p className="text-2xl font-bold text-[#C9A96E] mb-1">{stat.value}</p>
-                      <p className="text-gray-400 text-xs">{stat.label}</p>
+                    <div key={i} className="flex flex-col items-center gap-1">
+                      <p className="text-3xl font-extrabold text-[#C9A96E]">{stat.value}</p>
+                      <div className="w-8 h-0.5 bg-[#C9A96E]/30 rounded-full my-1" />
+                      <p className="text-gray-400 text-xs uppercase tracking-widest">{stat.label}</p>
                     </div>
                   ))}
                 </div>
@@ -319,7 +325,7 @@ function Home() {
             </section>
 
             {/* ── FOR SELLERS ──────────────────────────────────────── */}
-            <section className="py-20 bg-white">
+            <section className="pt-8 pb-20 bg-white">
               <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
@@ -356,12 +362,12 @@ function Home() {
                       ))}
                     </div>
 
-                    <Link
-                      to="/register"
+                    <button
+                      onClick={() => setAuthModal({ tab: 'register', role: 'SELLER' })}
                       className="inline-flex items-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] text-white px-7 py-3.5 rounded-full font-semibold text-sm transition-colors duration-200"
                     >
                       Become a Seller <FiArrowRight className="w-4 h-4" />
-                    </Link>
+                    </button>
                   </div>
 
                   {/* Right — Dashboard Mockup */}
@@ -425,31 +431,62 @@ function Home() {
             </section>
 
             {/* ── CTA ──────────────────────────────────────────────── */}
-            <section className="py-24 bg-[#FAF8F5]">
-                <div className="max-w-3xl mx-auto px-6 text-center">
-                    <h2 className="text-4xl lg:text-5xl font-bold text-[#1C1F2E] mb-4 leading-tight">
-                        Ready to start?
-                    </h2>
-                    <p className="text-[#6B6560] mb-10 text-lg">
-                        Join thousands of buyers and sellers on the fairest marketplace online.
-                    </p>
-                    <div className="flex flex-wrap gap-4 justify-center">
-                        <Link
-                            to="/products"
-                            className="flex items-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] text-white px-8 py-4 rounded-full font-semibold text-sm transition-colors"
-                        >
-                            Browse Products <FiArrowRight className="w-4 h-4" />
-                        </Link>
-                        <Link
-                            to="/register"
-                            className="flex items-center gap-2 border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#1C1F2E] px-8 py-4 rounded-full font-semibold text-sm transition-colors"
-                        >
-                            Create Account
-                        </Link>
-                    </div>
+            <section className="py-20 bg-[#1C1F2E]">
+              <div className="max-w-3xl mx-auto px-6 text-center">
+
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 border border-[#C9A96E]/30 bg-[#C9A96E]/10 text-[#C9A96E] text-xs px-4 py-2 rounded-full mb-6">
+                  <span className="w-1.5 h-1.5 bg-[#C9A96E] rounded-full animate-pulse" />
+                  Join DynaMart Today
                 </div>
+
+                <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+                  Ready to start?
+                </h2>
+                <p className="text-gray-400 mb-10 text-lg">
+                  Join thousands of buyers and sellers on the fairest marketplace online.
+                </p>
+
+                {/* Buttons */}
+                <div className="flex flex-wrap gap-4 justify-center mb-10">
+                  <Link
+                    to="/products"
+                    className="flex items-center gap-2 bg-white text-[#1C1F2E] hover:bg-gray-100 px-8 py-4 rounded-full font-semibold text-sm transition-colors hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
+                  >
+                    Browse Products <FiArrowRight className="w-4 h-4" />
+                  </Link>
+                  <button
+                    onClick={() => setAuthModal({ tab: 'register', role: 'BUYER' })}
+                    className="flex items-center gap-2 border border-[#C9A96E]/50 hover:border-[#C9A96E] hover:bg-[#C9A96E]/10 text-[#C9A96E] px-8 py-4 rounded-full font-semibold text-sm transition-all duration-200 hover:-translate-y-0.5"
+                  >
+                    Create Account
+                  </button>
+                </div>
+
+                {/* Trust indicators */}
+                <div className="flex flex-wrap items-center justify-center gap-8 pt-8 border-t border-white/10">
+                  {[
+                    { icon: FiCheckCircle, text: 'Free to join' },
+                    { icon: FiShield,      text: 'AI-verified prices' },
+                    { icon: FiStar,        text: 'No hidden fees' },
+                  ].map(({ icon: Icon, text }) => (
+                    <div key={text} className="flex items-center gap-2 text-gray-400 text-sm">
+                      <Icon className="w-4 h-4 text-[#C9A96E] shrink-0" />
+                      {text}
+                    </div>
+                  ))}
+                </div>
+
+              </div>
             </section>
 
+        {authModal && (
+          <AuthModal
+            onClose={() => setAuthModal(null)}
+            initialTab={authModal.tab}
+            initialRole={authModal.role}
+          />
+        )}
         </div>
     )
 }
