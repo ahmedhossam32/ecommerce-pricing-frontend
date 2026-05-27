@@ -27,11 +27,27 @@ function Cart() {
     <div className="min-h-screen bg-[#FAF8F5]">
 
       {/* ── HEADER ──────────────────────────────────────────── */}
-      <div className="bg-[#1C1F2E] py-10 px-6">
-        <div className="max-w-7xl mx-auto">
-          <BackButton label="Continue Shopping" />
-          <h1 className="text-3xl font-extrabold text-white">My Cart</h1>
-          <p className="text-[#C9A96E] mt-1">{cartItems.length} items</p>
+      <div className="bg-[#1C1F2E] py-6 px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div>
+            <BackButton label="Continue Shopping" />
+            <div className="flex items-center gap-3 mt-2">
+              <h1 className="text-2xl font-extrabold text-white">My Cart</h1>
+              {cartItems.length > 0 && (
+                <span className="bg-[#C9A96E]/20 text-[#C9A96E] text-xs font-bold px-2.5 py-1 rounded-full border border-[#C9A96E]/30">
+                  {cartItems.length} items
+                </span>
+              )}
+            </div>
+          </div>
+          {cartItems.length > 0 && (
+            <button
+              onClick={() => setCartItems([])}
+              className="flex items-center gap-2 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-4 py-2 rounded-full transition-all font-medium"
+            >
+              <FiTrash2 className="w-3.5 h-3.5" /> Clear Cart
+            </button>
+          )}
         </div>
       </div>
 
@@ -60,15 +76,6 @@ function Cart() {
 
               /* Items list */
               <div>
-                <div className="flex justify-end mb-4">
-                  <button
-                    onClick={() => setCartItems([])}
-                    className="flex items-center gap-2 text-xs text-[#6B6560] hover:text-[#1C1F2E] border border-[#E8E0D5] hover:border-[#1C1F2E] px-4 py-2 rounded-full transition-all font-medium"
-                  >
-                    <FiTrash2 className="w-3.5 h-3.5" /> Clear Cart
-                  </button>
-                </div>
-
                 <div className="flex flex-col gap-4">
                   {cartItems.map(item => {
                     const emoji = categoryEmojis[item.category] || categoryEmojis.default
@@ -81,7 +88,7 @@ function Cart() {
                       >
                         <Link to={`/products/${item.productId}`} className="flex gap-4 items-start flex-1 hover:opacity-80 transition-opacity">
                           {/* Image */}
-                          <div className="w-24 h-24 rounded-xl overflow-hidden bg-[#FAF8F5] shrink-0 flex items-center justify-center">
+                          <div className="w-20 h-20 rounded-xl overflow-hidden bg-[#FAF8F5] shrink-0 flex items-center justify-center">
                             {hasImage ? (
                               <img
                                 src={item.imageUrls[0]}
@@ -125,7 +132,9 @@ function Cart() {
                           <p className="text-[#1C1F2E] font-extrabold text-lg leading-none">
                             ${item.price?.toFixed(2)}
                           </p>
-                          <p className="text-[#9E9590] text-[10px] mt-0.5">Fair Price</p>
+                          <span className="inline-flex items-center gap-1 text-[#C9A96E] text-[9px] font-bold bg-[#C9A96E]/10 border border-[#C9A96E]/20 px-2 py-0.5 rounded-full mt-1">
+                            ✦ AI Verified
+                          </span>
                           <div className="flex items-center gap-2 mt-2">
                             {/* Move to Wishlist */}
                             <div className="relative group/move">
@@ -163,48 +172,60 @@ function Cart() {
 
           {/* ── RIGHT — Order Summary ──────────────────────────── */}
           <div className="sticky top-24 self-start">
-            <div className="bg-white border border-[#E8E0D5] rounded-3xl p-6">
-              <h2 className="text-lg font-bold text-[#1C1F2E] mb-6">Order Summary</h2>
+            <div className="bg-white border border-[#E8E0D5] rounded-3xl overflow-hidden">
 
-              {/* Per-item list */}
-              <div>
-                {cartItems.map(item => (
-                  <div key={item.cartItemId} className="flex justify-between text-sm py-2 border-b border-[#FAF8F5] last:border-0">
-                    <span className="text-[#6B6560] truncate max-w-[160px]">{item.name}</span>
-                    <span className="text-[#1C1F2E] font-semibold ml-2 shrink-0">${item.price?.toFixed(2)}</span>
-                  </div>
-                ))}
+              {/* Summary header */}
+              <div className="bg-[#1C1F2E] px-6 py-4">
+                <h2 className="text-white font-extrabold text-base">Order Summary</h2>
+                <p className="text-gray-400 text-xs mt-0.5">{cartItems.length} item{cartItems.length !== 1 ? 's' : ''} in your cart</p>
               </div>
 
-              {/* Totals */}
-              <div className="flex justify-between text-sm font-medium text-[#1C1F2E] mt-4">
-                <span>Subtotal ({cartItems.length} items)</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-xs text-[#6B6560] mt-2">
-                <span>Shipping</span>
-                <span>Calculated at checkout</span>
-              </div>
+              <div className="p-6">
+                {/* Per-item list */}
+                <div className="space-y-2 mb-4">
+                  {cartItems.map(item => (
+                    <div key={item.cartItemId} className="flex justify-between text-sm py-1.5">
+                      <span className="text-[#6B6560] truncate max-w-[160px] text-xs">{item.name}</span>
+                      <span className="text-[#1C1F2E] font-bold ml-2 shrink-0 text-xs">${item.price?.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
 
-              {/* AI pricing note */}
-              <div className="mt-3 bg-[#FAF8F5] rounded-xl p-3 text-xs text-[#6B6560] flex gap-2">
-                <FiTrendingUp className="w-3.5 h-3.5 text-[#C9A96E] shrink-0 mt-0.5" />
-                <span>Every price has been verified by our AI engine to be fair and competitive.</span>
+                {/* Divider */}
+                <div className="h-px bg-gradient-to-r from-[#C9A96E]/30 via-[#E8E0D5] to-transparent mb-4" />
+
+                {/* Subtotal */}
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[#1C1F2E] font-bold text-sm">Subtotal</span>
+                  <span className="text-[#1C1F2E] font-extrabold text-xl">${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-[#9E9590] mb-4">
+                  <span>Shipping</span>
+                  <span>Calculated at checkout</span>
+                </div>
+
+                {/* AI pricing note */}
+                <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3 flex gap-2 mb-5">
+                  <FiTrendingUp className="w-3.5 h-3.5 text-[#C9A96E] shrink-0 mt-0.5" />
+                  <span className="text-xs text-[#6B6560]">
+                    All prices are AI-verified to be fair. What you see is what you pay.
+                  </span>
+                </div>
+
+                {/* Checkout button */}
+                <button
+                  onClick={() => toast.success('Order placed! (dummy)')}
+                  disabled={cartItems.length === 0}
+                  className="w-full bg-[#C9A96E] hover:bg-[#b8935a] active:scale-[0.98] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm transition-all shadow-lg shadow-[#C9A96E]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FiZap className="w-4 h-4" />
+                  Checkout — ${subtotal.toFixed(2)}
+                </button>
+
+                <p className="text-center text-xs text-[#9E9590] mt-3 leading-relaxed">
+                  🔒 Secure checkout · AI-fair pricing guaranteed
+                </p>
               </div>
-
-              {/* Checkout button */}
-              <button
-                onClick={() => toast.success('Order placed! (dummy)')}
-                disabled={cartItems.length === 0}
-                className="mt-6 w-full bg-[#C9A96E] hover:bg-[#b8935a] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <FiZap className="w-4 h-4" />
-                Checkout ({cartItems.length} items)
-              </button>
-
-              <p className="text-center text-xs text-[#9E9590] mt-3">
-                Each product is purchased separately per our marketplace model.
-              </p>
             </div>
           </div>
 
