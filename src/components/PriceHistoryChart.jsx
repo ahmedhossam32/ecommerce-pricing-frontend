@@ -36,6 +36,29 @@ function PriceHistoryChart({ history }) {
   const minPrice = Math.min(...prices)
   const maxPrice = Math.max(...prices)
   const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length
+  const padding = (maxPrice - minPrice) * 0.3 || 50
+  const yMin = Math.floor((minPrice - padding) / 50) * 50
+  const yMax = Math.ceil((maxPrice + padding) / 50) * 50
+
+  const getEventColor = (event) => {
+    if (!event) return '#C9A96E'
+    const e = event.toLowerCase()
+    if (e.includes('seller'))   return '#C9A96E'
+    if (e.includes('approved')) return '#3B82F6'
+    if (e.includes('override')) return '#F97316'
+    if (e.includes('rejected')) return '#EF4444'
+    return '#C9A96E'
+  }
+
+  const getEventBadge = (event) => {
+    if (!event) return null
+    const e = event.toLowerCase()
+    if (e.includes('seller'))   return { label: 'Seller',   color: 'bg-[#C9A96E]/10 text-[#C9A96E] border-[#C9A96E]/20' }
+    if (e.includes('approved')) return { label: 'Admin',    color: 'bg-blue-50 text-blue-600 border-blue-200' }
+    if (e.includes('override')) return { label: 'Override', color: 'bg-orange-50 text-orange-600 border-orange-200' }
+    if (e.includes('rejected')) return { label: 'Rejected', color: 'bg-red-50 text-red-500 border-red-200' }
+    return null
+  }
 
   return (
     <div>
@@ -64,10 +87,11 @@ function PriceHistoryChart({ history }) {
             tickLine={false}
           />
           <YAxis
+            domain={[yMin, yMax]}
             tick={{ fontSize: 11, fill: '#6B6560' }}
             axisLine={false}
             tickLine={false}
-            tickFormatter={v => `$${v}`}
+            tickFormatter={v => `$${v.toLocaleString()}`}
             width={55}
           />
           <Tooltip content={<CustomTooltip />} />
@@ -93,8 +117,19 @@ function PriceHistoryChart({ history }) {
         {history.map((h, i) => (
           <div key={i} className="flex items-center justify-between text-xs py-2 border-b border-[#E8E0D5] last:border-0">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#C9A96E]" />
+              <span
+                className="w-2 h-2 rounded-full shrink-0 mt-0.5"
+                style={{ backgroundColor: getEventColor(h.event) }}
+              />
               <span className="text-[#6B6560]">{h.event}</span>
+              {(() => {
+                const badge = getEventBadge(h.event)
+                return badge ? (
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${badge.color} ml-1.5`}>
+                    {badge.label}
+                  </span>
+                ) : null
+              })()}
             </div>
             <div className="flex items-center gap-4">
               <span className="text-[#1C1F2E] font-semibold">${h.price?.toFixed(2)}</span>
