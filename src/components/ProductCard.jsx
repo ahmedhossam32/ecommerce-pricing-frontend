@@ -25,7 +25,7 @@ const categoryGradients = {
   default: 'from-[#FAF8F5] via-[#F5F0EA] to-[#EDE5D8]',
 }
 
-function ProductCard({ product }) {
+function ProductCard({ product, confidence = 'HIGH' }) {
   const { productId, name, category, brand, price, sellerName, createdAt, imageUrls, sellerProfilePictureUrl } = product
   const [imgIndex, setImgIndex] = useState(0)
   const [imgLoaded, setImgLoaded] = useState(false)
@@ -64,7 +64,7 @@ function ProductCard({ product }) {
 
   return (
     <Link to={`/products/${productId}`} className="block">
-    <div className="group bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden hover:shadow-xl hover:border-[#C9A96E]/50 hover:-translate-y-1.5 hover:scale-[1.02] transition-all duration-300 flex flex-col cursor-pointer">
+    <div className="group bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden hover:shadow-xl hover:border-[#C9A96E]/50 hover:border-l-[#C9A96E] hover:-translate-y-1.5 hover:scale-[1.02] transition-all duration-300 flex flex-col cursor-pointer">
 
       {/* ── IMAGE AREA ─────────────────────────────────────── */}
       <div className={`relative overflow-hidden bg-gradient-to-br ${gradient}`} style={{ aspectRatio: '1 / 1' }}>
@@ -114,14 +114,26 @@ function ProductCard({ product }) {
           </>
         )}
 
-        {/* New badge */}
-        {isNew && (
-          <div className="absolute top-3 left-3">
-            <span className="bg-[#1C1F2E] text-[#C9A96E] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+        {/* New badge + Confidence pill (stacked top-left) */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+          {isNew && (
+            <span className="self-start bg-[#1C1F2E] text-[#C9A96E] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
               New
             </span>
-          </div>
-        )}
+          )}
+          <span className={`self-start inline-flex items-center gap-1 bg-white/95 backdrop-blur-sm text-[10px] font-semibold px-2 py-0.5 rounded-full border border-white/40 shadow-sm ${
+            confidence === 'HIGH' ? 'text-green-700' :
+            confidence === 'MEDIUM' ? 'text-yellow-700' :
+            'text-blue-700'
+          }`}>
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+              confidence === 'HIGH' ? 'bg-green-500' :
+              confidence === 'MEDIUM' ? 'bg-yellow-400' :
+              'bg-blue-500'
+            }`} />
+            {confidence === 'LOW' ? 'Admin Set' : 'AI Priced'}
+          </span>
+        </div>
 
         {/* Wishlist button */}
         <div className="absolute top-3 right-3 group/wish">
@@ -160,40 +172,49 @@ function ProductCard({ product }) {
         </p>
 
         {/* Name */}
-        <h3 className="text-[#1C1F2E] font-bold text-sm leading-snug mb-1.5 line-clamp-2 flex-1 group-hover:text-[#2E3452] transition-colors">
+        <h3 className="text-[#1C1F2E] font-bold text-sm leading-snug mb-2 line-clamp-2 flex-1 group-hover:text-[#2E3452] transition-colors">
           {name}
         </h3>
 
-        {/* Seller */}
-        <div className="flex items-center gap-2 mb-3">
-          {sellerProfilePictureUrl ? (
-            <img src={sellerProfilePictureUrl} alt={sellerName} className="w-5 h-5 rounded-full object-cover border border-[#E8E0D5] shrink-0" />
-          ) : (
-            <div className="w-5 h-5 rounded-full bg-[#C9A96E]/20 text-[#C9A96E] text-[9px] font-bold flex items-center justify-center shrink-0">
-              {sellerName?.[0]?.toUpperCase()}
-            </div>
-          )}
-          <p className="text-[#9E9590] text-xs truncate">
-            {brand}<span className="text-[#C9A96E]/70"> · {sellerName}</span>
-          </p>
+        {/* Brand + Seller (two lines) */}
+        <div className="mb-3 space-y-1">
+          <p className="text-[#6B6560] text-[11px] font-medium truncate">{brand}</p>
+          <div className="flex items-center gap-1.5">
+            {sellerProfilePictureUrl ? (
+              <img src={sellerProfilePictureUrl} alt={sellerName} className="w-4 h-4 rounded-full object-cover border border-[#E8E0D5] shrink-0" />
+            ) : (
+              <div className="w-4 h-4 rounded-full bg-[#C9A96E]/20 text-[#C9A96E] text-[8px] font-bold flex items-center justify-center shrink-0">
+                {sellerName?.[0]?.toUpperCase()}
+              </div>
+            )}
+            <p className="text-[#9E9590] text-[10px] truncate">{sellerName}</p>
+          </div>
         </div>
 
         {/* Price + View button */}
-        <div className="flex items-center justify-between pt-3 border-t border-[#F0EBE3]">
-          <div>
-            <p className="text-[#1C1F2E] font-extrabold text-base sm:text-lg leading-none">
-              ${price?.toFixed(2)}
-            </p>
-            <p className="text-[#9E9590] text-[10px] mt-0.5">Fair Price</p>
-          </div>
-
-          <div className="relative group/view">
-            <div className="flex items-center gap-1.5 bg-[#FAF8F5] hover:bg-[#1C1F2E] text-[#6B6560] hover:text-white text-xs font-bold px-3 py-2 rounded-full transition-all duration-200 border border-[#E8E0D5] hover:border-[#1C1F2E] group-hover/view:shadow-md">
-              View <FiArrowRight className="w-3 h-3 group-hover/view:translate-x-0.5 transition-transform" />
+        <div className="pt-3 border-t border-[#F0EBE3]">
+          {/* AI engine hint — visible on hover */}
+          <p className="text-[#9E9590] text-[9px] mb-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Price set by AI engine
+          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[#1C1F2E] font-extrabold text-base sm:text-lg leading-none">
+                ${price?.toFixed(2)}
+              </p>
+              <span className="inline-flex items-center gap-1 bg-[#C9A96E]/10 border border-[#C9A96E]/20 text-[#C9A96E] text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-1">
+                ✦ AI Verified
+              </span>
             </div>
-            <span className="pointer-events-none absolute -top-8 right-0 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] font-medium px-2.5 py-1.5 rounded-lg opacity-0 group-hover/view:opacity-100 transition-opacity duration-150 shadow-xl">
-              View details
-            </span>
+
+            <div className="relative group/view">
+              <button className="w-8 h-8 bg-[#FAF8F5] hover:bg-[#1C1F2E] text-[#6B6560] hover:text-white rounded-full flex items-center justify-center transition-all duration-200 border border-[#E8E0D5] hover:border-[#1C1F2E] group-hover/view:shadow-md">
+                <FiArrowRight className="w-3.5 h-3.5 group-hover/view:translate-x-0.5 transition-transform" />
+              </button>
+              <span className="pointer-events-none absolute -top-8 right-0 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] font-medium px-2.5 py-1.5 rounded-lg opacity-0 group-hover/view:opacity-100 transition-opacity duration-150 shadow-xl">
+                View details
+              </span>
+            </div>
           </div>
         </div>
       </div>

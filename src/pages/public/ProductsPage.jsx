@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
-import { FiSearch, FiX, FiTrendingUp, FiGrid, FiList, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { Link } from 'react-router-dom'
+import { FiSearch, FiX, FiGrid, FiList, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
 import ProductCardComponent from '../../components/ProductCard'
 import { DUMMY_PRODUCTS } from '../../data/dummyData'
 import catPhones from '../../assets/cat-phones1.jpg'
@@ -11,6 +12,14 @@ import productPs5 from '../../assets/product-ps5.jpg'
 import productBag from '../../assets/product-bag.jpg'
 
 const MemoProductCard = React.memo(ProductCardComponent)
+
+const categoryEmojis = {
+  telephony: '📱', audio: '🎧', computers: '💻',
+  watches_gifts: '⌚', fashion_shoes: '👟',
+  fashion_bags_accessories: '👜', consoles_games: '🎮',
+  health_beauty: '💄', sports_leisure: '⚽',
+  furniture_decor: '🛋', default: '📦',
+}
 
 const CATEGORIES = [
   { value: 'all',                      label: 'All',       img: null },
@@ -93,47 +102,82 @@ function ProductsPage() {
 
       {/* ── HERO HEADER ──────────────────────────────────────── */}
       <div className="relative bg-[#1C1F2E] overflow-hidden">
-        {/* decorative circles */}
-        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#C9A96E]/5 pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-[#C9A96E]/5 pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-white/[0.02] pointer-events-none" />
+        {/* Radial glow centred on the left content area */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse 55% 60% at 25% 50%, rgba(201,169,110,0.08) 0%, transparent 70%)' }}
+        />
+        {/* Subtle repeating dot grid */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{ backgroundImage: 'radial-gradient(circle, #C9A96E 1px, transparent 1px)', backgroundSize: '24px 24px' }}
+        />
 
         <div className="relative max-w-7xl mx-auto px-6 py-14">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:items-center">
+
+            {/* ── Left column ── */}
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-5 h-0.5 bg-[#C9A96E]" />
-                <p className="text-[#C9A96E] text-xs font-bold uppercase tracking-[0.2em]">
-                  DynaMart Marketplace
-                </p>
+              {/* Label row: brand line + AI status pill */}
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-0.5 bg-[#C9A96E]" />
+                  <p className="text-[#C9A96E] text-xs font-bold uppercase tracking-[0.2em]">
+                    DynaMart Marketplace
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 bg-green-500/15 text-green-400 border border-green-500/20 text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shrink-0" />
+                  AI Engine Active
+                </span>
               </div>
+
               <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 leading-tight">
                 Browse Products
               </h1>
               <p className="text-gray-400 text-sm max-w-md">
-                Every price is AI-verified to be fair. Shop confidently — no price gouging, ever.
+                Every price is set by our AI engine — analyzing market data in real time so you always pay a fair price.
               </p>
-            </div>
-          </div>
 
-          {/* Search bar inside header */}
-          <div className="mt-8 relative max-w-xl">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={searchInput}
-              onChange={e => setSearchInput(e.target.value)}
-              placeholder="Search products, brands, categories..."
-              className="w-full bg-white/10 backdrop-blur-sm border border-white/15 hover:border-white/30 focus:border-[#C9A96E] rounded-2xl pl-11 pr-10 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none transition-colors"
-            />
-            {searchInput && (
-              <button
-                onClick={() => { setSearchInput(''); handleSearch('') }}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-              >
-                <FiX className="w-3 h-3 text-white" />
-              </button>
-            )}
+              {/* Search bar — full width of left column */}
+              <div className="mt-8 relative focus-within:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] rounded-2xl transition-shadow duration-200">
+                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={e => setSearchInput(e.target.value)}
+                  placeholder="Search products, brands, categories..."
+                  className="w-full bg-white/10 backdrop-blur-sm border border-white/15 hover:border-white/30 focus:border-[#C9A96E] rounded-2xl pl-11 pr-10 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none transition-colors"
+                />
+                {searchInput && (
+                  <button
+                    onClick={() => { setSearchInput(''); handleSearch('') }}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                  >
+                    <FiX className="w-3 h-3 text-white" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* ── Right column: stats card (desktop only) ── */}
+            <div className="hidden md:flex justify-end">
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-xs">
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { value: '500+', label: 'Sellers' },
+                    { value: '100%', label: 'AI-Verified Prices' },
+                    { value: '12+',  label: 'Categories' },
+                  ].map(({ value, label }) => (
+                    <div key={label} className="text-center">
+                      <p className="text-[#C9A96E] font-extrabold text-2xl leading-none mb-1.5">{value}</p>
+                      <p className="text-gray-400 text-[10px] leading-tight">{label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -141,48 +185,69 @@ function ProductsPage() {
       {/* ── FILTER BAR ───────────────────────────────────────── */}
       <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-sm border-b border-[#E8E0D5] shadow-sm">
         <div className="max-w-7xl mx-auto px-6">
+          <div className="relative">
 
-          {/* Category thumbnails — full-width row */}
-          <div className="flex gap-2 py-3 overflow-x-auto scrollbar-none w-full justify-between">
-            {CATEGORIES.map(cat => {
-              const active = category === cat.value
-              return (
-                <button
-                  key={cat.value}
-                  onClick={() => handleCategory(cat.value)}
-                  className={`flex-1 min-w-0 flex flex-col items-center gap-1 py-2 px-1 rounded-xl cursor-pointer ${
-                    active
-                      ? `bg-[#1C1F2E] shadow-md${cat.value === 'all' ? ' ring-2 ring-[#C9A96E] ring-offset-1' : ''}`
-                      : 'bg-white border border-[#E8E0D5] hover:border-[#C9A96E]'
-                  }`}
-                >
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-[#F5F0EA] flex items-center justify-center shrink-0">
-                    {cat.img ? (
-                      <img src={cat.img} className="w-full h-full object-cover" alt={cat.label} />
-                    ) : (
-                      <span className="text-lg">{cat.value === 'all' ? '✨' : '💄'}</span>
-                    )}
-                  </div>
-                  <span className={`text-[9px] font-semibold whitespace-nowrap truncate w-full text-center ${active ? 'text-white' : 'text-[#6B6560]'}`}>
-                    {cat.label}
-                  </span>
-                </button>
-              )
-            })}
+            {/* Left fade hint for scroll */}
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/95 to-transparent z-10 pointer-events-none" />
+            {/* Right fade hint for scroll */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/95 to-transparent z-10 pointer-events-none" />
+
+            <div className="flex gap-2 py-3 overflow-x-auto scrollbar-none">
+              {CATEGORIES.map(cat => {
+                const active = category === cat.value
+                return (
+                  <button
+                    key={cat.value}
+                    onClick={() => handleCategory(cat.value)}
+                    className={`flex items-center gap-2.5 px-3.5 py-2 rounded-2xl border shrink-0 transition-all duration-200 group
+                      ${active
+                        ? 'bg-[#1C1F2E] border-[#1C1F2E] text-white shadow-md'
+                        : 'bg-white border-[#E8E0D5] text-[#6B6560] hover:border-[#C9A96E]/60 hover:text-[#1C1F2E] hover:shadow-sm'
+                      }`}
+                  >
+                    {/* Image or icon thumbnail */}
+                    <div className={`w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center transition-all duration-200
+                      ${active ? 'ring-1 ring-[#C9A96E]/40' : 'ring-1 ring-[#E8E0D5]'}
+                      ${!cat.img ? (active ? 'bg-[#C9A96E]/20' : 'bg-[#F5F0EA]') : ''}
+                    `}>
+                      {cat.value === 'all'
+                        ? <FiGrid className={`w-4 h-4 ${active ? 'text-[#C9A96E]' : 'text-[#6B6560]'}`} />
+                        : cat.img
+                          ? <img src={cat.img} className="w-full h-full object-cover" alt={cat.label} />
+                          : <span className="text-lg">{cat.value === 'health_beauty' ? '💄' : '📦'}</span>
+                      }
+                    </div>
+
+                    {/* Label */}
+                    <span className={`text-xs font-semibold whitespace-nowrap transition-colors duration-200
+                      ${active ? 'text-white' : 'text-[#6B6560] group-hover:text-[#1C1F2E]'}
+                    `}>
+                      {cat.value === 'all' ? 'All Products' : cat.label}
+                    </span>
+
+                    {/* Active gold dot indicator */}
+                    <span className={`h-1.5 rounded-full bg-[#C9A96E] shrink-0 transition-all duration-200
+                      ${active ? 'opacity-100 scale-100 w-1.5' : 'opacity-0 scale-0 w-0'}
+                    `} />
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
 
       {/* ── TOOLBAR ──────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-6 py-5">
+      <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
 
           {/* Left — count + active filters */}
           <div className="flex items-center gap-3">
             <p className="text-[#1C1F2E] font-bold text-sm">
-              {filtered.length}
-              <span className="text-[#6B6560] font-normal"> products</span>
+              <span className="text-2xl font-extrabold text-[#1C1F2E]">{filtered.length}</span>
+              <span className="text-[#6B6560] font-normal text-sm ml-1.5">products found</span>
             </p>
+            {activeFilters > 0 && <div className="w-px h-4 bg-[#E8E0D5]" />}
             {activeFilters > 0 && (
               <button
                 onClick={() => { setSearchInput(''); handleSearch(''); handleCategory('all') }}
@@ -196,10 +261,11 @@ function ProductsPage() {
 
           {/* Right — sort + view toggle */}
           <div className="flex items-center gap-3">
+            <span className="text-xs text-[#6B6560] hidden sm:block">Sort by</span>
             <select
               value={sort}
               onChange={e => handleSort(e.target.value)}
-              className="bg-white border border-[#E8E0D5] rounded-xl px-3 py-2 text-xs text-[#1C1F2E] focus:outline-none focus:border-[#1C1F2E] transition-colors cursor-pointer font-medium"
+              className="bg-white border border-[#E8E0D5] rounded-xl px-3 py-2 text-xs text-[#1C1F2E] focus:outline-none focus:border-[#C9A96E] transition-colors cursor-pointer font-semibold"
             >
               {SORT_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -210,19 +276,22 @@ function ProductsPage() {
             <div className="flex bg-white border border-[#E8E0D5] rounded-xl overflow-hidden">
               <button
                 onClick={() => setView('grid')}
-                className={`p-2 transition-colors ${view === 'grid' ? 'bg-[#1C1F2E] text-white' : 'text-[#6B6560] hover:text-[#1C1F2E]'}`}
+                className={`p-2.5 transition-colors ${view === 'grid' ? 'bg-[#1C1F2E] text-white' : 'text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5]'}`}
               >
-                <FiGrid className="w-4 h-4" />
+                <FiGrid className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setView('list')}
-                className={`p-2 transition-colors ${view === 'list' ? 'bg-[#1C1F2E] text-white' : 'text-[#6B6560] hover:text-[#1C1F2E]'}`}
+                className={`p-2.5 transition-colors ${view === 'list' ? 'bg-[#1C1F2E] text-white' : 'text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5]'}`}
               >
-                <FiList className="w-4 h-4" />
+                <FiList className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         </div>
+
+        {/* Thin gold divider line below toolbar */}
+        <div className="mt-4 h-px bg-gradient-to-r from-[#C9A96E]/30 via-[#E8E0D5] to-transparent" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 pb-16">
@@ -266,74 +335,105 @@ function ProductsPage() {
           </div>
         )}
 
-        {/* PRODUCTS GRID */}
+        {/* PRODUCTS GRID / LIST */}
         {!loading && filtered.length > 0 && (
-          <div className={
-            view === 'grid'
-              ? 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5'
-              : 'flex flex-col gap-4'
-          }>
-            {filtered.map(product => (
-              <MemoProductCard key={product.productId} product={product} />
-            ))}
-          </div>
+          <>
+            {view === 'grid' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 items-stretch">
+                {filtered.map(product => (
+                  <MemoProductCard key={product.productId} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {filtered.map(product => (
+                  <Link
+                    key={product.productId}
+                    to={`/products/${product.productId}`}
+                    className="bg-white border border-[#E8E0D5] rounded-2xl p-4 flex items-center gap-5 hover:border-[#C9A96E]/50 hover:shadow-md transition-all duration-200 group"
+                  >
+                    {/* Thumbnail */}
+                    <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-[#FAF8F5] flex items-center justify-center">
+                      {product.imageUrls?.[0]
+                        ? <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover" />
+                        : <span className="text-3xl">{categoryEmojis[product.category] || '📦'}</span>
+                      }
+                    </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[#C9A96E] text-[10px] font-extrabold uppercase tracking-widest mb-0.5">{product.category?.replace(/_/g, ' ')}</p>
+                      <h3 className="text-[#1C1F2E] font-bold text-sm leading-snug truncate group-hover:text-[#2E3452]">{product.name}</h3>
+                      <p className="text-[#9E9590] text-xs mt-0.5">{product.brand} · {product.sellerName}</p>
+                    </div>
+                    {/* Price */}
+                    <div className="shrink-0 text-right">
+                      <p className="text-[#1C1F2E] font-extrabold text-lg">${product.price?.toFixed(2)}</p>
+                      <span className="inline-flex items-center gap-1 text-[#C9A96E] text-[10px] font-bold bg-[#C9A96E]/10 border border-[#C9A96E]/20 px-2 py-0.5 rounded-full mt-1">
+                        ✦ AI Verified
+                      </span>
+                    </div>
+                    {/* Arrow */}
+                    <FiArrowRight className="w-4 h-4 text-[#6B6560] group-hover:text-[#1C1F2E] group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* PAGINATION */}
         {!loading && filtered.length > 0 && (
-          <div className="flex items-center justify-center gap-2 mt-10">
-            <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="w-9 h-9 rounded-full border border-[#E8E0D5] bg-white flex items-center justify-center text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-              <FiChevronLeft className="w-4 h-4" />
-            </button>
+          <div className="mt-12 flex flex-col items-center gap-4">
 
-            {[1,2,3,4,5].map(n => (
+            {/* Page info text */}
+            <p className="text-xs text-[#9E9590]">
+              Page <span className="font-bold text-[#1C1F2E]">{page}</span> of{' '}
+              <span className="font-bold text-[#1C1F2E]">5</span>
+            </p>
+
+            {/* Pagination controls */}
+            <div className="flex items-center gap-1.5">
+
+              {/* Prev button */}
               <button
-                key={n}
-                onClick={() => setPage(n)}
-                className={`w-9 h-9 rounded-full text-xs font-bold transition-all ${
-                  page === n
-                    ? 'bg-[#1C1F2E] text-white shadow-md'
-                    : 'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E]'
-                }`}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E8E0D5] bg-white text-xs font-semibold text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E] hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
               >
-                {n}
+                <FiChevronLeft className="w-3.5 h-3.5" />
+                Prev
               </button>
-            ))}
 
-            <button
-              onClick={() => setPage(p => Math.min(5, p + 1))}
-              disabled={page === 5}
-              className="w-9 h-9 rounded-full border border-[#E8E0D5] bg-white flex items-center justify-center text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-              <FiChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+              {/* Page numbers */}
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map(n => (
+                  <button
+                    key={n}
+                    onClick={() => setPage(n)}
+                    className={`w-9 h-9 rounded-xl text-xs font-bold transition-all duration-200 ${
+                      page === n
+                        ? 'bg-[#1C1F2E] text-white shadow-md scale-105'
+                        : 'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-[#C9A96E]/50 hover:text-[#1C1F2E] hover:shadow-sm'
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
 
-        {/* Trending banner */}
-        {!loading && filtered.length > 0 && category === 'all' && !search && (
-          <div className="mt-12 bg-[#1C1F2E] rounded-3xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#C9A96E]/20 rounded-2xl flex items-center justify-center shrink-0">
-                <FiTrendingUp className="w-6 h-6 text-[#C9A96E]" />
-              </div>
-              <div>
-                <p className="text-white font-bold text-lg">AI-Powered Pricing</p>
-                <p className="text-gray-400 text-sm">Every price is dynamically verified to be fair and competitive.</p>
-              </div>
+              {/* Next button */}
+              <button
+                onClick={() => setPage(p => Math.min(5, p + 1))}
+                disabled={page === 5}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E8E0D5] bg-white text-xs font-semibold text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E] hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                Next
+                <FiChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <div className="flex gap-6 shrink-0">
-              {[['100%', 'Fair Prices'], ['12+', 'Categories'], ['24/7', 'AI Monitoring']].map(([val, lbl]) => (
-                <div key={lbl} className="text-center">
-                  <p className="text-[#C9A96E] font-extrabold text-xl">{val}</p>
-                  <p className="text-gray-500 text-xs">{lbl}</p>
-                </div>
-              ))}
-            </div>
+
+            {/* Bottom gold accent line */}
+            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-[#C9A96E]/40 to-transparent rounded-full mt-2" />
           </div>
         )}
       </div>
