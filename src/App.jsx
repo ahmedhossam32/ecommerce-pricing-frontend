@@ -25,6 +25,7 @@ import SellerDecisions from './pages/seller/SellerDecisions'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminRequests from './pages/admin/AdminRequests'
 import AdminRequestDetail from './pages/admin/AdminRequestDetail'
+import AdminProducts from './pages/admin/AdminProducts'
 
 const DefaultLayout = () => (
   <>
@@ -80,6 +81,7 @@ function App() {
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/requests" element={<AdminRequests />} />
               <Route path="/admin/requests/:requestId" element={<AdminRequestDetail />} />
+              <Route path="/admin/products" element={<AdminProducts />} />
             </Route>
           </Route>
 
