@@ -32,10 +32,10 @@ function WishlistCard({ item, onRemove }) {
 
   return (
     <Link to={`/products/${item.productId}`} className="block">
-      <div className="bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden hover:shadow-xl hover:border-[#C9A96E]/50 transition-shadow duration-200 flex flex-col">
+      <div className="bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden hover:shadow-xl hover:border-[#C9A96E]/50 hover:-translate-y-1 transition-all duration-200 flex flex-col">
 
         {/* Image area */}
-        <div className={`relative overflow-hidden bg-gradient-to-br ${gradient}`} style={{ aspectRatio: '1 / 1' }}>
+        <div className={`relative overflow-hidden bg-gradient-to-br ${gradient}`} style={{ aspectRatio: '4 / 3' }}>
           {hasImage ? (
             <>
               {!imgLoaded && (
@@ -67,12 +67,6 @@ function WishlistCard({ item, onRemove }) {
             </span>
           </div>
 
-          {/* Saved badge */}
-          <div className="absolute bottom-3 left-3">
-            <span className="bg-[#C9A96E]/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-              Saved
-            </span>
-          </div>
         </div>
 
         {/* Info */}
@@ -103,7 +97,12 @@ function WishlistCard({ item, onRemove }) {
 
           {/* Price + Add to Cart */}
           <div className="flex items-center justify-between pt-3 border-t border-[#F0EBE3]">
-            <span className="text-[#1C1F2E] font-extrabold text-lg">${item.price?.toFixed(2)}</span>
+            <div className="flex flex-col">
+              <span className="text-[#1C1F2E] font-extrabold text-lg">${item.price?.toFixed(2)}</span>
+              <span className="inline-flex items-center gap-1 text-[#C9A96E] text-[9px] font-bold bg-[#C9A96E]/10 border border-[#C9A96E]/20 px-2 py-0.5 rounded-full mt-0.5 w-fit">
+                ✦ AI Verified
+              </span>
+            </div>
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success(`${item.name} added to cart!`) }}
               className="bg-[#1C1F2E] hover:bg-[#C9A96E] text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1.5 transition-colors"
@@ -132,11 +131,27 @@ function Wishlist() {
     <div className="min-h-screen bg-[#FAF8F5]">
 
       {/* ── HEADER ──────────────────────────────────────────── */}
-      <div className="bg-[#1C1F2E] py-10 px-6">
-        <div className="max-w-7xl mx-auto">
-          <BackButton label="Continue Shopping" />
-          <h1 className="text-3xl font-extrabold text-white mt-4">My Wishlist</h1>
-          <p className="text-[#C9A96E] mt-1">{wishlistItems.length} saved items</p>
+      <div className="bg-[#1C1F2E] py-6 px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div>
+            <BackButton label="Continue Shopping" />
+            <div className="flex items-center gap-3 mt-2">
+              <h1 className="text-2xl font-extrabold text-white">My Wishlist</h1>
+              {wishlistItems.length > 0 && (
+                <span className="bg-[#C9A96E]/20 text-[#C9A96E] text-xs font-bold px-2.5 py-1 rounded-full border border-[#C9A96E]/30">
+                  {wishlistItems.length} saved
+                </span>
+              )}
+            </div>
+          </div>
+          {wishlistItems.length > 0 && (
+            <button
+              onClick={() => setWishlistItems([])}
+              className="flex items-center gap-2 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-4 py-2 rounded-full transition-all font-medium"
+            >
+              <FiTrash2 className="w-3.5 h-3.5" /> Clear Wishlist
+            </button>
+          )}
         </div>
       </div>
 
@@ -161,17 +176,7 @@ function Wishlist() {
 
           /* Items */
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-sm font-bold text-[#1C1F2E]">{wishlistItems.length} items</span>
-              <button
-                onClick={() => setWishlistItems([])}
-                className="flex items-center gap-2 text-xs text-[#6B6560] hover:text-[#1C1F2E] border border-[#E8E0D5] hover:border-[#1C1F2E] px-4 py-2 rounded-full transition-all font-medium"
-              >
-                <FiTrash2 className="w-3.5 h-3.5" /> Clear Wishlist
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 pt-2">
               {wishlistItems.map(item => (
                 <WishlistCard key={item.savedId} item={item} onRemove={handleRemove} />
               ))}
