@@ -64,7 +64,7 @@ function Cart() {
       `}</style>
 
       {/* ── HEADER ──────────────────────────────────────────── */}
-      <div className="bg-[#1C1F2E] py-6 px-6">
+      <div className="bg-[#1C1F2E] py-10 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <BackButton label="Continue Shopping" />
@@ -178,7 +178,7 @@ function Cart() {
                             setSelectedItem(item)
                             setItemOrderModal(true)
                           }}
-                          className="bg-[#C9A96E] hover:bg-[#b8935a] text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all hover:shadow-[0_4px_12px_rgba(201,169,110,0.3)] mt-1"
+                          className="bg-[#1C1F2E] hover:bg-[#2E3452] text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all mt-1"
                         >
                           Place Order →
                         </button>
@@ -233,7 +233,7 @@ function Cart() {
           </div>
 
           {/* ── RIGHT — Order Summary ──────────────────────────── */}
-          <div className="sticky top-24 self-start">
+          {cartItems.length > 0 && <div className="sticky top-24 self-start">
             <div className="bg-white border border-[#E8E0D5] rounded-3xl overflow-hidden">
 
               {/* Summary header */}
@@ -289,7 +289,7 @@ function Cart() {
                 </p>
               </div>
             </div>
-          </div>
+          </div>}
 
         </div>
       </div>

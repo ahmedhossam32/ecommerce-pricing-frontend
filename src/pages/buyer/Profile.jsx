@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 
 const roleBadge = {
-  BUYER:  'bg-green-50 text-green-600 border border-green-200',
+  BUYER:  'bg-[#1C1F2E]/10 text-[#1C1F2E] border border-[#1C1F2E]/20',
   SELLER: 'bg-[#C9A96E]/10 text-[#C9A96E] border border-[#C9A96E]/30',
   ADMIN:  'bg-[#1C1F2E]/10 text-[#1C1F2E] border border-[#1C1F2E]/20',
 }
@@ -87,7 +87,7 @@ function Profile() {
 
               {/* Avatar with hover-overlay camera */}
               <div className="relative w-28 h-28 mx-auto mb-4">
-                <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-[#C9A96E]/30 bg-[#1C1F2E] flex items-center justify-center mx-auto">
+                <div className="w-28 h-28 rounded-full overflow-hidden ring-4 ring-[#C9A96E]/60 bg-[#1C1F2E] flex items-center justify-center mx-auto">
                   {preview ? (
                     <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                   ) : user?.profilePictureUrl ? (

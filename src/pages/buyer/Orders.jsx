@@ -121,7 +121,7 @@ function Orders() {
       `}</style>
 
       {/* ── HEADER ──────────────────────────────────────────── */}
-      <div className="bg-[#1C1F2E] py-6 px-6">
+      <div className="bg-[#1C1F2E] py-10 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <BackButton label="Back to Shopping" />

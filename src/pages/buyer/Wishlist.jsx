@@ -109,8 +109,8 @@ function WishlistCard({ item, onRemove, onAddToCart, isInCart }) {
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAddToCart(item.productId, item.name) }}
               className={`text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1.5 transition-colors ${
                 isInCart
-                  ? 'bg-[#C9A96E] hover:bg-[#b8935a]'
-                  : 'bg-[#1C1F2E] hover:bg-[#C9A96E]'
+                  ? 'bg-[#1C1F2E] hover:bg-[#2E3452]'
+                  : 'bg-[#1C1F2E] hover:bg-[#2E3452]'
               }`}
             >
               <FiShoppingCart className="w-3 h-3" />
@@ -134,7 +134,7 @@ function Wishlist() {
     <div className="min-h-screen bg-[#FAF8F5]">
 
       {/* ── HEADER ──────────────────────────────────────────── */}
-      <div className="bg-[#1C1F2E] py-6 px-6">
+      <div className="bg-[#1C1F2E] py-10 px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <BackButton label="Continue Shopping" />

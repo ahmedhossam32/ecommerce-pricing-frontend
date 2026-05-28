@@ -37,7 +37,7 @@ function OrderDetail() {
       `}</style>
 
       {/* ── HEADER ──────────────────────────────────────────── */}
-      <div className="bg-[#1C1F2E] py-6">
+      <div className="bg-[#1C1F2E] py-10">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-6">
           <div>
             <BackButton label="Back to Orders" />
@@ -45,8 +45,8 @@ function OrderDetail() {
               <h1 className="text-2xl font-extrabold text-white">Order Details</h1>
             </div>
           </div>
-          <span className="bg-green-500/15 text-green-400 border border-green-500/20 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
-            <FiCheck className="w-3.5 h-3.5" />
+          <span className="bg-[#C9A96E]/20 text-[#C9A96E] border border-[#C9A96E]/30 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C9A96E]" />
             Purchased
           </span>
         </div>
