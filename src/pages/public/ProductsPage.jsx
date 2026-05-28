@@ -1,15 +1,9 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiSearch, FiX, FiGrid, FiList, FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi'
+import { FiSearch, FiX, FiGrid, FiList, FiChevronLeft, FiChevronRight, FiArrowRight, FiSmartphone, FiMonitor, FiZap, FiWatch, FiShoppingBag, FiHeadphones, FiStar, FiActivity, FiHome, FiMusic, FiBookOpen, FiHeart, FiCoffee } from 'react-icons/fi'
+import { MdPets } from 'react-icons/md'
 import ProductCardComponent from '../../components/ProductCard'
 import { DUMMY_PRODUCTS } from '../../data/dummyData'
-import catPhones from '../../assets/cat-phones1.jpg'
-import catComputers from '../../assets/cat-computers.jpg'
-import catFashion from '../../assets/cat-fashion2.jpg'
-import catWatches from '../../assets/cat-watches1.jpg'
-import productHeadphones from '../../assets/product-headphones.jpg'
-import productPs5 from '../../assets/product-ps5.jpg'
-import productBag from '../../assets/product-bag.jpg'
 
 const MemoProductCard = React.memo(ProductCardComponent)
 
@@ -22,15 +16,21 @@ const categoryEmojis = {
 }
 
 const CATEGORIES = [
-  { value: 'all',                      label: 'All',       img: null },
-  { value: 'telephony',                label: 'Phones',    img: catPhones },
-  { value: 'audio',                    label: 'Audio',     img: productHeadphones },
-  { value: 'computers',                label: 'Computers', img: catComputers },
-  { value: 'watches_gifts',            label: 'Watches',   img: catWatches },
-  { value: 'fashion_shoes',            label: 'Fashion',   img: catFashion },
-  { value: 'consoles_games',           label: 'Gaming',    img: productPs5 },
-  { value: 'fashion_bags_accessories', label: 'Bags',      img: productBag },
-  { value: 'health_beauty',            label: 'Beauty',    img: null },
+  { value: 'all',                      label: 'All Products',  icon: FiGrid },
+  { value: 'telephony',                label: 'Phones',        icon: FiSmartphone },
+  { value: 'computers',                label: 'Computers',     icon: FiMonitor },
+  { value: 'electronics',              label: 'Electronics',   icon: FiZap },
+  { value: 'audio',                    label: 'Audio',         icon: FiHeadphones },
+  { value: 'watches_gifts',            label: 'Watches',       icon: FiWatch },
+  { value: 'fashion_bags_accessories', label: 'Bags',          icon: FiShoppingBag },
+  { value: 'fashion_shoes',            label: 'Shoes',         icon: FiActivity },
+  { value: 'fashio_female_clothing',   label: 'Fashion',       icon: FiStar },
+  { value: 'consoles_games',           label: 'Gaming',        icon: FiZap },
+  { value: 'health_beauty',            label: 'Beauty',        icon: FiHeart },
+  { value: 'sports_leisure',           label: 'Sports',        icon: FiActivity },
+  { value: 'furniture_bedroom',        label: 'Furniture',     icon: FiHome },
+  { value: 'musical_instruments',      label: 'Music',         icon: FiMusic },
+  { value: 'pet_shop',                 label: 'Pet Shop',      icon: MdPets },
 ]
 
 const SORT_OPTIONS = [
@@ -187,11 +187,17 @@ function ProductsPage() {
             {/* Left fade hint for scroll */}
             <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/95 to-transparent z-10 pointer-events-none" />
             {/* Right fade hint for scroll */}
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/95 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 flex items-center z-10 pointer-events-none">
+              <div className="w-16 h-full bg-gradient-to-l from-white via-white/90 to-transparent" />
+              <div className="absolute right-2 flex items-center gap-1 text-[#9CA3AF]">
+                <FiChevronRight className="w-3.5 h-3.5 animate-bounce-x" />
+              </div>
+            </div>
 
             <div className="flex gap-2 py-3 overflow-x-auto scrollbar-none">
               {CATEGORIES.map(cat => {
                 const active = category === cat.value
+                const Icon = cat.icon
                 return (
                   <button
                     key={cat.value}
@@ -202,18 +208,7 @@ function ProductsPage() {
                         : 'bg-white border-[#E8E0D5] text-[#6B6560] hover:border-[#C9A96E]/60 hover:text-[#1C1F2E] hover:shadow-sm hover:-translate-y-0.5'
                       }`}
                   >
-                    {/* Image or icon thumbnail */}
-                    <div className={`w-11 h-11 rounded-xl overflow-hidden shrink-0 flex items-center justify-center transition-all duration-200
-                      ${active ? 'ring-2 ring-[#C9A96E]/50 scale-105' : 'ring-1 ring-[#E8E0D5] group-hover:ring-[#C9A96E]/30 group-hover:scale-105'}
-                      ${!cat.img ? (active ? 'bg-[#C9A96E]/20' : 'bg-[#F5F0EA] group-hover:bg-[#C9A96E]/10') : ''}
-                    `}>
-                      {cat.value === 'all'
-                        ? <FiGrid className={`w-5 h-5 ${active ? 'text-[#C9A96E]' : 'text-[#6B6560] group-hover:text-[#C9A96E]'} transition-colors`} />
-                        : cat.img
-                          ? <img src={cat.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" alt={cat.label} />
-                          : <span className="text-xl">{cat.value === 'health_beauty' ? '💄' : '📦'}</span>
-                      }
-                    </div>
+                    <Icon className={`w-4 h-4 ${active ? 'text-[#C9A96E]' : 'text-[#9CA3AF] group-hover:text-[#C9A96E]'} transition-colors`} />
 
                     {/* Label */}
                     <span className={`text-xs font-semibold whitespace-nowrap transition-colors duration-200

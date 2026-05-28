@@ -69,7 +69,7 @@ function PriceHistoryChart({ history }) {
           { label: 'Average', value: `$${avgPrice.toFixed(0)}`, color: 'text-[#C9A96E]' },
           { label: 'Highest', value: `$${maxPrice.toFixed(0)}`, color: 'text-[#1C1F2E]' },
         ].map((s, i) => (
-          <div key={i} className="bg-[#FAF8F5] rounded-xl p-3 text-center">
+          <div key={i} className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3 text-center">
             <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
             <p className="text-[#6B6560] text-xs mt-0.5">{s.label}</p>
           </div>

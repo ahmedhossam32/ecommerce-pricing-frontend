@@ -14,7 +14,14 @@ createRoot(document.getElementById('root')).render(
       closeButton={true}
       pauseOnHover={true}
       draggable={true}
-      theme="dark"
+      toastStyle={{
+        background: '#1C1F2E',
+        color: '#FAF8F5',
+        borderLeft: '3px solid #C9A96E',
+        borderRadius: '12px',
+        fontSize: '13px',
+      }}
+      progressStyle={{ background: '#C9A96E' }}
     />
   </StrictMode>,
 )

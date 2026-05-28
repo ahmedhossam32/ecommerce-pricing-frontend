@@ -294,7 +294,7 @@ function ProductDetail() {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleBuyNow}
-                  className="w-full flex items-center justify-center gap-2 bg-[#C9A96E] hover:bg-[#b8935a] active:scale-[0.98] text-white font-bold py-4 rounded-2xl text-sm transition-all shadow-lg shadow-[#C9A96E]/25"
+                  className="w-full flex items-center justify-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] active:scale-[0.98] text-white font-bold py-4 rounded-2xl text-sm transition-all shadow-lg"
                 >
                   Buy Now — ${product.price?.toFixed(2)}
                 </button>
@@ -303,7 +303,7 @@ function ProductDetail() {
                     onClick={handleAddToCart}
                     className={`flex-1 flex items-center justify-center gap-2 active:scale-[0.98] text-white py-3.5 rounded-2xl font-semibold text-sm transition-all ${
                       inCart || cartAdded
-                        ? 'bg-[#C9A96E] hover:bg-[#b8935a]'
+                        ? 'bg-[#1C1F2E]'
                         : 'bg-[#1C1F2E] hover:bg-[#2E3452]'
                     }`}
                   >
@@ -314,8 +314,8 @@ function ProductDetail() {
                     onClick={handleWishlist}
                     className={`flex-1 flex items-center justify-center gap-2 active:scale-[0.98] py-3.5 rounded-2xl font-semibold text-sm transition-all border-2 ${
                       inWishlist
-                        ? 'border-[#C9A96E] text-[#C9A96E] bg-[#C9A96E]/5'
-                        : 'border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5]'
+                        ? 'border-[#C9A96E] text-[#C9A96E] bg-[#C9A96E]/10'
+                        : 'border-[#C9A96E] text-[#C9A96E] hover:bg-[#C9A96E]/10'
                     }`}
                   >
                     <FiHeart className={`w-4 h-4 ${inWishlist ? 'fill-[#C9A96E]' : ''}`} />

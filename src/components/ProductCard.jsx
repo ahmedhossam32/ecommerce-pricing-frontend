@@ -182,20 +182,19 @@ function ProductCard({ product, confidence = 'HIGH' }) {
         </div>
 
         {/* Slide-up Add to Cart overlay */}
-        <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out p-3">
+        <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out px-4 pb-3">
           <button
             onClick={handleAddToCart}
-            className={`w-full backdrop-blur-sm text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-xl tracking-wide ${
-              inCart || cartAdded
-                ? 'bg-[#1C1F2E] hover:bg-[#2E3452]'
-                : 'bg-[#1C1F2E]/95 hover:bg-[#C9A96E]'
-            }`}
+            className={`mx-auto flex items-center justify-center gap-2 px-4 py-2 rounded-full text-xs font-bold shadow-xl transition-all duration-200 backdrop-blur-sm tracking-wide
+              ${inCart || cartAdded
+                ? 'bg-[#1C1F2E] text-white'
+                : 'bg-white/95 text-[#1C1F2E] hover:bg-[#1C1F2E] hover:text-white border border-[#E8E0D5]'
+              }`}
           >
-            {inCart || cartAdded ? (
-              <><FiCheckCircle className="w-3.5 h-3.5" /> In Cart</>
-            ) : (
-              <><FiShoppingCart className="w-3.5 h-3.5" /> Add to Cart</>
-            )}
+            {inCart || cartAdded
+              ? <><FiCheckCircle className="w-3.5 h-3.5" /> In Cart</>
+              : <><FiShoppingCart className="w-3.5 h-3.5" /> Add to Cart</>
+            }
           </button>
         </div>
 
@@ -204,7 +203,7 @@ function ProductCard({ product, confidence = 'HIGH' }) {
       </div>
 
       {/* ── INFO ───────────────────────────────────────────── */}
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-4 flex flex-col flex-1 min-h-[180px]">
 
         {/* Category label */}
         <p className="text-[#C9A96E] text-[10px] font-extrabold uppercase tracking-widest mb-1.5">

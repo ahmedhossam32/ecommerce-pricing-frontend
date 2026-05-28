@@ -30,3 +30,15 @@ body {
 .animate-fade-up-3 { animation-delay: 0.45s; }
 .animate-fade-up-4 { animation-delay: 0.6s; }
 .animate-fade-up-5 { animation-delay: 0.75s; }
+
+.Toastify__toast { background: #1C1F2E !important; }
+.Toastify__toast-body { color: #FAF8F5 !important; }
+.Toastify__progress-bar--success { background: #C9A96E !important; }
+.Toastify__toast-icon svg { color: #C9A96E !important; fill: #C9A96E !important; }
+.Toastify__toast--success .Toastify__toast-icon svg { color: #C9A96E !important; }
+
+@keyframes bounce-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+.animate-bounce-x { animation: bounce-x 1s ease-in-out infinite; }
