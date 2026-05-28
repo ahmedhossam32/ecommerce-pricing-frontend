@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { FiAlertCircle, FiClock, FiCheckCircle, FiXCircle, FiFileText } from 'react-icons/fi'
+import { FiAlertCircle, FiClock, FiCheckCircle, FiXCircle, FiFileText, FiArrowRight } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 
 const STATUS_CONFIG = {
@@ -69,10 +69,9 @@ export default function SellerProductRow({ product }) {
           {product.brand} · {product.category?.replace(/_/g, ' ')}
         </p>
         {product.status === 'DRAFT' && (
-          <p className="text-blue-500 text-[11px] mt-1 flex items-center gap-1">
-            <FiAlertCircle className="w-3 h-3 shrink-0" />
-            Price decision needed — click to review
-          </p>
+          <span className="text-[#C9A96E] text-xs font-semibold flex items-center gap-1 mt-1">
+            <FiArrowRight size={11} /> Price decision needed — click to review
+          </span>
         )}
         {product.status === 'REJECTED' && (
           <p className="text-red-400 text-[11px] mt-1 flex items-center gap-1">
@@ -98,6 +97,11 @@ export default function SellerProductRow({ product }) {
         )}
         {product.status === 'REJECTED' && (
           <p className="text-[#9CA3AF] text-sm font-medium line-through">${product.suggestedPrice?.toFixed(2)}</p>
+        )}
+        {product.status === 'DRAFT' && (
+          <button className="text-xs font-bold text-white bg-[#C9A96E] hover:bg-[#b8935a] px-3 py-1.5 rounded-lg transition-all shrink-0">
+            Review →
+          </button>
         )}
         <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border}`}>
           <cfg.icon size={11} />

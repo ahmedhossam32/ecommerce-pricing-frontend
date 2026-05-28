@@ -5,14 +5,14 @@ import { DUMMY_PRODUCTS } from '../../data/dummyData'
 import SellerProductRow from '../../components/seller/SellerProductRow'
 
 const ALL_PRODUCTS = [
-  { ...DUMMY_PRODUCTS[0], status: 'LIVE',           price: 977,  suggestedPrice: 950  },
-  { ...DUMMY_PRODUCTS[1], status: 'LIVE',           price: 280,  suggestedPrice: 275  },
+  { ...DUMMY_PRODUCTS[0], status: 'LIVE', price: 977, suggestedPrice: 950 },
+  { ...DUMMY_PRODUCTS[1], status: 'LIVE', price: 280, suggestedPrice: 275 },
   { ...DUMMY_PRODUCTS[2], status: 'PENDING_REVIEW', price: null, suggestedPrice: 1999 },
-  { ...DUMMY_PRODUCTS[3], status: 'DRAFT',          price: null, suggestedPrice: 7500 },
-  { ...DUMMY_PRODUCTS[4], status: 'REJECTED',       price: null, suggestedPrice: 120  },
-  { ...DUMMY_PRODUCTS[5], status: 'LIVE',           price: 499,  suggestedPrice: 480  },
-  { ...DUMMY_PRODUCTS[6], status: 'DRAFT',          price: null, suggestedPrice: 850  },
-  { ...DUMMY_PRODUCTS[7], status: 'PENDING_REVIEW', price: null, suggestedPrice: 399  },
+  { ...DUMMY_PRODUCTS[3], status: 'DRAFT', price: null, suggestedPrice: 7500 },
+  { ...DUMMY_PRODUCTS[4], status: 'REJECTED', price: null, suggestedPrice: 120 },
+  { ...DUMMY_PRODUCTS[5], status: 'LIVE', price: 499, suggestedPrice: 480 },
+  { ...DUMMY_PRODUCTS[6], status: 'DRAFT', price: null, suggestedPrice: 850 },
+  { ...DUMMY_PRODUCTS[7], status: 'PENDING_REVIEW', price: null, suggestedPrice: 399 },
 ]
 
 const DRAFT_PRODUCTS = ALL_PRODUCTS.filter(p => p.status === 'DRAFT')
@@ -80,7 +80,9 @@ function SellerDecisions() {
               <div>
                 <p className="text-[#1C1F2E] font-bold text-sm">Action required on {DRAFT_PRODUCTS.length} product{DRAFT_PRODUCTS.length > 1 ? 's' : ''}</p>
                 <p className="text-[#6B6560] text-xs mt-1 leading-relaxed">
-                  The AI has suggested a price for each product below. Review the suggestion and either
+                  The AI has suggested a price for each product below.
+                  <span className="text-red-500 font-semibold"> Act quickly</span> —
+                  review the suggestion and either
                   <span className="text-green-600 font-semibold"> accept </span>
                   it to go live immediately, or
                   <span className="text-[#C9A96E] font-semibold"> dispute </span>

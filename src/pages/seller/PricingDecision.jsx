@@ -189,9 +189,21 @@ function PricingDecision() {
                   <p className="text-[#6B6560] text-sm mt-2">
                     Range: ${decisionData.minRange} – ${decisionData.maxRange}
                   </p>
-                  <span className={`mt-3 inline-block text-xs font-bold px-3 py-1 rounded-full border ${confidenceStyle[decisionData.confidence] || confidenceStyle.MEDIUM}`}>
-                    {decisionData.confidence} Confidence
-                  </span>
+                  {decisionData.confidence === 'HIGH' && (
+                    <span className="mt-3 inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
+                      <FiCheckCircle size={12} /> HIGH Confidence
+                    </span>
+                  )}
+                  {decisionData.confidence === 'MEDIUM' && (
+                    <span className="mt-3 inline-flex items-center gap-1.5 bg-amber-400 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
+                      <FiAlertCircle size={12} /> MEDIUM Confidence
+                    </span>
+                  )}
+                  {decisionData.confidence === 'LOW' && (
+                    <span className="mt-3 inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
+                      <FiAlertCircle size={12} /> LOW Confidence
+                    </span>
+                  )}
                 </div>
 
                 {/* Data grid */}
@@ -245,14 +257,14 @@ function PricingDecision() {
                       <button
                         onClick={handleAccept}
                         disabled={accepting}
-                        className="w-full bg-[#C9A96E] hover:bg-[#b8935a] text-white font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+                        className="w-full bg-[#C9A96E] hover:bg-[#b8935a] text-white font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-all hover:shadow-[0_4px_20px_rgba(201,169,110,0.4)] disabled:opacity-60"
                       >
                         {accepting && <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
                         Accept Suggested Price (${decisionData.suggestedPrice})
                       </button>
                       <button
                         onClick={() => setAcceptMode(true)}
-                        className="w-full border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] py-3 rounded-xl text-sm font-medium mt-2 transition-colors"
+                        className="w-full border-2 border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] py-3 rounded-xl text-sm font-medium mt-2 transition-all bg-transparent"
                       >
                         Choose Custom Price
                       </button>
