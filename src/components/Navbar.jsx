@@ -319,38 +319,39 @@ function Navbar() {
                   <FiChevronDown className="w-3.5 h-3.5 text-[#6B6560]" />
                 </button>
                 {avatarOpen && (
-                  <div className="absolute right-0 top-full mt-2 bg-white border border-[#E8E0D5] shadow-lg rounded-xl w-48 py-2 z-50">
-                    <div className="px-4 py-2.5 border-b border-[#E8E0D5]">
-                      <p className="text-[#1C1F2E] text-xs font-medium">{user.name}</p>
-                      <p className="text-[#6B6560] text-xs">{user.email}</p>
+                  <div className="absolute right-0 top-full mt-2 bg-white border border-[#E8E0D5] border-t-2 border-t-[#C9A96E] shadow-lg rounded-xl w-48 py-2 z-50 overflow-hidden">
+                    <div className="px-4 py-2.5 border-b border-[#E8E0D5] bg-[#1C1F2E]">
+                      <p className="text-white text-xs font-bold">{user.name}</p>
+                      <p className="text-white/50 text-xs">{user.email}</p>
                     </div>
                     {user.role === 'BUYER' && (
                       <>
-                        <Link to="/cart" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] text-xs transition-colors">
+                        <Link to="/cart" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] border-l-2 border-l-transparent hover:border-l-[#C9A96E] text-xs transition-all">
                           <FiShoppingCart className="w-3.5 h-3.5" /> My Cart
                         </Link>
-                        <Link to="/orders" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
+                        <Link to="/orders" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] border-l-2 border-l-transparent hover:border-l-[#C9A96E] transition-all text-xs">
                           <FiPackage className="w-3.5 h-3.5" /> My Orders
                         </Link>
-                        <Link to="/wishlist" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
+                        <Link to="/wishlist" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] border-l-2 border-l-transparent hover:border-l-[#C9A96E] transition-all text-xs">
                           <FiHeart className="w-3.5 h-3.5" /> Wishlist
                         </Link>
                       </>
                     )}
                     {user.role === 'SELLER' && (
-                      <Link to="/seller/dashboard" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
+                      <Link to="/seller/dashboard" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] border-l-2 border-l-transparent hover:border-l-[#C9A96E] transition-all text-xs">
                         <FiPackage className="w-3.5 h-3.5" /> Dashboard
                       </Link>
                     )}
                     {user.role === 'ADMIN' && (
-                      <Link to="/admin/dashboard" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] transition-colors text-xs">
+                      <Link to="/admin/dashboard" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] border-l-2 border-l-transparent hover:border-l-[#C9A96E] transition-all text-xs">
                         <FiPackage className="w-3.5 h-3.5" /> Admin Panel
                       </Link>
                     )}
-                    <Link to="/profile" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] text-xs transition-colors">
+                    <Link to="/profile" onClick={() => setAvatarOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] border-l-2 border-l-transparent hover:border-l-[#C9A96E] text-xs transition-all">
                       <FiUser className="w-3.5 h-3.5" /> Profile Settings
                     </Link>
-                    <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 text-red-500 hover:text-red-600 hover:bg-[#FAF8F5] transition-colors text-xs w-full text-left">
+                    <div className="h-px bg-[#C9A96E]/20 mx-3 my-1" />
+                    <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 text-red-500 hover:text-red-600 hover:bg-red-50 border-l-2 border-l-transparent hover:border-l-[#C9A96E] transition-all text-xs w-full text-left">
                       <FiLogOut className="w-3.5 h-3.5" /> Sign Out
                     </button>
                   </div>

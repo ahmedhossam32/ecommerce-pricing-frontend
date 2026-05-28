@@ -57,9 +57,9 @@ function AdminDashboard() {
     { label: 'Live Products', value: stats.liveProducts, icon: FiCheckCircle, color: 'text-green-500', bg: 'bg-green-50', hero: false, hoverBorder: 'hover:border-green-300', hoverShadow: 'hover:shadow-green-100', navigateTo: '/admin/products?tab=LIVE', accentColor: '#22c55e' },
     { label: 'Pending Review', value: stats.pendingReview, icon: FiClock, color: 'text-[#C9A96E]', bg: 'bg-[#C9A96E]/10', hero: true, hoverBorder: 'hover:border-[#C9A96E]', hoverShadow: 'hover:shadow-[#C9A96E]/20', navigateTo: '/admin/requests', accentColor: '#C9A96E' },
     { label: 'Rejected Products', value: stats.rejectedProducts, icon: FiXCircle, color: 'text-red-400', bg: 'bg-red-50', hero: false, hoverBorder: 'hover:border-red-300', hoverShadow: 'hover:shadow-red-100', navigateTo: '/admin/products?tab=REJECTED', accentColor: '#ef4444' },
-    { label: 'Total Sellers', value: stats.totalSellers, icon: FiUsers, color: 'text-blue-500', bg: 'bg-blue-50', hero: false, hoverBorder: 'hover:border-blue-300', hoverShadow: 'hover:shadow-blue-100', navigateTo: null, accentColor: '#3b82f6' },
-    { label: 'Total Buyers', value: stats.totalBuyers, icon: FiUser, color: 'text-purple-500', bg: 'bg-purple-50', hero: false, hoverBorder: 'hover:border-purple-300', hoverShadow: 'hover:shadow-purple-100', navigateTo: null, accentColor: '#a855f7' },
-    { label: 'Total Orders', value: stats.totalOrders, icon: FiShoppingBag, color: 'text-teal-500', bg: 'bg-teal-50', hero: false, hoverBorder: 'hover:border-teal-300', hoverShadow: 'hover:shadow-teal-100', navigateTo: null, accentColor: '#14b8a6' },
+    { label: 'Total Sellers', value: stats.totalSellers, icon: FiUsers, color: 'text-[#1C1F2E]', bg: 'bg-[#1C1F2E]/5', hero: false, hoverBorder: 'hover:border-[#1C1F2E]/30', hoverShadow: 'hover:shadow-[#1C1F2E]/10', navigateTo: null, accentColor: '#1C1F2E' },
+    { label: 'Total Buyers', value: stats.totalBuyers, icon: FiUser, color: 'text-[#1C1F2E]', bg: 'bg-[#1C1F2E]/5', hero: false, hoverBorder: 'hover:border-[#1C1F2E]/30', hoverShadow: 'hover:shadow-[#1C1F2E]/10', navigateTo: null, accentColor: '#1C1F2E' },
+    { label: 'Total Orders', value: stats.totalOrders, icon: FiShoppingBag, color: 'text-[#1C1F2E]', bg: 'bg-[#1C1F2E]/5', hero: false, hoverBorder: 'hover:border-[#1C1F2E]/30', hoverShadow: 'hover:shadow-[#1C1F2E]/10', navigateTo: null, accentColor: '#1C1F2E' },
     { label: 'Approved Decisions', value: stats.totalApprovedDecisions, icon: FiZap, color: 'text-[#C9A96E]', bg: 'bg-[#C9A96E]/10', hero: false, hoverBorder: 'hover:border-[#C9A96E]', hoverShadow: 'hover:shadow-[#C9A96E]/20', navigateTo: null, accentColor: '#C9A96E' },
   ] : []
 
@@ -151,7 +151,7 @@ function AdminDashboard() {
             {/* Right — CTA */}
             <Link
               to="/admin/requests"
-              className="flex items-center gap-2 bg-[#C9A96E] hover:bg-[#b8935a] text-[#1C1F2E] font-bold px-5 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_4px_20px_rgba(201,169,110,0.4)] shrink-0 mt-9"
+              className="flex items-center gap-2 bg-[#C9A96E] hover:bg-[#b8935a] text-[#1C1F2E] font-bold px-5 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_4px_20px_rgba(201,169,110,0.4)] shrink-0 self-center"
             >
               <FiClock size={15} />
               Review Pending Requests
@@ -298,8 +298,9 @@ function AdminDashboard() {
 
             <Link
               to="/admin/products"
-              className="admin-action-card relative flex items-center gap-4 p-5 rounded-2xl bg-white border border-[#E8E0D5] hover:border-[#C9A96E]/50 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-300 group"
+              className="admin-action-card relative overflow-hidden flex items-center gap-4 p-5 rounded-2xl bg-white border border-[#E8E0D5] hover:border-[#C9A96E]/50 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-300 group"
             >
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A96E]/40 to-transparent rounded-t-2xl" />
               <div className="w-11 h-11 rounded-xl bg-[#FAF8F5] border border-[#E8E0D5] group-hover:bg-[#C9A96E]/10 group-hover:border-[#C9A96E]/30 transition-all duration-300 flex items-center justify-center shrink-0">
                 <FiList className="text-[#C9A96E] group-hover:scale-110 transition-transform duration-200" size={18} />
               </div>

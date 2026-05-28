@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { FiGrid, FiClock, FiPackage, FiUser, FiLogOut, FiShield } from 'react-icons/fi'
+import { FiGrid, FiClock, FiLayers, FiUser, FiLogOut, FiShield } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 
 function AdminSidebar({ pendingCount }) {
@@ -18,7 +18,7 @@ function AdminSidebar({ pendingCount }) {
   const NAV_ITEMS = [
     { to: '/admin/dashboard', icon: FiGrid,    label: 'Dashboard',    end: true,  badge: null                 },
     { to: '/admin/requests',  icon: FiClock,   label: 'Requests',     end: true,  badge: pendingCount || null },
-    { to: '/admin/products',  icon: FiPackage, label: 'All Products', end: true,  badge: null                 },
+    { to: '/admin/products',  icon: FiLayers,  label: 'All Products', end: true,  badge: null                 },
     { to: '/admin/profile',   icon: FiUser,    label: 'Profile',      end: true,  badge: null                 },
   ]
 
@@ -49,7 +49,7 @@ function AdminSidebar({ pendingCount }) {
         .badge-pulse { animation: badgePulse 2s ease infinite; }
       `}</style>
 
-      <aside className="w-[210px] bg-[#21253A] border-r border-white/[0.07] flex flex-col sticky top-[88px] h-[calc(100dvh-88px)] overflow-hidden">
+      <aside className="w-56 bg-[#21253A] border-r border-white/[0.07] flex flex-col sticky top-[88px] h-[calc(100dvh-88px)] overflow-hidden">
 
         {/* Top gradient accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A96E]/40 to-transparent" />

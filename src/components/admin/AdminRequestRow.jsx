@@ -19,7 +19,7 @@ function AdminRequestRow({ request }) {
 
   const rowBg =
     requestType !== 'DISPUTE' && llmConfidence === 'LOW'
-      ? 'bg-red-50/40 border-red-100 hover:border-red-200'
+      ? 'bg-red-50/30 border-red-200 hover:border-red-300'
       : requestType === 'DISPUTE'
       ? 'bg-[#FDF6EC] border-[#E8D5A3] hover:border-[#C9A96E]'
       : 'bg-white border-[#E8E0D5] hover:border-[#C9A96E]/50'
@@ -35,7 +35,7 @@ function AdminRequestRow({ request }) {
       }`} />
 
       {/* Thumbnail */}
-      <div className={`w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+      <div className={`w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
         {hasImage ? (
           <img src={imageUrls[0]} alt={productName} className="w-full h-full object-cover" />
         ) : (

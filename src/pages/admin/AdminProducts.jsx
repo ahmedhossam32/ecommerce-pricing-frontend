@@ -35,8 +35,8 @@ const TABS = [
 
 const TAB_ACTIVE = {
   ALL:            'bg-[#1C1F2E] text-white shadow-md',
-  LIVE:           'bg-green-500 text-white shadow-md',
-  PENDING_REVIEW: 'bg-amber-400 text-white shadow-md',
+  LIVE:           'bg-green-600 text-white shadow-md',
+  PENDING_REVIEW: 'bg-[#C9A96E] text-white shadow-md',
   REJECTED:       'bg-red-500 text-white shadow-md',
   DRAFT:          'bg-[#6B7280] text-white shadow-md',
 }
@@ -44,7 +44,7 @@ const TAB_ACTIVE = {
 const TAB_INACTIVE = {
   ALL:            'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E]',
   LIVE:           'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-green-400 hover:text-green-600',
-  PENDING_REVIEW: 'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-amber-400 hover:text-amber-600',
+  PENDING_REVIEW: 'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-[#C9A96E] hover:text-[#C9A96E]',
   REJECTED:       'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-red-400 hover:text-red-500',
   DRAFT:          'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-gray-400 hover:text-gray-600',
 }
@@ -98,7 +98,7 @@ function AdminProductRow({ product, onOverrideClick, navigate }) {
         isClickable ? 'cursor-pointer hover:shadow-md group' : 'cursor-default'
       } ${
         status === 'LIVE'           ? 'bg-white border-[#E8E0D5] hover:border-green-300' :
-        status === 'PENDING_REVIEW' ? 'bg-amber-50/40 border-amber-200 hover:border-amber-300' :
+        status === 'PENDING_REVIEW' ? 'bg-[#C9A96E]/5 border-[#C9A96E]/20 hover:border-[#C9A96E]/40' :
         status === 'REJECTED'       ? 'bg-red-50/30 border-red-200' :
         status === 'DRAFT'          ? 'bg-gray-50/40 border-[#E8E0D5]' :
         'bg-white border-[#E8E0D5] hover:border-[#C9A96E]/40'
@@ -107,7 +107,7 @@ function AdminProductRow({ product, onOverrideClick, navigate }) {
       {/* Left accent bar */}
       <div className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full ${
         status === 'LIVE'           ? 'bg-green-400' :
-        status === 'PENDING_REVIEW' ? 'bg-amber-400' :
+        status === 'PENDING_REVIEW' ? 'bg-[#C9A96E]' :
         status === 'REJECTED'       ? 'bg-red-400' :
         'bg-gray-300'
       }`} />
@@ -212,6 +212,7 @@ function AdminProducts() {
   const [overrideLoading, setOverrideLoading]     = useState(false)
   const [overrideError, setOverrideError]         = useState(null)
   const [confirmOverride, setConfirmOverride]     = useState(false)
+  const [overrideImgIndex, setOverrideImgIndex]   = useState(0)
 
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab')
@@ -477,6 +478,7 @@ function AdminProducts() {
                       setNewPrice(String(product.price ?? ''))
                       setAdminNote('')
                       setOverrideError(null)
+                      setOverrideImgIndex(0)
                     }}
                     navigate={navigate}
                   />
@@ -537,7 +539,7 @@ function AdminProducts() {
             <div className="relative h-40 overflow-hidden">
               {overrideModal.product.imageUrls?.length > 0 ? (
                 <img
-                  src={overrideModal.product.imageUrls[0]}
+                  src={overrideModal.product.imageUrls[overrideImgIndex]}
                   alt={overrideModal.product.productName}
                   className="w-full h-full object-cover"
                 />
@@ -547,6 +549,31 @@ function AdminProducts() {
                     {categoryEmojis[overrideModal.product.category] || categoryEmojis.default}
                   </span>
                 </div>
+              )}
+              {overrideModal.product.imageUrls?.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setOverrideImgIndex(i => i === 0 ? overrideModal.product.imageUrls.length - 1 : i - 1) }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/35 hover:bg-black/55 text-white rounded-full flex items-center justify-center transition-colors z-10"
+                  >
+                    <FiChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setOverrideImgIndex(i => i === overrideModal.product.imageUrls.length - 1 ? 0 : i + 1) }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/35 hover:bg-black/55 text-white rounded-full flex items-center justify-center transition-colors z-10"
+                  >
+                    <FiChevronRight className="w-4 h-4" />
+                  </button>
+                  <div className="absolute bottom-[62px] left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                    {overrideModal.product.imageUrls.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={(e) => { e.stopPropagation(); setOverrideImgIndex(i) }}
+                        className={`w-1.5 h-1.5 rounded-full transition-colors ${i === overrideImgIndex ? 'bg-white' : 'bg-white/40'}`}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">

@@ -461,7 +461,7 @@ function AdminRequestDetail() {
                       onClick={() => { setActiveDecisionTab('APPROVE'); setApproveError(null) }}
                       className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
                         activeDecisionTab === 'APPROVE'
-                          ? 'bg-green-500 text-white shadow-sm'
+                          ? 'bg-[#1C1F2E] text-white shadow-sm'
                           : 'text-[#6B6560] hover:text-green-600 hover:bg-green-50'
                       }`}
                     >
@@ -472,7 +472,7 @@ function AdminRequestDetail() {
                       onClick={() => { setActiveDecisionTab('REJECT'); setRejectError(null) }}
                       className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
                         activeDecisionTab === 'REJECT'
-                          ? 'bg-red-500 text-white shadow-sm'
+                          ? 'bg-red-700 text-white shadow-sm'
                           : 'text-[#6B6560] hover:text-red-500 hover:bg-red-50'
                       }`}
                     >
@@ -483,7 +483,7 @@ function AdminRequestDetail() {
 
                   {/* APPROVE TAB */}
                   {activeDecisionTab === 'APPROVE' && (
-                    <div className="bg-white border border-green-200 rounded-2xl p-6 space-y-4">
+                    <div className="bg-white border border-[#C9A96E]/30 rounded-2xl p-6 space-y-4">
                       <div>
                         <p className="text-[#1C1F2E] font-bold text-base">Set Final Price</p>
                         <p className="text-[#6B6560] text-xs mt-1">
@@ -555,7 +555,7 @@ function AdminRequestDetail() {
                           setConfirmModal({ type: 'APPROVE' })
                         }}
                         disabled={approveLoading}
-                        className="w-full bg-green-500 hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+                        className="w-full bg-[#1C1F2E] hover:bg-[#2E3452] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
                       >
                         {approveLoading
                           ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
@@ -616,7 +616,7 @@ function AdminRequestDetail() {
                           setConfirmModal({ type: 'REJECT' })
                         }}
                         disabled={rejectLoading}
-                        className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+                        className="w-full bg-red-700 hover:bg-red-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
                       >
                         {rejectLoading
                           ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
@@ -647,11 +647,11 @@ function AdminRequestDetail() {
           >
             <div className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto ${
               confirmModal.type === 'APPROVE'
-                ? 'bg-green-50 border border-green-200'
+                ? 'bg-[#C9A96E]/10 border border-[#C9A96E]/30'
                 : 'bg-red-50 border border-red-200'
             }`}>
               {confirmModal.type === 'APPROVE'
-                ? <FiCheckCircle className="w-7 h-7 text-green-500" />
+                ? <FiCheckCircle className="w-7 h-7 text-[#C9A96E]" />
                 : <FiXCircle className="w-7 h-7 text-red-400" />
               }
             </div>
@@ -690,8 +690,8 @@ function AdminRequestDetail() {
                 }}
                 className={`flex-1 font-bold py-2.5 rounded-xl transition-colors text-sm text-white ${
                   confirmModal.type === 'APPROVE'
-                    ? 'bg-green-500 hover:bg-green-600'
-                    : 'bg-red-500 hover:bg-red-600'
+                    ? 'bg-[#1C1F2E] hover:bg-[#2E3452]'
+                    : 'bg-red-700 hover:bg-red-800'
                 }`}
               >
                 {confirmModal.type === 'APPROVE' ? 'Yes, Approve' : 'Yes, Reject'}
