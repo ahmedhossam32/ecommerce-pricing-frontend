@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { FiHeart, FiShoppingCart, FiPackage, FiTag, FiTrendingUp, FiChevronLeft, FiChevronRight, FiZap } from 'react-icons/fi'
+import { FiHeart, FiShoppingCart, FiPackage, FiTag, FiTrendingUp, FiChevronLeft, FiChevronRight, FiCheckCircle, FiZap } from 'react-icons/fi'
 import BackButton from '../../components/BackButton'
 import { toast } from 'react-toastify'
+import { useAuth } from '../../context/AuthContext'
+import { useCart } from '../../context/CartContext'
+import { useWishlist } from '../../context/WishlistContext'
 import { format } from 'date-fns'
 import PriceHistoryChart from '../../components/PriceHistoryChart'
 import { DUMMY_PRODUCTS } from '../../data/dummyData'
@@ -25,19 +28,88 @@ function ProductDetail() {
   const { id } = useParams()
   const [activeImg, setActiveImg] = useState(0)
   const [imgLoaded, setImgLoaded] = useState(false)
+  const [cartAdded, setCartAdded] = useState(false)
+  const [buyModal, setBuyModal] = useState(false)
+  const [buyLoading, setBuyLoading] = useState(false)
+  const [orderConfirmed, setOrderConfirmed] = useState(false)
+  const [orderData, setOrderData] = useState(null)
+
+  const { user } = useAuth()
+  const { isInCart, addItem: addToCartCtx } = useCart()
+  const { isInWishlist, addItem: addToWishlistCtx, removeItem: removeFromWishlistCtx } = useWishlist()
 
   const product = DUMMY_PRODUCTS.find(p => p.productId === parseInt(id)) || DUMMY_PRODUCTS[0]
   const emoji = categoryEmojis[product.category] || categoryEmojis.default
   const hasImages = product.imageUrls?.length > 0
   const multiImage = product.imageUrls?.length > 1
 
+  const isBuyer = user?.role === 'BUYER'
+  const inCart = isBuyer && isInCart(product.productId)
+  const inWishlist = isBuyer && isInWishlist(product.productId)
+
   const handlePrev = () => { setImgLoaded(false); setActiveImg(i => (i === 0 ? product.imageUrls.length - 1 : i - 1)) }
   const handleNext = () => { setImgLoaded(false); setActiveImg(i => (i === product.imageUrls.length - 1 ? 0 : i + 1)) }
   const handleThumb = (i) => { setImgLoaded(false); setActiveImg(i) }
 
-  const handleBuyNow    = () => toast.success(`Order placed for ${product.name}!`)
-  const handleAddToCart = () => toast.success(`${product.name} added to cart!`)
-  const handleWishlist  = () => toast.success(`${product.name} saved to wishlist!`)
+  const handleBuyNow = () => {
+    if (!user) { toast.error('Please sign in to place an order'); return }
+    setBuyModal(true)
+  }
+
+  const confirmBuyNow = async () => {
+    setBuyLoading(true)
+    await new Promise(r => setTimeout(r, 800))
+    setOrderData({
+      orderId: `ORD-${Date.now().toString().slice(-8)}`,
+      productId: product.productId,
+      productName: product.name,
+      price: product.price,
+      sellerName: product.sellerName,
+      category: product.category,
+      brand: product.brand,
+      imageUrls: product.imageUrls,
+      createdAt: new Date().toISOString(),
+      message: 'Your order has been placed and is being processed.',
+    })
+    setOrderConfirmed(true)
+    setBuyLoading(false)
+  }
+
+  const closeBuyModal = () => {
+    setBuyModal(false)
+    setOrderConfirmed(false)
+    setOrderData(null)
+  }
+
+  const handleAddToCart = async () => {
+    if (!user) { toast.error('Please sign in to add to cart'); return }
+    if (inCart) { toast.info('Already in cart'); return }
+    const result = await addToCartCtx(product.productId)
+    if (result.success) {
+      setCartAdded(true)
+      toast.success(`${product.name} added to cart!`)
+      setTimeout(() => setCartAdded(false), 2000)
+    } else {
+      toast.error(result.message || 'Failed to add to cart')
+    }
+  }
+
+  const handleWishlist = async () => {
+    if (!user) { toast.error('Please sign in to save products'); return }
+    if (inWishlist) {
+      await removeFromWishlistCtx(product.productId)
+      toast.success(`${product.name} removed from wishlist`)
+    } else {
+      const result = await addToWishlistCtx(product.productId)
+      if (result.success) toast.success(`${product.name} saved to wishlist!`)
+      else toast.error(result.message || 'Failed to save')
+    }
+  }
+
+  const historyPrices = DUMMY_HISTORY.map(h => h.price)
+  const lowest  = Math.min(...historyPrices).toFixed(2)
+  const highest = Math.max(...historyPrices).toFixed(2)
+  const average = (historyPrices.reduce((a, b) => a + b, 0) / historyPrices.length).toFixed(2)
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -163,8 +235,8 @@ function ProductDetail() {
                   <span className="text-4xl font-extrabold text-[#1C1F2E]">
                     ${product.price?.toFixed(2)}
                   </span>
-                  <span className="text-sm text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-lg border border-green-100">
-                    ↓ AI Optimized
+                  <span className="text-xs text-[#C9A96E] font-semibold bg-[#C9A96E]/10 px-2.5 py-1 rounded-lg border border-[#C9A96E]/20">
+                    AI Optimized
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -224,20 +296,30 @@ function ProductDetail() {
                   onClick={handleBuyNow}
                   className="w-full flex items-center justify-center gap-2 bg-[#C9A96E] hover:bg-[#b8935a] active:scale-[0.98] text-white font-bold py-4 rounded-2xl text-sm transition-all shadow-lg shadow-[#C9A96E]/25"
                 >
-                  <FiZap className="w-4 h-4" /> Buy Now — ${product.price?.toFixed(2)}
+                  Buy Now — ${product.price?.toFixed(2)}
                 </button>
                 <div className="flex gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 flex items-center justify-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] active:scale-[0.98] text-white py-3.5 rounded-2xl font-semibold text-sm transition-all"
+                    className={`flex-1 flex items-center justify-center gap-2 active:scale-[0.98] text-white py-3.5 rounded-2xl font-semibold text-sm transition-all ${
+                      inCart || cartAdded
+                        ? 'bg-[#C9A96E] hover:bg-[#b8935a]'
+                        : 'bg-[#1C1F2E] hover:bg-[#2E3452]'
+                    }`}
                   >
-                    <FiShoppingCart className="w-4 h-4" /> Add to Cart
+                    <FiShoppingCart className="w-4 h-4" />
+                    {inCart || cartAdded ? 'In Cart ✓' : 'Add to Cart'}
                   </button>
                   <button
                     onClick={handleWishlist}
-                    className="flex-1 flex items-center justify-center gap-2 border-2 border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] active:scale-[0.98] py-3.5 rounded-2xl font-semibold text-sm transition-all"
+                    className={`flex-1 flex items-center justify-center gap-2 active:scale-[0.98] py-3.5 rounded-2xl font-semibold text-sm transition-all border-2 ${
+                      inWishlist
+                        ? 'border-[#C9A96E] text-[#C9A96E] bg-[#C9A96E]/5'
+                        : 'border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5]'
+                    }`}
                   >
-                    <FiHeart className="w-4 h-4" /> Save
+                    <FiHeart className={`w-4 h-4 ${inWishlist ? 'fill-[#C9A96E]' : ''}`} />
+                    {inWishlist ? 'Saved' : 'Save'}
                   </button>
                 </div>
               </div>
@@ -273,6 +355,157 @@ function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* ── BUY NOW MODAL ───────────────────────────────────── */}
+      {buyModal && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4"
+          onClick={() => !buyLoading && closeBuyModal()}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            {!orderConfirmed ? (
+              <div className="p-6 space-y-4">
+                {/* Header */}
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full bg-[#C9A96E]/10 border border-[#C9A96E]/30 flex items-center justify-center mx-auto mb-3">
+                    <FiZap className="w-5 h-5 text-[#C9A96E]" />
+                  </div>
+                  <h3 className="text-[#1C1F2E] font-extrabold text-lg">Confirm Order</h3>
+                  <p className="text-[#9CA3AF] text-xs mt-0.5">Review your order before placing</p>
+                </div>
+
+                {/* Product preview */}
+                <div className="flex items-center gap-3 p-3 bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-white border border-[#E8E0D5] flex items-center justify-center">
+                    {product.imageUrls?.[0]
+                      ? <img src={product.imageUrls[0]} alt={product.name} className="w-full h-full object-cover" />
+                      : <span className="text-2xl">{emoji}</span>
+                    }
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[#1C1F2E] font-bold text-sm truncate">{product.name}</p>
+                    <p className="text-[#9CA3AF] text-xs mt-0.5">{product.brand} · {product.sellerName}</p>
+                    <span className="inline-flex items-center gap-1 text-[#C9A96E] text-[9px] font-bold bg-[#C9A96E]/10 border border-[#C9A96E]/20 px-1.5 py-0.5 rounded-full mt-1">
+                      ✦ AI Verified
+                    </span>
+                  </div>
+                </div>
+
+                {/* Order summary */}
+                <div className="space-y-2 bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#6B6560]">Item price</span>
+                    <span className="font-semibold text-[#1C1F2E]">${product.price?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#6B6560]">AI Verified</span>
+                    <span className="text-[#C9A96E] font-semibold">✦ Fair Price</span>
+                  </div>
+                  <div className="h-px bg-[#E8E0D5]" />
+                  <div className="flex justify-between font-bold text-base">
+                    <span className="text-[#1C1F2E]">Total</span>
+                    <span className="text-[#1C1F2E]">${product.price?.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Email note */}
+                <p className="text-[#9CA3AF] text-xs text-center">
+                  Order confirmation will be sent to your email
+                </p>
+
+                {/* Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={closeBuyModal}
+                    disabled={buyLoading}
+                    className="flex-1 bg-[#FAF8F5] border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] font-bold py-3 rounded-xl transition-all text-sm disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmBuyNow}
+                    disabled={buyLoading}
+                    className="flex-1 bg-[#C9A96E] hover:bg-[#b8935a] disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+                  >
+                    {buyLoading
+                      ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Placing...</>
+                      : 'Confirm Order'
+                    }
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-6 flex flex-col items-center text-center space-y-5">
+                {/* Success icon */}
+                <div className="w-16 h-16 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center">
+                  <FiCheckCircle className="w-8 h-8 text-green-500" />
+                </div>
+
+                {/* Heading */}
+                <div>
+                  <h2 className="text-xl font-extrabold text-[#1C1F2E]">Order Confirmed!</h2>
+                  <p className="text-[#9E9590] text-xs mt-1">{orderData?.message}</p>
+                </div>
+
+                {/* Product card */}
+                <div className="w-full flex items-center gap-3 p-3 bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl text-left">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-white border border-[#E8E0D5]">
+                    {orderData?.imageUrls?.[0]
+                      ? <img src={orderData.imageUrls[0]} alt={orderData.productName} className="w-full h-full object-cover" />
+                      : <div className="w-full h-full flex items-center justify-center text-xl">{emoji}</div>
+                    }
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[#1C1F2E] font-bold text-sm truncate">{orderData?.productName}</p>
+                    <p className="text-[#9E9590] text-xs mt-0.5 capitalize">{orderData?.category?.replace(/_/g, ' ')} · {orderData?.brand}</p>
+                  </div>
+                </div>
+
+                {/* Order details grid */}
+                <div className="w-full grid grid-cols-3 gap-2">
+                  <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3">
+                    <p className="text-[#9E9590] text-[10px] font-semibold uppercase tracking-wider mb-1">Order No.</p>
+                    <p className="text-[#1C1F2E] font-bold text-xs truncate">{orderData?.orderId}</p>
+                  </div>
+                  <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3">
+                    <p className="text-[#9E9590] text-[10px] font-semibold uppercase tracking-wider mb-1">Paid</p>
+                    <p className="text-[#1C1F2E] font-bold text-xs">${orderData?.price?.toFixed(2)}</p>
+                  </div>
+                  <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3">
+                    <p className="text-[#9E9590] text-[10px] font-semibold uppercase tracking-wider mb-1">Seller</p>
+                    <p className="text-[#1C1F2E] font-bold text-xs truncate">{orderData?.sellerName}</p>
+                  </div>
+                </div>
+
+                {/* Email note */}
+                <p className="text-[#9CA3AF] text-xs">
+                  A confirmation has been sent to your email
+                </p>
+
+                {/* Action buttons */}
+                <div className="w-full flex gap-3">
+                  <button
+                    onClick={closeBuyModal}
+                    className="flex-1 bg-[#FAF8F5] border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] font-bold py-3 rounded-xl transition-all text-sm"
+                  >
+                    Continue Shopping
+                  </button>
+                  <Link
+                    to="/orders"
+                    onClick={closeBuyModal}
+                    className="flex-1 bg-[#1C1F2E] hover:bg-[#2E3452] text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center"
+                  >
+                    View Orders
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

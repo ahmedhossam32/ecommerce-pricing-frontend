@@ -21,11 +21,13 @@ function OrderCard({ order }) {
 
   return (
     <Link to={`/orders/${order.orderId}`} className="block">
-      <div className="bg-white border border-[#E8E0D5] rounded-2xl p-4 hover:border-[#C9A96E]/40 hover:shadow-md transition-all duration-200">
+      <div className="order-row relative overflow-hidden bg-white border border-[#E8E0D5] rounded-2xl p-4 hover:border-[#C9A96E]/40 hover:shadow-md transition-all duration-200 group">
+        {/* Left accent bar */}
+        <div className="absolute left-0 top-3 bottom-3 w-[3px] bg-[#C9A96E]/30 rounded-r-full group-hover:bg-[#C9A96E] transition-colors" />
         <div className="flex gap-4 items-center">
 
           {/* Image */}
-          <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#FAF8F5] shrink-0 relative flex items-center justify-center">
+          <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#FAF8F5] shrink-0 relative flex items-center justify-center border border-[#E8E0D5] group-hover:border-[#C9A96E]/30 transition-colors">
             {hasImage ? (
               <>
                 {!imgLoaded && (
@@ -46,7 +48,9 @@ function OrderCard({ order }) {
           {/* Middle — product info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[#9E9590] text-[10px] font-mono">#{order.orderId}</span>
+              <span className="text-[#9E9590] text-[10px] font-mono tracking-wider">
+                ORD-{String(order.orderId).padStart(5, '0')}
+              </span>
               <span className="bg-[#FAF8F5] border border-[#E8E0D5] text-[#C9A96E] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
                 {order.category?.replace(/_/g, ' ')}
               </span>
@@ -103,6 +107,18 @@ function OrderCard({ order }) {
 function Orders() {
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
+      <style>{`
+        @keyframes orderRowIn {
+          from { opacity: 0; transform: translateX(-8px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        .order-row { animation: orderRowIn 0.3s ease both; }
+        .order-row:nth-child(1) { animation-delay: 0.05s; }
+        .order-row:nth-child(2) { animation-delay: 0.10s; }
+        .order-row:nth-child(3) { animation-delay: 0.15s; }
+        .order-row:nth-child(4) { animation-delay: 0.20s; }
+        .order-row:nth-child(5) { animation-delay: 0.25s; }
+      `}</style>
 
       {/* ── HEADER ──────────────────────────────────────────── */}
       <div className="bg-[#1C1F2E] py-6 px-6">

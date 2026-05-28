@@ -1,7 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiHeart, FiShoppingCart, FiArrowRight, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { FiHeart, FiShoppingCart, FiArrowRight, FiChevronLeft, FiChevronRight, FiCheckCircle } from 'react-icons/fi'
 import { toast } from 'react-toastify'
+import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
 
 const categoryEmojis = {
   telephony: '📱', audio: '🎧', computers: '💻',
@@ -30,6 +33,15 @@ function ProductCard({ product, confidence = 'HIGH' }) {
   const [imgIndex, setImgIndex] = useState(0)
   const [imgLoaded, setImgLoaded] = useState(false)
   const [imgError, setImgError] = useState(false)
+  const [cartAdded, setCartAdded] = useState(false)
+
+  const { user } = useAuth()
+  const { isInCart, addItem: addToCartCtx } = useCart()
+  const { isInWishlist, addItem: addToWishlistCtx, removeItem: removeFromWishlistCtx } = useWishlist()
+
+  const isBuyer = user?.role === 'BUYER'
+  const inCart = isBuyer && isInCart(productId)
+  const inWishlist = isBuyer && isInWishlist(productId)
 
   const emoji = categoryEmojis[category] || categoryEmojis.default
   const gradient = categoryGradients[category] || categoryGradients.default
@@ -50,17 +62,34 @@ function ProductCard({ product, confidence = 'HIGH' }) {
     }
   }, [imgIndex, imageUrls])
 
-  const handleAddToCart = useCallback((e) => {
+  const handleAddToCart = useCallback(async (e) => {
     e.preventDefault()
     e.stopPropagation()
-    toast.success(`${name} added to cart!`)
-  }, [name])
+    if (!user) { toast.error('Please sign in to add to cart'); return }
+    if (inCart) { toast.info('Already in cart'); return }
+    const result = await addToCartCtx(productId)
+    if (result.success) {
+      setCartAdded(true)
+      toast.success(`${name} added to cart!`)
+      setTimeout(() => setCartAdded(false), 2000)
+    } else {
+      toast.error(result.message || 'Failed to add to cart')
+    }
+  }, [user, inCart, productId, name, addToCartCtx])
 
-  const handleWishlist = useCallback((e) => {
+  const handleWishlist = useCallback(async (e) => {
     e.preventDefault()
     e.stopPropagation()
-    toast.success(`${name} saved to wishlist!`)
-  }, [name])
+    if (!user) { toast.error('Please sign in to save products'); return }
+    if (inWishlist) {
+      await removeFromWishlistCtx(productId)
+      toast.success(`${name} removed from wishlist`)
+    } else {
+      const result = await addToWishlistCtx(productId)
+      if (result.success) toast.success(`${name} saved to wishlist!`)
+      else toast.error(result.message || 'Failed to save')
+    }
+  }, [user, inWishlist, productId, name, addToWishlistCtx, removeFromWishlistCtx])
 
   return (
     <Link to={`/products/${productId}`} className="block">
@@ -139,9 +168,13 @@ function ProductCard({ product, confidence = 'HIGH' }) {
         <div className="absolute top-3 right-3 group/wish">
           <button
             onClick={handleWishlist}
-            className="w-8 h-8 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all duration-200 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0"
+            className={`w-8 h-8 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-all duration-200 translate-y-1 group-hover:translate-y-0 ${
+              inWishlist
+                ? 'bg-[#C9A96E]/20 text-[#C9A96E] opacity-100 translate-y-0 border border-[#C9A96E]/40'
+                : 'bg-white/95 text-gray-400 hover:text-[#C9A96E] hover:bg-[#C9A96E]/10 opacity-0 group-hover:opacity-100'
+            }`}
           >
-            <FiHeart className="w-3.5 h-3.5" />
+            <FiHeart className={`w-3.5 h-3.5 transition-all ${inWishlist ? 'fill-[#C9A96E] text-[#C9A96E]' : ''}`} />
           </button>
           <span className="pointer-events-none absolute top-full right-0 mt-2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] font-medium px-2.5 py-1.5 rounded-lg opacity-0 group-hover/wish:opacity-100 transition-opacity duration-150 shadow-xl">
             Add to Wishlist
@@ -152,10 +185,17 @@ function ProductCard({ product, confidence = 'HIGH' }) {
         <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out p-3">
           <button
             onClick={handleAddToCart}
-            className="w-full bg-[#1C1F2E]/95 backdrop-blur-sm hover:bg-[#C9A96E] text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-xl tracking-wide"
+            className={`w-full backdrop-blur-sm text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 shadow-xl tracking-wide ${
+              inCart || cartAdded
+                ? 'bg-[#1C1F2E] hover:bg-[#2E3452]'
+                : 'bg-[#1C1F2E]/95 hover:bg-[#C9A96E]'
+            }`}
           >
-            <FiShoppingCart className="w-3.5 h-3.5" />
-            Add to Cart
+            {inCart || cartAdded ? (
+              <><FiCheckCircle className="w-3.5 h-3.5" /> In Cart</>
+            ) : (
+              <><FiShoppingCart className="w-3.5 h-3.5" /> Add to Cart</>
+            )}
           </button>
         </div>
 

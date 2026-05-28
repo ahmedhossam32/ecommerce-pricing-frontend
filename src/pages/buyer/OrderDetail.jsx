@@ -28,6 +28,13 @@ function OrderDetail() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
+      <style>{`
+        @keyframes detailFadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .order-detail-grid { animation: detailFadeIn 0.4s ease both; }
+      `}</style>
 
       {/* ── HEADER ──────────────────────────────────────────── */}
       <div className="bg-[#1C1F2E] py-6">
@@ -49,7 +56,7 @@ function OrderDetail() {
       <div className="max-w-5xl mx-auto px-6 py-8">
 
         {/* Two column grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="order-detail-grid grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* ── LEFT — Image ─────────────────────────────────── */}
           <div className="flex flex-col gap-4">
@@ -155,7 +162,7 @@ function OrderDetail() {
               <h3 className="text-[#1C1F2E] font-bold text-sm mb-4">Order Information</h3>
               <div className="space-y-3">
                 {[
-                  { icon: FiTag, label: 'Order ID', value: `#${order.orderId}`, mono: true },
+                  { icon: FiTag, label: 'Order ID', value: `ORD-${String(order.orderId).padStart(5, '0')}`, mono: true },
                   { icon: FiCalendar, label: 'Purchase Date', value: order.createdAt ? format(new Date(order.createdAt), 'MMM d, yyyy · h:mm a') : 'N/A' },
                   { icon: FiUser, label: 'Purchased by', value: order.buyerName },
                   { icon: FiTrendingUp, label: 'Pricing Method', value: 'AI-Verified Dynamic Price', gold: true },

@@ -1,11 +1,15 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useCart } from '../context/CartContext'
+import { useWishlist } from '../context/WishlistContext'
 import { FiShoppingCart, FiHeart, FiUser, FiChevronDown, FiLogOut, FiPackage, FiMenu, FiX, FiTrendingUp } from 'react-icons/fi'
 import { useState } from 'react'
 import AuthModal from './AuthModal'
 
 function Navbar() {
   const { user, logout } = useAuth()
+  const { cartCount } = useCart()
+  const { wishlistCount } = useWishlist()
   const navigate = useNavigate()
   const location = useLocation()
   const isOnCart = location.pathname === '/cart'
@@ -215,12 +219,17 @@ function Navbar() {
             {user?.role !== 'SELLER' && user?.role !== 'ADMIN' && (
               user?.role === 'BUYER' ? (
                 <div className="relative group/wl">
-                  <Link to="/wishlist" className="p-1 block transition-colors">
+                  <Link to="/wishlist" className="p-1 block transition-colors relative">
                     <FiHeart
                       className="w-5 h-5 transition-colors"
                       style={{ color: isOnWishlist ? '#C9A96E' : '#6B6560' }}
                       fill={isOnWishlist ? '#C9A96E' : 'none'}
                     />
+                    {wishlistCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#C9A96E] text-[#1C1F2E] text-[9px] font-bold rounded-full flex items-center justify-center">
+                        {wishlistCount > 9 ? '9+' : wishlistCount}
+                      </span>
+                    )}
                   </Link>
                   <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
                 </div>
@@ -238,12 +247,17 @@ function Navbar() {
             {user?.role !== 'SELLER' && user?.role !== 'ADMIN' && (
               user?.role === 'BUYER' ? (
                 <div className="relative group/ct">
-                  <Link to="/cart" className="p-1 block transition-colors">
+                  <Link to="/cart" className="p-1 block transition-colors relative">
                     <FiShoppingCart
                       className="w-5 h-5 transition-colors"
                       style={{ color: isOnCart ? '#C9A96E' : '#6B6560' }}
                       fill={isOnCart ? '#C9A96E' : 'none'}
                     />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#1C1F2E] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                        {cartCount > 9 ? '9+' : cartCount}
+                      </span>
+                    )}
                   </Link>
                   <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
                 </div>

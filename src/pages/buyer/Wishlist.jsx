@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { FiHeart, FiShoppingCart, FiTrash2 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import BackButton from '../../components/BackButton'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
+import { useWishlist } from '../../context/WishlistContext'
+import { useCart } from '../../context/CartContext'
+import { useAuth } from '../../context/AuthContext'
 
 const categoryEmojis = {
   telephony: '📱', audio: '🎧', computers: '💻',
@@ -24,7 +26,7 @@ const categoryGradients = {
   default: 'from-[#FAF8F5] via-[#F5F0EA] to-[#EDE5D8]',
 }
 
-function WishlistCard({ item, onRemove }) {
+function WishlistCard({ item, onRemove, onAddToCart, isInCart }) {
   const [imgLoaded, setImgLoaded] = useState(false)
   const emoji = categoryEmojis[item.category] || categoryEmojis.default
   const gradient = categoryGradients[item.category] || categoryGradients.default
@@ -57,7 +59,7 @@ function WishlistCard({ item, onRemove }) {
           {/* Remove button */}
           <div className="absolute top-3 right-3 group/remove">
             <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRemove(item.savedId) }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRemove(item.productId) }}
               className="w-8 h-8 bg-white/95 rounded-full flex items-center justify-center shadow-md border border-[#E8E0D5] hover:border-[#1C1F2E] hover:bg-[#1C1F2E] text-[#9E9590] hover:text-white transition-all"
             >
               <FiTrash2 className="w-3.5 h-3.5" />
@@ -104,11 +106,15 @@ function WishlistCard({ item, onRemove }) {
               </span>
             </div>
             <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast.success(`${item.name} added to cart!`) }}
-              className="bg-[#1C1F2E] hover:bg-[#C9A96E] text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1.5 transition-colors"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAddToCart(item.productId, item.name) }}
+              className={`text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1.5 transition-colors ${
+                isInCart
+                  ? 'bg-[#C9A96E] hover:bg-[#b8935a]'
+                  : 'bg-[#1C1F2E] hover:bg-[#C9A96E]'
+              }`}
             >
               <FiShoppingCart className="w-3 h-3" />
-              Add to Cart
+              {isInCart ? 'In Cart ✓' : 'Add to Cart'}
             </button>
           </div>
         </div>
@@ -118,14 +124,11 @@ function WishlistCard({ item, onRemove }) {
 }
 
 function Wishlist() {
-  const [wishlistItems, setWishlistItems] = useState(() => [
-    { savedId: 1, ...DUMMY_PRODUCTS[0] },
-    { savedId: 2, ...DUMMY_PRODUCTS[3] },
-    { savedId: 3, ...DUMMY_PRODUCTS[8] },
-    { savedId: 4, ...DUMMY_PRODUCTS[7] },
-  ])
+  const { wishlistItems, removeItem: removeFromWishlistCtx, clearAll, wishlistCount } = useWishlist()
+  const { addItem: addToCartCtx, isInCart } = useCart()
+  const { user } = useAuth()
 
-  const handleRemove = (savedId) => setWishlistItems(prev => prev.filter(i => i.savedId !== savedId))
+  const [clearModal, setClearModal] = useState(false)
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -146,7 +149,7 @@ function Wishlist() {
           </div>
           {wishlistItems.length > 0 && (
             <button
-              onClick={() => setWishlistItems([])}
+              onClick={() => setClearModal(true)}
               className="flex items-center gap-2 text-xs text-white/50 hover:text-white border border-white/10 hover:border-white/30 px-4 py-2 rounded-full transition-all font-medium"
             >
               <FiTrash2 className="w-3.5 h-3.5" /> Clear Wishlist
@@ -178,12 +181,68 @@ function Wishlist() {
           <div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 pt-2">
               {wishlistItems.map(item => (
-                <WishlistCard key={item.savedId} item={item} onRemove={handleRemove} />
+                <WishlistCard
+                  key={item.savedId || item.productId}
+                  item={item}
+                  onRemove={async (productId) => {
+                    await removeFromWishlistCtx(productId)
+                    toast.success('Removed from wishlist')
+                  }}
+                  onAddToCart={async (productId, name) => {
+                    if (!user) { toast.error('Please sign in'); return }
+                    if (isInCart(productId)) { toast.info('Already in cart'); return }
+                    const result = await addToCartCtx(productId)
+                    if (result.success) toast.success(`${name} added to cart!`)
+                    else toast.error(result.message || 'Failed to add to cart')
+                  }}
+                  isInCart={isInCart(item.productId)}
+                />
               ))}
             </div>
           </div>
         )}
       </div>
+
+      {/* ── CLEAR WISHLIST MODAL ─────────────────────────────── */}
+      {clearModal && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4"
+          onClick={() => setClearModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-14 h-14 rounded-full bg-[#C9A96E]/10 border border-[#C9A96E]/30 flex items-center justify-center mx-auto">
+              <FiHeart className="w-7 h-7 text-[#C9A96E]" />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="text-[#1C1F2E] font-extrabold text-lg">Clear your wishlist?</p>
+              <p className="text-[#6B6560] text-sm">
+                This will remove all {wishlistItems.length} saved item{wishlistItems.length !== 1 ? 's' : ''}.
+              </p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setClearModal(false)}
+                className="flex-1 bg-[#FAF8F5] border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] font-bold py-3 rounded-xl text-sm transition-all"
+              >
+                Keep Items
+              </button>
+              <button
+                onClick={() => {
+                  clearAll()
+                  toast.success('Wishlist cleared')
+                  setClearModal(false)
+                }}
+                className="flex-1 bg-[#C9A96E] hover:bg-[#b8935a] text-white font-bold py-3 rounded-xl text-sm transition-colors"
+              >
+                Yes, Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

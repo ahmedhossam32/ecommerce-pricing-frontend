@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { AuthProvider } from './context/AuthContext'
+import { CartProvider } from './context/CartContext'
+import { WishlistProvider } from './context/WishlistContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -46,6 +48,8 @@ const Unauthorized = () => (
 function App() {
   return (
     <AuthProvider>
+      <CartProvider>
+      <WishlistProvider>
       <BrowserRouter>
         <ToastContainer position="top-right" autoClose={3000} />
         <Routes>
@@ -106,6 +110,8 @@ function App() {
 
         </Routes>
       </BrowserRouter>
+      </WishlistProvider>
+      </CartProvider>
     </AuthProvider>
   )
 }

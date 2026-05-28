@@ -97,6 +97,10 @@ function ProductsPage() {
 
   const activeFilters = (search ? 1 : 0) + (category !== 'all' ? 1 : 0)
 
+  const ITEMS_PER_PAGE = 8
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
 
@@ -113,71 +117,64 @@ function ProductsPage() {
           style={{ backgroundImage: 'radial-gradient(circle, #C9A96E 1px, transparent 1px)', backgroundSize: '24px 24px' }}
         />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-14">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:items-center">
+        <div className="relative max-w-7xl mx-auto px-6 py-12">
 
-            {/* ── Left column ── */}
-            <div>
-              {/* Label row: brand line + AI status pill */}
-              <div className="flex items-center justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-0.5 bg-[#C9A96E]" />
-                  <p className="text-[#C9A96E] text-xs font-bold uppercase tracking-[0.2em]">
-                    DynaMart Marketplace
-                  </p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 bg-green-500/15 text-green-400 border border-green-500/20 text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shrink-0" />
-                  AI Engine Active
-                </span>
-              </div>
+          {/* Top label row */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-5 h-0.5 bg-[#C9A96E]" />
+            <p className="text-[#C9A96E] text-xs font-bold uppercase tracking-[0.2em]">
+              DynaMart Marketplace
+            </p>
+            <div className="w-px h-3 bg-white/20 mx-1" />
+            <span className="inline-flex items-center gap-1.5 bg-green-500/15 text-green-400 border border-green-500/20 text-[10px] font-semibold px-2.5 py-1 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shrink-0" />
+              AI Engine Active
+            </span>
+          </div>
 
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 leading-tight">
-                Browse Products
-              </h1>
-              <p className="text-gray-400 text-sm max-w-md">
-                Every price is set by our AI engine — analyzing market data in real time so you always pay a fair price.
-              </p>
+          {/* Headline */}
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 leading-tight max-w-xl">
+            Browse Products
+          </h1>
+          <p className="text-gray-400 text-sm max-w-lg mb-6">
+            Every price is set by our AI engine — analyzing market data in real time so you always pay a fair price.
+          </p>
 
-              {/* Search bar — full width of left column */}
-              <div className="mt-8 relative focus-within:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] rounded-2xl transition-shadow duration-200">
-                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchInput}
-                  onChange={e => setSearchInput(e.target.value)}
-                  placeholder="Search products, brands, categories..."
-                  className="w-full bg-white/10 backdrop-blur-sm border border-white/15 hover:border-white/30 focus:border-[#C9A96E] rounded-2xl pl-11 pr-10 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none transition-colors"
-                />
-                {searchInput && (
-                  <button
-                    onClick={() => { setSearchInput(''); handleSearch('') }}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-                  >
-                    <FiX className="w-3 h-3 text-white" />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* ── Right column: stats card (desktop only) ── */}
-            <div className="hidden md:flex justify-end">
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-xs">
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { value: '500+', label: 'Sellers' },
-                    { value: '100%', label: 'AI-Verified Prices' },
-                    { value: '12+',  label: 'Categories' },
-                  ].map(({ value, label }) => (
-                    <div key={label} className="text-center">
-                      <p className="text-[#C9A96E] font-extrabold text-2xl leading-none mb-1.5">{value}</p>
-                      <p className="text-gray-400 text-[10px] leading-tight">{label}</p>
-                    </div>
-                  ))}
+          {/* Stats strip — inline, simple */}
+          <div className="flex items-center gap-6 mb-8">
+            {[
+              { value: '500+', label: 'Verified Sellers' },
+              { value: '100%', label: 'AI-Priced' },
+              { value: '12+',  label: 'Categories' },
+            ].map(({ value, label }, i) => (
+              <div key={label} className="flex items-center gap-3">
+                {i > 0 && <div className="w-px h-6 bg-white/10" />}
+                <div>
+                  <p className="text-[#C9A96E] font-extrabold text-lg leading-none">{value}</p>
+                  <p className="text-white/40 text-[10px] mt-0.5">{label}</p>
                 </div>
               </div>
-            </div>
+            ))}
+          </div>
 
+          {/* Search bar */}
+          <div className="relative max-w-xl focus-within:shadow-[0_0_0_3px_rgba(201,169,110,0.2)] rounded-2xl transition-shadow duration-200">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+              placeholder="Search products, brands, categories..."
+              className="w-full bg-white/[0.08] backdrop-blur-sm border border-white/20 hover:border-white/35 focus:border-[#C9A96E] focus:bg-white/[0.12] rounded-2xl pl-11 pr-10 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none transition-all"
+            />
+            {searchInput && (
+              <button
+                onClick={() => { setSearchInput(''); handleSearch('') }}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+              >
+                <FiX className="w-3 h-3 text-white" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -199,22 +196,22 @@ function ProductsPage() {
                   <button
                     key={cat.value}
                     onClick={() => handleCategory(cat.value)}
-                    className={`flex items-center gap-2.5 px-3.5 py-2 rounded-2xl border shrink-0 transition-all duration-200 group
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-2xl border shrink-0 transition-all duration-200 group
                       ${active
                         ? 'bg-[#1C1F2E] border-[#1C1F2E] text-white shadow-md'
-                        : 'bg-white border-[#E8E0D5] text-[#6B6560] hover:border-[#C9A96E]/60 hover:text-[#1C1F2E] hover:shadow-sm'
+                        : 'bg-white border-[#E8E0D5] text-[#6B6560] hover:border-[#C9A96E]/60 hover:text-[#1C1F2E] hover:shadow-sm hover:-translate-y-0.5'
                       }`}
                   >
                     {/* Image or icon thumbnail */}
-                    <div className={`w-9 h-9 rounded-xl overflow-hidden shrink-0 flex items-center justify-center transition-all duration-200
-                      ${active ? 'ring-1 ring-[#C9A96E]/40' : 'ring-1 ring-[#E8E0D5]'}
-                      ${!cat.img ? (active ? 'bg-[#C9A96E]/20' : 'bg-[#F5F0EA]') : ''}
+                    <div className={`w-11 h-11 rounded-xl overflow-hidden shrink-0 flex items-center justify-center transition-all duration-200
+                      ${active ? 'ring-2 ring-[#C9A96E]/50 scale-105' : 'ring-1 ring-[#E8E0D5] group-hover:ring-[#C9A96E]/30 group-hover:scale-105'}
+                      ${!cat.img ? (active ? 'bg-[#C9A96E]/20' : 'bg-[#F5F0EA] group-hover:bg-[#C9A96E]/10') : ''}
                     `}>
                       {cat.value === 'all'
-                        ? <FiGrid className={`w-4 h-4 ${active ? 'text-[#C9A96E]' : 'text-[#6B6560]'}`} />
+                        ? <FiGrid className={`w-5 h-5 ${active ? 'text-[#C9A96E]' : 'text-[#6B6560] group-hover:text-[#C9A96E]'} transition-colors`} />
                         : cat.img
-                          ? <img src={cat.img} className="w-full h-full object-cover" alt={cat.label} />
-                          : <span className="text-lg">{cat.value === 'health_beauty' ? '💄' : '📦'}</span>
+                          ? <img src={cat.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" alt={cat.label} />
+                          : <span className="text-xl">{cat.value === 'health_beauty' ? '💄' : '📦'}</span>
                       }
                     </div>
 
@@ -225,7 +222,7 @@ function ProductsPage() {
                       {cat.value === 'all' ? 'All Products' : cat.label}
                     </span>
 
-                    {/* Active gold dot indicator */}
+                    {/* Active gold dot */}
                     <span className={`h-1.5 rounded-full bg-[#C9A96E] shrink-0 transition-all duration-200
                       ${active ? 'opacity-100 scale-100 w-1.5' : 'opacity-0 scale-0 w-0'}
                     `} />
@@ -340,13 +337,13 @@ function ProductsPage() {
           <>
             {view === 'grid' ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 items-stretch">
-                {filtered.map(product => (
+                {paginated.map(product => (
                   <MemoProductCard key={product.productId} product={product} />
                 ))}
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {filtered.map(product => (
+                {paginated.map(product => (
                   <Link
                     key={product.productId}
                     to={`/products/${product.productId}`}
@@ -388,7 +385,7 @@ function ProductsPage() {
             {/* Page info text */}
             <p className="text-xs text-[#9E9590]">
               Page <span className="font-bold text-[#1C1F2E]">{page}</span> of{' '}
-              <span className="font-bold text-[#1C1F2E]">5</span>
+              <span className="font-bold text-[#1C1F2E]">{totalPages}</span>
             </p>
 
             {/* Pagination controls */}
@@ -406,7 +403,7 @@ function ProductsPage() {
 
               {/* Page numbers */}
               <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map(n => (
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                   <button
                     key={n}
                     onClick={() => setPage(n)}
@@ -424,7 +421,7 @@ function ProductsPage() {
               {/* Next button */}
               <button
                 onClick={() => setPage(p => Math.min(5, p + 1))}
-                disabled={page === 5}
+                disabled={page === totalPages}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E8E0D5] bg-white text-xs font-semibold text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E] hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
               >
                 Next
