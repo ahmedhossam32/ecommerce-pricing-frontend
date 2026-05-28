@@ -1,7 +1,11 @@
 import { useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { FiUpload, FiX, FiZap, FiCheckCircle, FiCircle, FiMessageSquare, FiTrendingUp, FiClock, FiAlertCircle, FiPackage, FiTruck } from 'react-icons/fi'
+import {
+  FiUpload, FiX, FiZap, FiCheckCircle, FiCircle, FiMessageSquare,
+  FiTrendingUp, FiClock, FiAlertCircle, FiPackage, FiTruck,
+  FiArrowLeft, FiArrowRight, FiCheck, FiImage,
+} from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import Cropper from 'react-easy-crop'
 
@@ -62,6 +66,8 @@ function ListProduct() {
   const navigate = useNavigate()
   const { user } = useAuth()
 
+  const [currentStep, setCurrentStep] = useState(1)
+
   const [form, setForm] = useState({
     name: '', category: '', description: '',
     weight: '', freightValue: '',
@@ -89,8 +95,8 @@ function ListProduct() {
     { label: 'Name entered',       done: form.name.length >= 2 },
     { label: 'Category selected',  done: form.category !== '' },
     { label: 'Description filled', done: form.description.length >= 10 },
-    { label: 'Weight entered',     done: form.weight !== '' && Number(form.weight) > 0 },
-    { label: 'Photos uploaded',    done: images.length >= 1 },
+    { label: 'Weight entered',       done: form.weight !== '' && Number(form.weight) > 0 },
+    { label: 'Freight value entered', done: form.freightValue !== '' && Number(form.freightValue) >= 0 },
   ]
   const allDone = checks.every(c => c.done)
 
@@ -146,6 +152,7 @@ function ListProduct() {
     setLoading(true)
     await new Promise(r => setTimeout(r, 2000))
     setPricingResult(DUMMY_RESULT)
+    setCurrentStep(3)
     setLoading(false)
   }
 
@@ -165,192 +172,368 @@ function ListProduct() {
         <p className="text-[#9CA3AF] text-sm mt-2">Fill in the details — our AI will suggest a fair price automatically.</p>
       </div>
 
-      {/* 3-column grid */}
-      <div className="grid grid-cols-[220px_1fr_220px] gap-5 p-8">
+      {/* Step content */}
+      <div className="max-w-3xl mx-auto px-6 py-8">
 
-        {/* Column 1: Product Images */}
-        <div className="bg-white border border-[#E8E0D5] rounded-2xl p-5">
-          <h2 className="text-sm font-bold text-[#1C1F2E] mb-1">Product Images</h2>
-          <p className="text-xs text-[#9CA3AF] mb-4">Up to 5 images. First is thumbnail.</p>
-
-          <label className="block cursor-pointer">
-            <div className="border-2 border-dashed border-[#E8E0D5] hover:border-[#C9A96E] rounded-2xl p-8 flex flex-col items-center gap-3 transition-colors bg-[#FAF8F5] hover:bg-[#FDF6EC] group">
-              <div className="w-10 h-10 bg-[#C9A96E]/10 rounded-xl flex items-center justify-center group-hover:bg-[#C9A96E]/20 transition-colors">
-                <FiUpload className="w-5 h-5 text-[#C9A96E]" />
+        {/* Step indicator */}
+        <div className="flex items-center gap-0 mb-10">
+          {[
+            { num: 1, label: 'Product Images' },
+            { num: 2, label: 'Product Details' },
+            { num: 3, label: 'AI Pricing' },
+          ].map(({ num, label }, idx) => (
+            <div key={num} className="flex items-center flex-1">
+              <div className="flex flex-col items-center gap-1.5">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                  currentStep > num
+                    ? 'bg-green-500 text-white'
+                    : currentStep === num
+                    ? 'bg-[#C9A96E] text-white shadow-[0_0_0_4px_rgba(201,169,110,0.2)]'
+                    : 'bg-white border-2 border-[#E8E0D5] text-[#9CA3AF]'
+                }`}>
+                  {currentStep > num ? <FiCheck size={16} /> : num}
+                </div>
+                <span className={`text-[10px] font-semibold whitespace-nowrap ${
+                  currentStep === num ? 'text-[#C9A96E]' : 'text-[#9CA3AF]'
+                }`}>
+                  {label}
+                </span>
               </div>
-              <div className="text-center">
-                <p className="text-[#1C1F2E] font-semibold text-sm">Click to upload</p>
-                <p className="text-[#9E9590] text-xs mt-0.5">JPG, PNG — max 5 images</p>
+              {idx < 2 && (
+                <div className={`flex-1 h-[2px] mx-2 mb-5 rounded-full transition-all duration-500 ${
+                  currentStep > num ? 'bg-green-400' : 'bg-[#E8E0D5]'
+                }`} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* ── STEP 1: Product Images ── */}
+        {currentStep === 1 && (
+          <div className="bg-white border border-[#E8E0D5] rounded-2xl p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#C9A96E]/10 flex items-center justify-center">
+                <FiImage className="text-[#C9A96E]" size={20} />
+              </div>
+              <div>
+                <h2 className="text-[#1C1F2E] font-bold text-lg">Product Images</h2>
+                <p className="text-[#9CA3AF] text-xs">Upload up to 5 photos. First image is the thumbnail.</p>
               </div>
             </div>
-            <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
-          </label>
 
-          {images.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              {images.map((file, idx) => (
-                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-[#E8E0D5] bg-[#FAF8F5]">
-                  <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
-                  {idx === 0 && (
-                    <span className="absolute top-1 left-1 bg-[#C9A96E] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                      Thumbnail
-                    </span>
-                  )}
-                  <button
-                    onClick={() => removeImage(idx)}
-                    className="absolute top-1 right-1 bg-black/50 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-black/70"
-                  >
-                    <FiX className="w-3 h-3" />
-                  </button>
+            {/* Upload zone */}
+            <label className="block cursor-pointer mb-6">
+              <div className={`border-2 border-dashed rounded-2xl p-12 flex flex-col items-center gap-4 transition-all duration-200 ${
+                images.length >= 5
+                  ? 'border-[#E8E0D5] bg-[#FAF8F5] cursor-not-allowed opacity-50'
+                  : 'border-[#E8E0D5] hover:border-[#C9A96E] bg-[#FAF8F5] hover:bg-[#FDF6EC] group'
+              }`}>
+                <div className="w-14 h-14 bg-[#C9A96E]/10 rounded-2xl flex items-center justify-center group-hover:bg-[#C9A96E]/20 transition-colors">
+                  <FiUpload className="text-[#C9A96E]" size={24} />
+                </div>
+                <div className="text-center">
+                  <p className="text-[#1C1F2E] font-bold text-base">Click to upload photos</p>
+                  <p className="text-[#9CA3AF] text-sm mt-1">JPG, PNG — max 5 images</p>
+                </div>
+                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                  images.length >= 1 ? 'bg-green-50 text-green-600' : 'bg-[#F0EDE8] text-[#9CA3AF]'
+                }`}>
+                  {images.length} / 5 uploaded
+                </span>
+              </div>
+              <input type="file" multiple accept="image/*" className="hidden"
+                onChange={handleImageUpload} disabled={images.length >= 5} />
+            </label>
+
+            {/* 5-slot image grid */}
+            <div className="grid grid-cols-5 gap-3 mb-6">
+              {Array.from({ length: 5 }).map((_, idx) => {
+                const file = images[idx]
+                return (
+                  <div key={idx} className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                    file ? 'border-[#C9A96E]/40 shadow-sm' : 'border-dashed border-[#E8E0D5] bg-[#FAF8F5]'
+                  }`}>
+                    {file ? (
+                      <>
+                        <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                        {idx === 0 && (
+                          <span className="absolute bottom-0 left-0 right-0 bg-[#C9A96E] text-white text-[9px] font-bold py-0.5 text-center">
+                            THUMBNAIL
+                          </span>
+                        )}
+                        <button
+                          onClick={() => removeImage(idx)}
+                          className="absolute top-1 right-1 w-5 h-5 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center transition-colors"
+                        >
+                          <FiX size={10} className="text-white" />
+                        </button>
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-[#E8E0D5] text-xs font-medium">{idx + 1}</span>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Info note */}
+            <div className="bg-[#FAF0E0] border border-[#E8D5A3] rounded-xl p-3 flex items-start gap-2 mb-6">
+              <FiAlertCircle className="text-[#C9A96E] shrink-0 mt-0.5" size={14} />
+              <p className="text-[#92601A] text-xs leading-relaxed">
+                Images are uploaded when you list the product. Products without images will not be accepted.
+              </p>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between pt-4 border-t border-[#E8E0D5]">
+              <p className="text-xs text-[#9CA3AF]">
+                {images.length === 0
+                  ? 'At least 1 image recommended'
+                  : `${images.length} image${images.length > 1 ? 's' : ''} ready`}
+              </p>
+              <button
+                onClick={() => setCurrentStep(2)}
+                className="flex items-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all"
+              >
+                Continue <FiArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 2: Product Details ── */}
+        {currentStep === 2 && (
+          <div className="bg-white border border-[#E8E0D5] rounded-2xl p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#C9A96E]/10 flex items-center justify-center">
+                <FiPackage className="text-[#C9A96E]" size={20} />
+              </div>
+              <div>
+                <h2 className="text-[#1C1F2E] font-bold text-lg">Product Details</h2>
+                <p className="text-[#9CA3AF] text-xs">Tell us about your product — AI extracts the brand automatically.</p>
+              </div>
+            </div>
+
+            {/* AI brand note */}
+            <div className="bg-[#FAF0E0] border border-[#E8D5A3] rounded-xl p-3 flex items-start gap-2 mb-6">
+              <FiZap className="text-[#C9A96E] shrink-0 mt-0.5" size={14} />
+              <p className="text-[#92601A] text-xs leading-relaxed">
+                <span className="font-bold">Brand is extracted automatically</span> from your description — mention the brand name naturally (e.g. "Sony WH-1000XM5") for a more accurate price suggestion.
+              </p>
+            </div>
+
+            {/* Product Info */}
+            <div className="bg-white border border-[#E8E0D5] rounded-xl p-5 space-y-4 mb-4">
+              <h3 className="text-[#1C1F2E] font-bold text-sm flex items-center gap-2">
+                <FiPackage className="w-4 h-4 text-[#C9A96E]" /> Product Info
+              </h3>
+              <div>
+                <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
+                  Product Name <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text" name="name" value={form.name} onChange={handleChange}
+                  placeholder="e.g. Sony WH-1000XM5 Headphones"
+                  className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
+                  Category <span className="text-red-400">*</span>
+                </label>
+                <select
+                  name="category" value={form.category} onChange={handleChange}
+                  className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
+                >
+                  <option value="">Select a category...</option>
+                  {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-[#6B6560]">
+                    Description <span className="text-red-400">*</span>
+                  </label>
+                  <span className="text-[10px] text-[#9CA3AF]">{form.description.length} chars</span>
+                </div>
+                <textarea
+                  name="description" value={form.description} onChange={handleChange}
+                  placeholder="Describe your product in detail. Include the brand name — AI extracts it automatically."
+                  className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors resize-none overflow-y-auto h-24"
+                />
+              </div>
+            </div>
+
+            {/* Shipping Details */}
+            <div className="bg-white border border-[#E8E0D5] rounded-xl p-5 space-y-4 mb-6">
+              <h3 className="text-[#1C1F2E] font-bold text-sm flex items-center gap-2">
+                <FiTruck className="w-4 h-4 text-[#C9A96E]" /> Shipping Details
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
+                    Weight (g) <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="number" name="weight" value={form.weight} onChange={handleChange}
+                    placeholder="e.g. 250"
+                    className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
+                  />
+                  <p className="text-[10px] text-[#9CA3AF] mt-1">Approximate weight in grams. Check the box or product manual.</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
+                    Shipping Cost <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="number" name="freightValue" value={form.freightValue} onChange={handleChange}
+                    placeholder="0 = free"
+                    className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Progress checklist */}
+            <div className="grid grid-cols-2 gap-2 my-6 p-4 bg-[#FAF8F5] rounded-xl border border-[#E8E0D5]">
+              {checks.map(({ label, done }) => (
+                <div key={label} className={`flex items-center gap-2 text-xs ${done ? 'text-green-600' : 'text-[#9CA3AF]'}`}>
+                  {done
+                    ? <FiCheckCircle size={12} className="text-green-500 shrink-0" />
+                    : <FiCircle size={12} className="shrink-0" />
+                  }
+                  {label}
                 </div>
               ))}
             </div>
-          )}
 
-          <p className="text-[10px] text-[#9CA3AF] text-center mt-3">{images.length} / 5 images</p>
-        </div>
+            {/* Preview price (optional) */}
+            <button
+              onClick={handleComputePrice}
+              disabled={loading || !allDone}
+              className="w-full py-2.5 border border-[#C9A96E]/40 rounded-xl bg-[#C9A96E]/10 text-[#C9A96E] text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#C9A96E]/20 transition-colors disabled:opacity-40 mb-3"
+            >
+              <FiZap size={15} /> Preview AI Price (optional)
+            </button>
 
-        {/* Column 2: Product Details */}
-        <div className="bg-white border border-[#E8E0D5] rounded-2xl p-6">
-          <h2 className="text-sm font-bold text-[#1C1F2E] mb-4">Product Details</h2>
+            {/* computeResult preview card */}
+            {computeResult && (
+              <div className="border border-[#C9A96E]/30 bg-[#C9A96E]/10 rounded-xl p-4 flex flex-col gap-2 mb-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[#C9A96E] text-sm font-bold flex items-center gap-1.5">
+                    <FiZap className="w-3.5 h-3.5" />
+                    ${computeResult.suggestedPrice.toFixed(2)}
+                  </span>
+                  <button onClick={() => setComputeResult(null)} className="text-[#9CA3AF] hover:text-[#6B6560] transition-colors">
+                    <FiX className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs text-[#6B6560]">
+                    Range: ${computeResult.minRange}–${computeResult.maxRange}
+                  </span>
+                  <span className="text-xs font-bold text-green-600">
+                    {computeResult.confidence} confidence
+                  </span>
+                </div>
+                <div className="text-xs text-[#9CA3AF] flex items-center gap-1">
+                  <FiTrendingUp className="w-3 h-3 text-[#C9A96E]" />
+                  Brand: <span className="text-[#6B6560] font-semibold ml-0.5">{computeResult.brand}</span>
+                </div>
+              </div>
+            )}
 
-          <div className="bg-[#FAF0E0] border border-[#E8D5A3] rounded-xl p-3 flex items-start gap-2 mb-5">
-            <FiZap className="text-[#C9A96E] w-4 h-4 mt-0.5 shrink-0" />
-            <p className="text-[#92601A] text-xs leading-relaxed">
-              Brand is extracted automatically from your description — mention the brand name naturally in your description for a more accurate price.
-            </p>
-          </div>
-
-          <div className="bg-white border border-[#E8E0D5] rounded-2xl p-5 space-y-4">
-            <h3 className="text-[#1C1F2E] font-bold text-sm flex items-center gap-2">
-              <FiPackage className="w-4 h-4 text-[#C9A96E]" /> Product Info
-            </h3>
-            <div>
-              <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
-                Product Name <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text" name="name" value={form.name} onChange={handleChange}
-                placeholder="e.g. Sony WH-1000XM5 Headphones"
-                className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
-                Category <span className="text-red-400">*</span>
-              </label>
-              <select
-                name="category" value={form.category} onChange={handleChange}
-                className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
+            {/* Navigation */}
+            <div className="flex items-center justify-between pt-4 border-t border-[#E8E0D5]">
+              <button
+                onClick={() => setCurrentStep(1)}
+                className="flex items-center gap-2 border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] font-semibold px-5 py-2.5 rounded-xl text-sm transition-all"
               >
-                <option value="">Select a category...</option>
-                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-semibold text-[#6B6560]">
-                  Description <span className="text-red-400">*</span>
-                </label>
-                <span className="text-[10px] text-[#9CA3AF]">{form.description.length} chars</span>
-              </div>
-              <textarea
-                name="description" value={form.description} onChange={handleChange}
-                placeholder="Describe your product in detail. Include the brand name — AI extracts it automatically."
-                className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors resize-none overflow-y-auto h-24"
-              />
-            </div>
-          </div>
-
-          <div className="bg-white border border-[#E8E0D5] rounded-2xl p-5 space-y-4 mt-4">
-            <h3 className="text-[#1C1F2E] font-bold text-sm flex items-center gap-2">
-              <FiTruck className="w-4 h-4 text-[#C9A96E]" /> Shipping Details
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
-                  Weight (g) <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="number" name="weight" value={form.weight} onChange={handleChange}
-                  placeholder="e.g. 250"
-                  className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
-                />
-                <p className="text-[10px] text-[#9CA3AF] mt-1">Approximate weight in grams. Check the box or product manual.</p>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#6B6560] mb-1.5">
-                  Shipping Cost <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="number" name="freightValue" value={form.freightValue} onChange={handleChange}
-                  placeholder="0 = free"
-                  className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors"
-                />
-              </div>
+                <FiArrowLeft size={15} /> Back
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={loading || !allDone}
+                className="flex items-center gap-2 bg-[#C9A96E] hover:bg-[#b8935a] disabled:opacity-50 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_4px_20px_rgba(201,169,110,0.4)]"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Analyzing with AI...
+                  </>
+                ) : (
+                  <><FiZap size={15} /> List & Get AI Price</>
+                )}
+              </button>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Column 3: AI Preview Panel */}
-        <div className={`bg-[#1C1F2E] rounded-2xl p-5 flex flex-col gap-4 border ${pricingResult?.confidence === 'HIGH' ? 'border-green-300 shadow-md shadow-green-100' : 'border-transparent'}`}>
-          {pricingResult ? (
-            <>
-              {/* ── ACCEPTED SUCCESS SCREEN ── */}
+        {/* ── STEP 3: AI Pricing Result ── */}
+        {currentStep === 3 && pricingResult && (
+          <div className="bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden">
+            {/* Confidence top bar */}
+            <div className={`h-1.5 w-full ${
+              pricingResult.confidence === 'HIGH'   ? 'bg-green-400' :
+              pricingResult.confidence === 'MEDIUM' ? 'bg-amber-400' :
+              'bg-red-400'
+            }`} />
+
+            <div className="p-8">
               {accepted ? (
-                <div className="flex flex-col gap-4 items-center text-center">
-                  <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <FiCheckCircle className="w-7 h-7 text-green-400" />
+                /* ── Success screen ── */
+                <div className="flex flex-col gap-4 items-center text-center py-6">
+                  <div className="w-16 h-16 rounded-full bg-green-500/10 border-2 border-green-400/30 flex items-center justify-center">
+                    <FiCheckCircle className="w-8 h-8 text-green-500" />
                   </div>
                   <div>
-                    <p className="text-white font-bold text-base">Product is Live!</p>
-                    <p className="text-white/50 text-xs mt-1">
+                    <p className="text-[#1C1F2E] font-bold text-xl">Product is Live!</p>
+                    <p className="text-[#6B6560] text-sm mt-1">
                       Listed at ${chosenPrice ? Number(chosenPrice).toFixed(2) : pricingResult.suggestedPrice.toFixed(2)}
                     </p>
-                    <p className="text-white/30 text-[10px] mt-1">
-                      A confirmation email has been sent to you
-                    </p>
+                    <p className="text-[#9CA3AF] text-xs mt-1">A confirmation email has been sent to you</p>
                   </div>
                   <button
                     onClick={() => navigate('/seller/products')}
-                    className="w-full py-3 rounded-xl bg-[#C9A96E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#b8935a] transition-colors"
+                    className="w-full max-w-xs py-3 rounded-xl bg-[#C9A96E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#b8935a] transition-colors"
                   >
                     View My Products
                   </button>
                 </div>
-
               ) : (
                 <>
                   {/* Header */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-4">
                     <p className="text-[#C9A96E] font-bold text-sm flex items-center gap-2">
                       <FiZap className="w-4 h-4" /> AI Pricing Result
                     </p>
                     {pricingResult.status === 'PENDING_SELLER' && !acceptMode && (
                       <button
-                        onClick={() => { setPricingResult(null); setAcceptMode(false); setChosenPrice('') }}
-                        className="text-white/30 hover:text-white/60 text-xs transition-colors"
+                        onClick={() => { setPricingResult(null); setAcceptMode(false); setChosenPrice(''); setCurrentStep(2) }}
+                        className="text-[#9CA3AF] hover:text-[#6B6560] text-xs transition-colors"
                       >
                         ← Back
                       </button>
                     )}
                   </div>
 
-                  <hr className="border-white/10" />
+                  <hr className="border-[#E8E0D5]" />
 
-                  {/* Suggested Price */}
-                  <div>
-                    <p className="text-white/40 text-[10px] mb-1">Suggested Price</p>
-                    <p className="text-white text-3xl font-extrabold">
+                  {/* Suggested price — prominent center */}
+                  <div className="text-center py-6 border-b border-[#E8E0D5] mb-6">
+                    <p className="text-[#9CA3AF] text-sm mb-2">AI Suggested Price</p>
+                    <p className="text-5xl font-extrabold text-[#1C1F2E]">
                       ${pricingResult.suggestedPrice.toFixed(2)}
                     </p>
-                    <p className="text-white/50 text-xs mt-1">
-                      Range: ${pricingResult.minRange} – ${pricingResult.maxRange}
+                    <p className="text-[#6B6560] text-sm mt-2">
+                      Accepted range: ${pricingResult.minRange} – ${pricingResult.maxRange}
                     </p>
                   </div>
 
-                  {/* Confidence Badge */}
-                  <div>
+                  {/* Confidence badge */}
+                  <div className="mb-4">
                     {pricingResult.confidence === 'HIGH' && (
                       <span className="inline-flex items-center gap-1.5 bg-green-50 text-green-600 border border-green-200 text-xs font-bold px-3 py-1.5 rounded-full">
                         <FiCheckCircle className="w-3.5 h-3.5" /> High Confidence
@@ -369,7 +552,7 @@ function ListProduct() {
                   </div>
 
                   {/* Brand */}
-                  <p className="text-xs text-[#9CA3AF] flex items-center gap-2">
+                  <p className="text-xs text-[#9CA3AF] flex items-center gap-2 mb-2">
                     <FiTrendingUp className="w-3.5 h-3.5 text-[#C9A96E]" />
                     Brand detected:
                     <span className="bg-[#C9A96E]/10 text-[#C9A96E] font-bold px-2 py-0.5 rounded-full text-xs border border-[#C9A96E]/20">
@@ -377,48 +560,48 @@ function ListProduct() {
                     </span>
                   </p>
                   {pricingResult.confidence === 'HIGH' && (
-                    <p className="text-green-400/60 text-[10px]">
+                    <p className="text-green-600/60 text-[10px] mb-4">
                       ✓ AI is highly confident in this price — based on known market data
                     </p>
                   )}
                   {pricingResult.confidence === 'MEDIUM' && (
-                    <p className="text-yellow-400/60 text-[10px]">
+                    <p className="text-amber-500/70 text-[10px] mb-4">
                       ⚠ AI has moderate confidence — review the range carefully
                     </p>
                   )}
 
-                  <hr className="border-white/10" />
+                  <hr className="border-[#E8E0D5] mb-4" />
 
-                  {/* ML + Market */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-white/5 rounded-xl p-3">
-                      <p className="text-white/40 text-[10px] mb-1">ML Baseline</p>
-                      <p className="text-white font-bold text-sm">${pricingResult.mlBaselinePrice}</p>
+                  {/* ML Baseline + Market Range */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3">
+                      <p className="text-[#9CA3AF] text-[10px] mb-1">ML Baseline</p>
+                      <p className="text-[#1C1F2E] font-bold text-sm">${pricingResult.mlBaselinePrice}</p>
                     </div>
-                    <div className="bg-white/5 rounded-xl p-3">
-                      <p className="text-white/40 text-[10px] mb-1">Market Range</p>
-                      <p className="text-white font-bold text-sm">
+                    <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3">
+                      <p className="text-[#9CA3AF] text-[10px] mb-1">Market Range</p>
+                      <p className="text-[#1C1F2E] font-bold text-sm">
                         ${pricingResult.marketPriceMin}–${pricingResult.marketPriceMax}
                       </p>
                     </div>
                   </div>
 
-                  <hr className="border-white/10" />
+                  <hr className="border-[#E8E0D5] mb-4" />
 
-                  {/* ── SCENARIO 1: PENDING_SELLER ── */}
+                  {/* ── PENDING_SELLER ── */}
                   {pricingResult.status === 'PENDING_SELLER' && (
                     <>
                       {!acceptMode ? (
                         <div className="flex flex-col gap-3">
                           <button
                             onClick={() => setAcceptMode(true)}
-                            className="w-full bg-[#C9A96E] hover:bg-[#b8935a] text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-base shadow-md shadow-[#C9A96E]/20"
+                            className="w-full bg-[#C9A96E] hover:bg-[#b8935a] text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-base hover:shadow-[0_4px_20px_rgba(201,169,110,0.4)]"
                           >
                             <FiCheckCircle className="w-4 h-4" /> Accept Price
                           </button>
                           <button
                             onClick={() => setDisputeModalOpen(true)}
-                            className="w-full bg-white border-2 border-[#1C1F2E] hover:bg-[#1C1F2E] text-[#1C1F2E] hover:text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-base"
+                            className="w-full bg-white border-2 border-[#1C1F2E] hover:bg-[#1C1F2E] hover:text-white text-[#1C1F2E] font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-base"
                           >
                             <FiMessageSquare className="w-4 h-4" /> Dispute Price
                           </button>
@@ -426,9 +609,9 @@ function ListProduct() {
                       ) : (
                         <div className="flex flex-col gap-3">
                           <div>
-                            <p className="text-white/60 text-xs mb-1.5">
+                            <p className="text-[#6B6560] text-xs mb-1.5">
                               Choose your price{' '}
-                              <span className="text-white/30">
+                              <span className="text-[#9CA3AF]">
                                 (${pricingResult.minRange} – ${pricingResult.maxRange})
                               </span>
                             </p>
@@ -439,7 +622,7 @@ function ListProduct() {
                               placeholder={`Default: $${pricingResult.suggestedPrice}`}
                               min={pricingResult.minRange}
                               max={pricingResult.maxRange}
-                              className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white text-sm placeholder-white/30 focus:outline-none focus:border-[#C9A96E] transition-colors"
+                              className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#E8E0D5] text-[#1C1F2E] text-sm placeholder-[#9CA3AF] focus:outline-none focus:border-[#C9A96E] transition-colors"
                             />
                             {chosenPrice && (
                               Number(chosenPrice) < pricingResult.minRange ||
@@ -449,23 +632,17 @@ function ListProduct() {
                                 Must be between ${pricingResult.minRange} and ${pricingResult.maxRange}
                               </p>
                             )}
-                            <p className="text-white/25 text-[10px] mt-1">
+                            <p className="text-[#9CA3AF] text-[10px] mt-1">
                               Leave empty to accept suggested price
                             </p>
                           </div>
                           <button
                             onClick={() => {
-                              const price = chosenPrice
-                                ? Number(chosenPrice)
-                                : pricingResult.suggestedPrice
-                              if (
-                                chosenPrice &&
-                                (price < pricingResult.minRange || price > pricingResult.maxRange)
-                              ) {
+                              const price = chosenPrice ? Number(chosenPrice) : pricingResult.suggestedPrice
+                              if (chosenPrice && (price < pricingResult.minRange || price > pricingResult.maxRange)) {
                                 toast.error(`Price must be between $${pricingResult.minRange} and $${pricingResult.maxRange}`)
                                 return
                               }
-                              // TODO: call POST /api/products/{id}/accept with chosenPrice
                               setAccepted(true)
                             }}
                             className="w-full py-3 rounded-xl bg-[#C9A96E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#b8935a] transition-colors"
@@ -474,7 +651,7 @@ function ListProduct() {
                           </button>
                           <button
                             onClick={() => setAcceptMode(false)}
-                            className="w-full py-2 text-white/30 hover:text-white/60 text-xs transition-colors"
+                            className="w-full py-2 text-[#9CA3AF] hover:text-[#6B6560] text-xs transition-colors"
                           >
                             ← Cancel
                           </button>
@@ -483,26 +660,26 @@ function ListProduct() {
                     </>
                   )}
 
-                  {/* ── SCENARIO 2: PENDING_ADMIN ── */}
+                  {/* ── PENDING_ADMIN ── */}
                   {pricingResult.status === 'PENDING_ADMIN' && (
                     <div className="flex flex-col gap-3">
-                      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex flex-col gap-2">
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                          <FiClock className="w-5 h-5 text-yellow-400 shrink-0" />
+                          <FiClock className="w-5 h-5 text-amber-500 shrink-0" />
                           <div className="flex flex-col gap-1">
-                            <p className="text-yellow-400 font-bold text-sm">Under Admin Review</p>
-                            <p className="text-white/50 text-xs">
+                            <p className="text-amber-700 font-bold text-sm">Under Admin Review</p>
+                            <p className="text-[#6B6560] text-xs">
                               {pricingResult.confidence === 'LOW'
                                 ? 'AI could not price this confidently — admin will decide.'
                                 : 'Price is outside category bounds — admin will review.'}
                             </p>
                           </div>
                         </div>
-                        <hr className="border-white/10" />
-                        <p className="text-white/30 text-[10px]">You'll receive an email with the decision.</p>
+                        <hr className="border-amber-200" />
+                        <p className="text-[#9CA3AF] text-[10px]">You'll receive an email with the decision.</p>
                         {pricingResult.confidence === 'LOW' && (
-                          <div className="bg-white/5 rounded-xl p-3 mt-1">
-                            <p className="text-white/50 text-[10px] font-semibold mb-2">Tips if you relist:</p>
+                          <div className="bg-white border border-[#E8E0D5] rounded-xl p-3 mt-1">
+                            <p className="text-[#6B6560] text-[10px] font-semibold mb-2">Tips if you relist:</p>
                             <ul className="flex flex-col gap-1">
                               {[
                                 'Mention brand name clearly (e.g. Sony, Nike, Apple)',
@@ -510,7 +687,7 @@ function ListProduct() {
                                 'Describe condition, specs, and any accessories',
                                 'Avoid vague terms like "good quality" or "works fine"',
                               ].map(tip => (
-                                <li key={tip} className="text-[10px] text-white/30 flex items-start gap-1.5">
+                                <li key={tip} className="text-[10px] text-[#9CA3AF] flex items-start gap-1.5">
                                   <span className="text-[#C9A96E] mt-0.5 shrink-0">·</span> {tip}
                                 </li>
                               ))}
@@ -520,7 +697,7 @@ function ListProduct() {
                       </div>
                       <button
                         onClick={() => navigate('/seller/products')}
-                        className="w-full py-3 rounded-xl border border-white/20 text-white/70 text-sm font-semibold flex items-center justify-center gap-2 hover:border-white/40 hover:text-white transition-colors"
+                        className="w-full py-3 rounded-xl border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
                       >
                         Back to My Products
                       </button>
@@ -528,83 +705,10 @@ function ListProduct() {
                   )}
                 </>
               )}
-            </>
-          ) : (
-            /* ── BEFORE SUBMIT — checklist + buttons ── */
-            <>
-              <div>
-                <p className="text-[#C9A96E] font-bold text-sm flex items-center gap-2">
-                  <FiZap className="w-4 h-4" /> AI Price Preview
-                </p>
-                <p className="text-white/40 text-xs mt-1">Test pricing before listing</p>
-              </div>
-              <hr className="border-white/10" />
-              <div className="flex flex-col gap-2">
-                {checks.map(({ label, done }) => (
-                  <div
-                    key={label}
-                    className={`flex items-center gap-2 text-xs ${done ? 'text-white/80' : 'text-white/30'}`}
-                  >
-                    {done
-                      ? <FiCheckCircle className="w-3.5 h-3.5 text-green-400 shrink-0" />
-                      : <FiCircle className="w-3.5 h-3.5 shrink-0" />
-                    }
-                    {label}
-                  </div>
-                ))}
-              </div>
-              <hr className="border-white/10" />
-              <button
-                onClick={handleComputePrice}
-                disabled={loading}
-                className="w-full py-2.5 border border-[#C9A96E]/40 rounded-xl bg-[#C9A96E]/10 text-[#C9A96E] text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#C9A96E]/20 transition-colors disabled:opacity-50"
-              >
-                <FiZap className="w-3.5 h-3.5" /> Compute Price
-              </button>
-              {computeResult && (
-                <div className="border border-[#C9A96E]/30 bg-[#C9A96E]/10 rounded-xl p-4 flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[#C9A96E] text-sm font-bold flex items-center gap-1.5">
-                      <FiZap className="w-3.5 h-3.5" />
-                      ${computeResult.suggestedPrice.toFixed(2)}
-                    </span>
-                    <button
-                      onClick={() => setComputeResult(null)}
-                      className="text-white/20 hover:text-white/50 transition-colors"
-                    >
-                      <FiX className="w-3 h-3" />
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs text-white/50">
-                      Range: ${computeResult.minRange}–${computeResult.maxRange}
-                    </span>
-                    <span className="text-xs font-bold text-green-400">
-                      {computeResult.confidence} confidence
-                    </span>
-                  </div>
-                  <div className="text-xs text-white/40 flex items-center gap-1">
-                    <FiTrendingUp className="w-3 h-3 text-[#C9A96E]" />
-                    Brand: <span className="text-white/70 font-semibold ml-0.5">{computeResult.brand}</span>
-                  </div>
-                </div>
-              )}
-              <button
-                onClick={handleSubmit}
-                disabled={loading || !allDone}
-                className="w-full py-3 rounded-xl bg-[#C9A96E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#b8935a] transition-colors disabled:opacity-60"
-              >
-                {loading
-                  ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Analyzing...</>
-                  : <><FiZap className="w-4 h-4" /> List & Get AI Price</>
-                }
-              </button>
-              <p className="text-white/25 text-[9px] text-center leading-relaxed">
-                By listing, pricing is AI-verified and subject to admin review if outside bounds.
-              </p>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* ── DISPUTE MODAL ── */}
@@ -821,7 +925,7 @@ function ListProduct() {
                   </div>
                 </>
               ) : (
-                /* Success state */
+                /* Dispute success state */
                 <div className="py-10 flex flex-col items-center text-center gap-5">
                   <div className="w-16 h-16 bg-[#C9A96E]/10 border-2 border-[#C9A96E]/30 rounded-full flex items-center justify-center">
                     <FiClock className="w-8 h-8 text-[#C9A96E]" />
@@ -867,7 +971,7 @@ function ListProduct() {
         </div>
       )}
 
-      {/* Crop Modal */}
+      {/* ── CROP MODAL ── */}
       {cropModalOpen && (
         <div className="fixed inset-0 bg-black/80 z-[60] flex flex-col items-center justify-center p-4">
           <div className="relative w-full max-w-lg" style={{ height: 360 }}>
