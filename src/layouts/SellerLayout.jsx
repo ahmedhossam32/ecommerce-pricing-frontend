@@ -1,4 +1,4 @@
-import SellerSidebar from '../components/SellerSidebar'
+import SellerSidebar from '../components/seller/SellerSidebar'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { Outlet } from 'react-router-dom'

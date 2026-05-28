@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { FiGrid, FiPackage, FiPlus, FiTag, FiUser, FiLogOut, FiTrendingUp } from 'react-icons/fi'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../../context/AuthContext'
 
 const DRAFT_COUNT = 2
 
@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { to: '/seller/products', icon: FiPackage, label: 'My Products', end: false, badge: null },
   { to: '/seller/products/new', icon: FiPlus, label: 'List Product', end: true, badge: null },
   { to: '/seller/decisions', icon: FiTag, label: 'Decisions', end: true, badge: DRAFT_COUNT },
-  { to: '/profile', icon: FiUser, label: 'Profile', end: true, badge: null },
+  { to: '/seller/profile', icon: FiUser, label: 'Profile', end: true, badge: null },
 ]
 
 function SellerSidebar() {
@@ -107,8 +107,8 @@ function SellerSidebar() {
 
                     {/* Icon container */}
                     <div className={`nav-icon-wrap w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${isActive
-                        ? 'bg-[#C9A96E]/20'
-                        : 'bg-white/[0.04] group-hover:bg-white/[0.08]'
+                      ? 'bg-[#C9A96E]/20'
+                      : 'bg-white/[0.04] group-hover:bg-white/[0.08]'
                       }`}>
                       <Icon size={15} />
                     </div>
@@ -117,8 +117,8 @@ function SellerSidebar() {
 
                     {badge != null && (
                       <span className={`badge-pulse inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold transition-all ${isActive
-                          ? 'bg-[#C9A96E] text-[#191D2E]'
-                          : 'bg-[#C9A96E]/80 text-[#191D2E]'
+                        ? 'bg-[#C9A96E] text-[#191D2E]'
+                        : 'bg-[#C9A96E]/80 text-[#191D2E]'
                         }`}>
                         {badge}
                       </span>

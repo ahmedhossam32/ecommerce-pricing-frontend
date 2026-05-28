@@ -19,7 +19,7 @@ function AdminSidebar({ pendingCount }) {
     { to: '/admin/dashboard', icon: FiGrid,    label: 'Dashboard', end: true,  badge: null                },
     { to: '/admin/requests',  icon: FiClock,   label: 'Requests',  end: true,  badge: pendingCount || null },
     { to: '/admin/products',  icon: FiPackage, label: 'All Products', end: true, badge: null              },
-    { to: '/profile',         icon: FiUser,    label: 'Profile',   end: true,  badge: null                },
+    { to: '/admin/profile',   icon: FiUser,    label: 'Profile',   end: true,  badge: null                },
   ]
 
   return (

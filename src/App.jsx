@@ -71,6 +71,8 @@ function App() {
             <Route path="/orders/:orderId" element={
               <ProtectedRoute role="BUYER"><OrderDetail /></ProtectedRoute>
             } />
+
+            {/* Profile — any authenticated user, no sidebar */}
             <Route path="/profile" element={
               <ProtectedRoute><Profile /></ProtectedRoute>
             } />
@@ -84,6 +86,7 @@ function App() {
               <Route path="/admin/requests" element={<AdminRequests />} />
               <Route path="/admin/requests/:requestId" element={<AdminRequestDetail />} />
               <Route path="/admin/products" element={<AdminProducts />} />
+              <Route path="/admin/profile" element={<Profile />} />
             </Route>
           </Route>
 
@@ -95,6 +98,7 @@ function App() {
               <Route path="/seller/products/new" element={<ListProduct />} />
               <Route path="/seller/products/:id/decision" element={<PricingDecision />} />
               <Route path="/seller/decisions" element={<SellerDecisions />} />
+              <Route path="/seller/profile" element={<Profile />} />
             </Route>
           </Route>
 
