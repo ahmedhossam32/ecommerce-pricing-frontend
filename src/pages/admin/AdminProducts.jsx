@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import {
-  FiPackage, FiCheckCircle, FiClock, FiXCircle,
+  FiPackage, FiClock, FiXCircle,
   FiFileText, FiSearch, FiX, FiRefreshCw,
   FiAlertCircle, FiDollarSign, FiArrowRight,
-  FiMail, FiInbox,
+  FiMail, FiInbox, FiChevronLeft, FiChevronRight,
 } from 'react-icons/fi'
-import AdminSidebar from '../../components/admin/AdminSidebar'
 import { categoryEmojis, categoryGradients } from '../../data/adminDummyData'
 import { DUMMY_PRODUCTS } from '../../data/dummyData'
 
@@ -33,6 +32,22 @@ const TABS = [
   { key: 'REJECTED',       label: 'Rejected'       },
   { key: 'DRAFT',          label: 'Draft'          },
 ]
+
+const TAB_ACTIVE = {
+  ALL:            'bg-[#1C1F2E] text-white shadow-md',
+  LIVE:           'bg-green-500 text-white shadow-md',
+  PENDING_REVIEW: 'bg-amber-400 text-white shadow-md',
+  REJECTED:       'bg-red-500 text-white shadow-md',
+  DRAFT:          'bg-[#6B7280] text-white shadow-md',
+}
+
+const TAB_INACTIVE = {
+  ALL:            'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E]',
+  LIVE:           'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-green-400 hover:text-green-600',
+  PENDING_REVIEW: 'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-amber-400 hover:text-amber-600',
+  REJECTED:       'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-red-400 hover:text-red-500',
+  DRAFT:          'bg-white border border-[#E8E0D5] text-[#6B6560] hover:border-gray-400 hover:text-gray-600',
+}
 
 const getStatusBadge = (status) => {
   switch (status) {
@@ -61,9 +76,9 @@ function AdminProductRow({ product, onOverrideClick, navigate }) {
     price, suggestedPrice, status, createdAt, imageUrls,
   } = product
 
-  const emoji      = categoryEmojis[category]   || categoryEmojis.default
-  const gradient   = categoryGradients[category] || categoryGradients.default
-  const hasImage   = imageUrls?.length > 0
+  const emoji         = categoryEmojis[category]   || categoryEmojis.default
+  const gradient      = categoryGradients[category] || categoryGradients.default
+  const hasImage      = imageUrls?.length > 0
   const sellerInitial = sellerName?.[0]?.toUpperCase() || '?'
   const isClickable   = status === 'LIVE' || status === 'PENDING_REVIEW'
 
@@ -71,23 +86,32 @@ function AdminProductRow({ product, onOverrideClick, navigate }) {
     if (status === 'LIVE') {
       onOverrideClick(product)
     } else if (status === 'PENDING_REVIEW') {
-      if (product.requestId) {
-        navigate(`/admin/requests/${product.requestId}`)
-      } else {
-        navigate('/admin/requests')
-      }
+      if (product.requestId) navigate(`/admin/requests/${product.requestId}`)
+      else navigate('/admin/requests')
     }
   }
 
   return (
     <div
       onClick={isClickable ? handleClick : undefined}
-      className={`bg-white border border-[#E8E0D5] rounded-2xl p-4 flex items-center gap-4 transition-all duration-200 ${
-        isClickable
-          ? 'cursor-pointer hover:border-[#C9A96E]/50 hover:shadow-md group'
-          : 'cursor-default'
+      className={`relative overflow-hidden border rounded-2xl p-4 flex items-center gap-4 transition-all duration-200 ${
+        isClickable ? 'cursor-pointer hover:shadow-md group' : 'cursor-default'
+      } ${
+        status === 'LIVE'           ? 'bg-white border-[#E8E0D5] hover:border-green-300' :
+        status === 'PENDING_REVIEW' ? 'bg-amber-50/40 border-amber-200 hover:border-amber-300' :
+        status === 'REJECTED'       ? 'bg-red-50/30 border-red-200' :
+        status === 'DRAFT'          ? 'bg-gray-50/40 border-[#E8E0D5]' :
+        'bg-white border-[#E8E0D5] hover:border-[#C9A96E]/40'
       }`}
     >
+      {/* Left accent bar */}
+      <div className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full ${
+        status === 'LIVE'           ? 'bg-green-400' :
+        status === 'PENDING_REVIEW' ? 'bg-amber-400' :
+        status === 'REJECTED'       ? 'bg-red-400' :
+        'bg-gray-300'
+      }`} />
+
       {/* Thumbnail */}
       <div className={`w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
         {hasImage
@@ -174,18 +198,20 @@ function AdminProducts() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const [products, setProducts]           = useState([])
-  const [loading, setLoading]             = useState(true)
-  const [error, setError]                 = useState(null)
-  const [activeTab, setActiveTab]         = useState('ALL')
-  const [search, setSearch]               = useState('')
+  const [products, setProducts]               = useState([])
+  const [loading, setLoading]                 = useState(true)
+  const [error, setError]                     = useState(null)
+  const [activeTab, setActiveTab]             = useState('ALL')
+  const [search, setSearch]                   = useState('')
+  const [currentPage, setCurrentPage]         = useState(1)
+  const ITEMS_PER_PAGE = 8
 
-  const [overrideModal, setOverrideModal] = useState(null)
-  const [newPrice, setNewPrice]           = useState('')
-  const [adminNote, setAdminNote]         = useState('')
-  const [overrideLoading, setOverrideLoading] = useState(false)
-  const [overrideError, setOverrideError] = useState(null)
-  const [confirmOverride, setConfirmOverride] = useState(false)
+  const [overrideModal, setOverrideModal]         = useState(null)
+  const [newPrice, setNewPrice]                   = useState('')
+  const [adminNote, setAdminNote]                 = useState('')
+  const [overrideLoading, setOverrideLoading]     = useState(false)
+  const [overrideError, setOverrideError]         = useState(null)
+  const [confirmOverride, setConfirmOverride]     = useState(false)
 
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab')
@@ -196,6 +222,7 @@ function AdminProducts() {
 
   const handleTabChange = (key) => {
     setActiveTab(key)
+    setCurrentPage(1)
     if (key === 'ALL') setSearchParams({})
     else setSearchParams({ tab: key })
   }
@@ -230,10 +257,11 @@ function AdminProducts() {
     .filter(p => activeTab === 'ALL' || p.status === activeTab)
     .filter(p => !q || [p.productName, p.brand, p.sellerName].some(f => f?.toLowerCase().includes(q)))
 
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
+  const paginated  = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+
   const tabCount = (key) =>
-    key === 'ALL'
-      ? products.length
-      : products.filter(p => p.status === key).length
+    key === 'ALL' ? products.length : products.filter(p => p.status === key).length
 
   const handleOverride = async () => {
     setOverrideLoading(true)
@@ -275,6 +303,21 @@ function AdminProducts() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
+      <style>{`
+        @keyframes productRowIn {
+          from { opacity: 0; transform: translateX(-8px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        .admin-product-row { animation: productRowIn 0.3s ease both; }
+        .admin-product-row:nth-child(1) { animation-delay: 0.03s; }
+        .admin-product-row:nth-child(2) { animation-delay: 0.06s; }
+        .admin-product-row:nth-child(3) { animation-delay: 0.09s; }
+        .admin-product-row:nth-child(4) { animation-delay: 0.12s; }
+        .admin-product-row:nth-child(5) { animation-delay: 0.15s; }
+        .admin-product-row:nth-child(6) { animation-delay: 0.18s; }
+        .admin-product-row:nth-child(7) { animation-delay: 0.21s; }
+        .admin-product-row:nth-child(8) { animation-delay: 0.24s; }
+      `}</style>
 
       {/* ── HEADER ───────────────────────────────────────────── */}
       <div className="bg-[#1C1F2E] py-10 px-8">
@@ -304,9 +347,9 @@ function AdminProducts() {
             <button
               onClick={fetchProducts}
               disabled={loading}
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 border border-[#E8E0D5]/20 hover:border-white/30 text-white/60 hover:text-white px-4 py-2 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
             >
-              <FiRefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <FiRefreshCw size={14} className={loading ? 'animate-spin' : ''} />
               Refresh
             </button>
           </div>
@@ -316,40 +359,21 @@ function AdminProducts() {
       {/* ── MAIN ─────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-8 py-8 space-y-6">
 
-        {/* Mini stats */}
-        {!loading && !error && (
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { label: 'Live',           count: tabCount('LIVE'),           color: 'text-green-600', bg: 'bg-green-50',       border: 'border-green-200'       },
-              { label: 'Pending Review', count: tabCount('PENDING_REVIEW'), color: 'text-[#C9A96E]', bg: 'bg-[#C9A96E]/10',   border: 'border-[#C9A96E]/30'    },
-              { label: 'Rejected',       count: tabCount('REJECTED'),       color: 'text-red-500',   bg: 'bg-red-50',         border: 'border-red-200'         },
-              { label: 'Draft',          count: tabCount('DRAFT'),          color: 'text-gray-500',  bg: 'bg-gray-50',        border: 'border-gray-200'        },
-            ].map(({ label, count, color, bg, border }) => (
-              <div key={label} className={`${bg} border ${border} rounded-2xl px-4 py-3 flex items-center justify-between`}>
-                <p className="text-xs font-medium text-[#6B6560]">{label}</p>
-                <p className={`font-extrabold text-lg ${color}`}>{count}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* Filter bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="flex items-center bg-white border border-[#E8E0D5] rounded-2xl p-1 gap-0.5 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             {TABS.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => handleTabChange(key)}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-sm font-semibold transition-all ${
-                  activeTab === key
-                    ? 'bg-[#1C1F2E] text-white shadow-sm'
-                    : 'text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5]'
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  activeTab === key ? TAB_ACTIVE[key] : TAB_INACTIVE[key]
                 }`}
               >
                 {label}
                 {!loading && (
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                    activeTab === key ? 'bg-white/20 text-white' : 'bg-[#E8E0D5] text-[#6B6560]'
+                    activeTab === key ? 'bg-white/20' : 'bg-[#FAF8F5] text-[#6B6560]'
                   }`}>
                     {tabCount(key)}
                   </span>
@@ -358,18 +382,21 @@ function AdminProducts() {
             ))}
           </div>
 
-          <div className="relative flex-1 sm:max-w-xs">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9E9590] pointer-events-none" />
+          <div className="w-px h-7 bg-[#E8E0D5]" />
+
+          <div className="relative flex-1 min-w-[200px] max-w-sm">
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none" size={15} />
             <input
               type="text"
-              placeholder="Search product, seller, brand…"
+              placeholder="Search product, seller, brand..."
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full bg-white border border-[#E8E0D5] rounded-2xl pl-9 pr-9 py-2 text-sm text-[#1C1F2E] placeholder-[#9E9590] focus:outline-none focus:border-[#C9A96E] transition-colors"
+              onChange={e => { setSearch(e.target.value); setCurrentPage(1) }}
+              className="w-full pl-10 pr-9 py-2.5 bg-white border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] placeholder-[#9CA3AF] focus:outline-none focus:border-[#C9A96E] focus:ring-2 focus:ring-[#C9A96E]/10 transition-all"
             />
             {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9E9590] hover:text-[#1C1F2E]">
-                <FiX className="w-4 h-4" />
+              <button onClick={() => { setSearch(''); setCurrentPage(1) }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#1C1F2E] transition-colors">
+                <FiX size={14} />
               </button>
             )}
           </div>
@@ -432,25 +459,64 @@ function AdminProducts() {
           </div>
         ) : (
           <>
-            <p className="text-xs text-[#9E9590] font-medium">
-              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
-              {q ? ` matching "${search}"` : ''}
-            </p>
-            <div className="flex flex-col gap-3 mt-3">
-              {filteredProducts.map(p => (
-                <AdminProductRow
-                  key={p.productId}
-                  product={p}
-                  onOverrideClick={(product) => {
-                    setOverrideModal({ product })
-                    setNewPrice(String(product.price ?? ''))
-                    setAdminNote('')
-                    setOverrideError(null)
-                  }}
-                  navigate={navigate}
-                />
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-[#C9A96E] rounded-full" />
+              <p className="text-[#6B6560] text-sm">
+                <span className="font-bold text-[#1C1F2E]">{filteredProducts.length}</span> product{filteredProducts.length !== 1 ? 's' : ''}
+                {search && <span className="text-[#9CA3AF]"> matching "{search}"</span>}
+                {activeTab !== 'ALL' && !search && <span className="text-[#9CA3AF]"> · {TABS.find(t => t.key === activeTab)?.label}</span>}
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
+              {paginated.map(p => (
+                <div key={p.productId} className="admin-product-row">
+                  <AdminProductRow
+                    product={p}
+                    onOverrideClick={(product) => {
+                      setOverrideModal({ product })
+                      setNewPrice(String(product.price ?? ''))
+                      setAdminNote('')
+                      setOverrideError(null)
+                    }}
+                    navigate={navigate}
+                  />
+                </div>
               ))}
             </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-4 border-t border-[#E8E0D5]">
+                <p className="text-xs text-[#6B6560]">
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length}
+                </p>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="w-8 h-8 rounded-lg border border-[#E8E0D5] flex items-center justify-center text-[#6B6560] hover:border-[#C9A96E] hover:text-[#C9A96E] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <FiChevronLeft size={14} />
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button key={page} onClick={() => setCurrentPage(page)}
+                      className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all ${
+                        currentPage === page
+                          ? 'bg-[#1C1F2E] text-white'
+                          : 'border border-[#E8E0D5] text-[#6B6560] hover:border-[#C9A96E] hover:text-[#C9A96E]'
+                      }`}>
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="w-8 h-8 rounded-lg border border-[#E8E0D5] flex items-center justify-center text-[#6B6560] hover:border-[#C9A96E] hover:text-[#C9A96E] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <FiChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
 
