@@ -17,11 +17,23 @@ function AdminRequestRow({ request }) {
   const routingReason = getRoutingReason(request)
   const sellerInitial = sellerName?.[0]?.toUpperCase() || '?'
 
+  const rowBg =
+    requestType !== 'DISPUTE' && llmConfidence === 'LOW'
+      ? 'bg-red-50/40 border-red-100 hover:border-red-200'
+      : requestType === 'DISPUTE'
+      ? 'bg-[#FDF6EC] border-[#E8D5A3] hover:border-[#C9A96E]'
+      : 'bg-white border-[#E8E0D5] hover:border-[#C9A96E]/50'
+
   return (
     <div
       onClick={() => navigate(`/admin/requests/${requestId}`)}
-      className="bg-white border border-[#E8E0D5] rounded-2xl p-4 flex items-center gap-4 hover:border-[#C9A96E]/50 hover:shadow-md transition-all duration-200 cursor-pointer group"
+      className={`relative overflow-hidden rounded-2xl p-4 flex items-center gap-4 hover:shadow-md transition-all duration-200 cursor-pointer group border ${rowBg}`}
     >
+      {/* Left accent bar */}
+      <div className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full ${
+        requestType === 'DISPUTE' ? 'bg-[#C9A96E]' : 'bg-[#1C1F2E]/30'
+      }`} />
+
       {/* Thumbnail */}
       <div className={`w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
         {hasImage ? (
