@@ -168,7 +168,7 @@ function AdminRequestDetail() {
             </div>
             <Link
               to="/admin/requests"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
+              className="inline-flex items-center gap-2 border border-white/30 hover:bg-white/15 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
             >
               <FiArrowLeft className="w-3.5 h-3.5" /> Back to Requests
             </Link>
@@ -324,10 +324,10 @@ function AdminRequestDetail() {
                       <img
                         src={request.sellerProfilePictureUrl}
                         alt={request.sellerName}
-                        className="w-10 h-10 rounded-full object-cover border border-[#E8E0D5] shrink-0"
+                        className="w-12 h-12 rounded-full object-cover border border-[#E8E0D5] shrink-0"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-[#C9A96E]/20 flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-[#C9A96E]/20 flex items-center justify-center shrink-0">
                         <span className="text-[#C9A96E] font-bold text-sm">
                           {request.sellerName?.[0]?.toUpperCase()}
                         </span>
@@ -351,9 +351,9 @@ function AdminRequestDetail() {
 
                   {/* Pricing grid */}
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-4 text-center">
-                      <p className="text-[#9CA3AF] text-xs font-medium mb-1">AI Suggested</p>
-                      <p className="text-[#1C1F2E] font-extrabold text-xl">
+                    <div className="bg-[#FDF6EC] border border-[#C9A96E]/30 rounded-xl p-4 text-center">
+                      <p className="text-[#C9A96E] text-xs font-semibold uppercase tracking-wide mb-1">AI Suggested</p>
+                      <p className="text-[#1C1F2E] font-extrabold text-2xl">
                         ${request.suggestedPrice?.toFixed(2) ?? 'N/A'}
                       </p>
                     </div>
@@ -402,7 +402,7 @@ function AdminRequestDetail() {
             </div>
 
             {/* ── RIGHT COL ──────────────────────────────────── */}
-            <div className="col-span-2">
+            <div className="col-span-2 sticky top-6 self-start">
 
               {/* Success state */}
               {decision && (
