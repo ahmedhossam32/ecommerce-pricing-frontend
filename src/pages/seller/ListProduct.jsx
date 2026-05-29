@@ -756,8 +756,8 @@ function ListProduct() {
                   <div className="bg-white/5 border border-white/10 rounded-xl p-3">
                     <p className="text-white/40 text-[10px] mb-1 uppercase tracking-wide">Confidence</p>
                     <p className={`font-bold text-sm ${
-                      pricingResult?.confidence === 'HIGH' ? 'text-green-400' :
-                      pricingResult?.confidence === 'MEDIUM' ? 'text-yellow-400' :
+                      pricingResult?.confidence === 'HIGH' ? 'text-[#C9A96E]' :
+                      pricingResult?.confidence === 'MEDIUM' ? 'text-[#C9A96E]' :
                       'text-red-400'
                     }`}>
                       {pricingResult?.confidence}
@@ -915,7 +915,7 @@ function ListProduct() {
                         setDisputeSubmitted(true)
                       }}
                       disabled={disputeLoading || !disputeForm.sellerPrice || disputeForm.sellerReasoning.length < 10}
-                      className="flex-1 py-3 rounded-xl bg-[#1C1F2E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#2E3452] transition-colors disabled:opacity-50"
+                      className="flex-1 py-3 rounded-xl bg-[#1C1F2E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#2E3452] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {disputeLoading
                         ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Submitting...</>

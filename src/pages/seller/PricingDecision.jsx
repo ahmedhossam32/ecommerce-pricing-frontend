@@ -190,17 +190,17 @@ function PricingDecision() {
                     Range: ${decisionData.minRange} – ${decisionData.maxRange}
                   </p>
                   {decisionData.confidence === 'HIGH' && (
-                    <span className="mt-3 inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
+                    <span className="mt-3 inline-flex items-center gap-1.5 bg-green-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
                       <FiCheckCircle size={12} /> HIGH Confidence
                     </span>
                   )}
                   {decisionData.confidence === 'MEDIUM' && (
-                    <span className="mt-3 inline-flex items-center gap-1.5 bg-amber-400 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
+                    <span className="mt-3 inline-flex items-center gap-1.5 bg-[#C9A96E]/15 text-[#C9A96E] border border-[#C9A96E]/30 text-xs font-bold px-4 py-1.5 rounded-full">
                       <FiAlertCircle size={12} /> MEDIUM Confidence
                     </span>
                   )}
                   {decisionData.confidence === 'LOW' && (
-                    <span className="mt-3 inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
+                    <span className="mt-3 inline-flex items-center gap-1.5 bg-red-700 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
                       <FiAlertCircle size={12} /> LOW Confidence
                     </span>
                   )}

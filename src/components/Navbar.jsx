@@ -215,60 +215,42 @@ function Navbar() {
           {/* Right icons */}
           <div className="hidden md:flex items-center gap-4">
 
-            {/* Wishlist — always visible (guest opens auth modal) */}
-            {user?.role !== 'SELLER' && user?.role !== 'ADMIN' && (
-              user?.role === 'BUYER' ? (
-                <div className="relative group/wl">
-                  <Link to="/wishlist" className="p-1 block transition-colors relative">
-                    <FiHeart
-                      className="w-5 h-5 transition-colors"
-                      style={{ color: isOnWishlist ? '#C9A96E' : '#6B6560' }}
-                      fill={isOnWishlist ? '#C9A96E' : 'none'}
-                    />
-                    {wishlistCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#C9A96E] text-[#1C1F2E] text-[9px] font-bold rounded-full flex items-center justify-center">
-                        {wishlistCount > 9 ? '9+' : wishlistCount}
-                      </span>
-                    )}
-                  </Link>
-                  <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
-                </div>
-              ) : (
-                <div className="relative group/wl">
-                  <button onClick={() => openAuth('login')} className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
-                    <FiHeart className="w-5 h-5" />
-                  </button>
-                  <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
-                </div>
-              )
+            {/* Wishlist — buyer only */}
+            {user?.role === 'BUYER' && (
+              <div className="relative group/wl">
+                <Link to="/wishlist" className="p-1 block transition-colors relative">
+                  <FiHeart
+                    className="w-5 h-5 transition-colors"
+                    style={{ color: isOnWishlist ? '#C9A96E' : '#6B6560' }}
+                    fill={isOnWishlist ? '#C9A96E' : 'none'}
+                  />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#C9A96E] text-[#1C1F2E] text-[9px] font-bold rounded-full flex items-center justify-center">
+                      {wishlistCount > 9 ? '9+' : wishlistCount}
+                    </span>
+                  )}
+                </Link>
+                <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/wl:opacity-100 transition-opacity">Wishlist</span>
+              </div>
             )}
 
-            {/* Cart — always visible (guest opens auth modal) */}
-            {user?.role !== 'SELLER' && user?.role !== 'ADMIN' && (
-              user?.role === 'BUYER' ? (
-                <div className="relative group/ct">
-                  <Link to="/cart" className="p-1 block transition-colors relative">
-                    <FiShoppingCart
-                      className="w-5 h-5 transition-colors"
-                      style={{ color: isOnCart ? '#C9A96E' : '#6B6560' }}
-                      fill={isOnCart ? '#C9A96E' : 'none'}
-                    />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#1C1F2E] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                        {cartCount > 9 ? '9+' : cartCount}
-                      </span>
-                    )}
-                  </Link>
-                  <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
-                </div>
-              ) : (
-                <div className="relative group/ct">
-                  <button onClick={() => openAuth('login')} className="text-[#6B6560] hover:text-[#1C1F2E] transition-colors p-1 block">
-                    <FiShoppingCart className="w-5 h-5" />
-                  </button>
-                  <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
-                </div>
-              )
+            {/* Cart — buyer only */}
+            {user?.role === 'BUYER' && (
+              <div className="relative group/ct">
+                <Link to="/cart" className="p-1 block transition-colors relative">
+                  <FiShoppingCart
+                    className="w-5 h-5 transition-colors"
+                    style={{ color: isOnCart ? '#C9A96E' : '#6B6560' }}
+                    fill={isOnCart ? '#C9A96E' : 'none'}
+                  />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#1C1F2E] text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                      {cartCount > 9 ? '9+' : cartCount}
+                    </span>
+                  )}
+                </Link>
+                <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#1C1F2E] text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover/ct:opacity-100 transition-opacity">Cart</span>
+              </div>
             )}
 
             {/* Orders — buyer only */}

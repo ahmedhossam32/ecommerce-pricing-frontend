@@ -26,10 +26,10 @@ const RECENT_PRODUCTS = DUMMY_PRODUCTS.slice(0, 5).map((p, i) => ({
 const statCards = [
   { label: 'Total Products', value: DUMMY_STATS.total,    icon: FiPackage,     color: 'text-[#1C1F2E]',  bg: 'bg-[#1C1F2E]/[0.06]', accent: '#1C1F2E' },
   { label: 'Live',           value: DUMMY_STATS.live,     icon: FiCheckCircle, color: 'text-green-500',   bg: 'bg-green-50',          accent: '#22c55e' },
-  { label: 'Pending Review', value: DUMMY_STATS.pending,  icon: FiClock,       color: 'text-amber-500',   bg: 'bg-amber-50',          accent: '#f59e0b', isPending: true },
+  { label: 'Pending Review', value: DUMMY_STATS.pending,  icon: FiClock,       color: 'text-[#C9A96E]',   bg: 'bg-[#C9A96E]/10',      accent: '#C9A96E', isPending: true },
   { label: 'Drafts',         value: DUMMY_STATS.draft,    icon: FiFileText,    color: 'text-gray-400',    bg: 'bg-[#1C1F2E]/[0.06]', accent: '#9CA3AF' },
   { label: 'Rejected',       value: DUMMY_STATS.rejected,     icon: FiXCircle,     color: 'text-red-400',   bg: 'bg-red-50',        accent: '#ef4444' },
-  { label: 'Total Orders',  value: DUMMY_STATS.totalOrders,  icon: FiShoppingBag, color: 'text-blue-500', bg: 'bg-blue-50',       accent: '#3b82f6' },
+  { label: 'Total Orders',  value: DUMMY_STATS.totalOrders,  icon: FiShoppingBag, color: 'text-[#1C1F2E]', bg: 'bg-[#1C1F2E]/[0.06]', accent: '#1C1F2E' },
   {
     label: 'Total Revenue',
     value: `$${DUMMY_STATS.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
@@ -167,7 +167,7 @@ function SellerDashboard() {
             {/* CTA button */}
             <Link
               to="/seller/products/new"
-              className="shrink-0 inline-flex items-center gap-2 bg-[#C9A96E] hover:bg-[#b8935a] text-[#1C1F2E] font-bold px-5 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_4px_20px_rgba(201,169,110,0.35)]"
+              className="shrink-0 inline-flex items-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all border border-white/20"
             >
               <FiPlus size={16} />
               List New Product
@@ -292,7 +292,8 @@ function SellerDashboard() {
 
               {/* Secondary: My Products */}
               <Link to="/seller/products"
-                className="action-card relative flex items-center gap-4 p-5 rounded-2xl bg-white border border-[#E8E0D5] hover:border-[#C9A96E]/50 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-300 group">
+                className="action-card relative overflow-hidden flex items-center gap-4 p-5 rounded-2xl bg-white border border-[#E8E0D5] hover:border-[#C9A96E]/50 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-300 group">
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A96E]/40 to-transparent rounded-t-2xl" />
                 <div className="w-11 h-11 rounded-xl bg-[#FAF8F5] border border-[#E8E0D5] group-hover:bg-[#C9A96E]/10 group-hover:border-[#C9A96E]/30 transition-all duration-300 flex items-center justify-center shrink-0">
                   <FiList className="text-[#C9A96E] group-hover:scale-110 transition-transform duration-200" size={18} />
                 </div>
@@ -305,7 +306,8 @@ function SellerDashboard() {
 
               {/* Secondary: Profile */}
               <Link to="/profile"
-                className="action-card relative flex items-center gap-4 p-5 rounded-2xl bg-white border border-[#E8E0D5] hover:border-[#C9A96E]/50 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-300 group">
+                className="action-card relative overflow-hidden flex items-center gap-4 p-5 rounded-2xl bg-white border border-[#E8E0D5] hover:border-[#C9A96E]/50 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-300 group">
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A96E]/40 to-transparent rounded-t-2xl" />
                 <div className="w-11 h-11 rounded-xl bg-[#FAF8F5] border border-[#E8E0D5] group-hover:bg-[#C9A96E]/10 group-hover:border-[#C9A96E]/30 transition-all duration-300 flex items-center justify-center shrink-0">
                   <FiUser className="text-[#C9A96E] group-hover:scale-110 transition-transform duration-200" size={18} />
                 </div>

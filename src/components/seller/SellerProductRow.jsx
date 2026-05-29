@@ -41,7 +41,7 @@ export default function SellerProductRow({ product }) {
     <div
       onClick={isClickable ? handleClick : undefined}
       className={`product-row relative flex items-center gap-4 p-4 rounded-2xl border transition-all duration-200 hover:shadow-[0_2px_16px_rgba(0,0,0,0.06)] group
-        ${product.status === 'PENDING_REVIEW' ? 'border-amber-200 bg-amber-50/40 hover:border-amber-300' :
+        ${product.status === 'PENDING_REVIEW' ? 'border-[#C9A96E]/20 bg-[#C9A96E]/5 hover:border-[#C9A96E]/40' :
           product.status === 'REJECTED'       ? 'border-red-200 bg-red-50/30 hover:border-red-300' :
           'border-[#E8E0D5] bg-white hover:border-[#C9A96E]/40'}
         ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
@@ -49,7 +49,7 @@ export default function SellerProductRow({ product }) {
       {/* Left accent bar */}
       <div className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full
         ${product.status === 'LIVE'           ? 'bg-green-400' :
-          product.status === 'PENDING_REVIEW' ? 'bg-amber-400' :
+          product.status === 'PENDING_REVIEW' ? 'bg-[#C9A96E]' :
           product.status === 'REJECTED'       ? 'bg-red-400' :
           'bg-gray-300'}`} />
 
@@ -92,7 +92,7 @@ export default function SellerProductRow({ product }) {
         {product.status === 'LIVE' && (
           <p className="text-[#1C1F2E] text-base font-extrabold">${product.price?.toFixed(2)}</p>
         )}
-        {(product.status === 'DRAFT' || product.status === 'PENDING_REVIEW') && (
+        {(product.status === 'DRAFT' || product.status === 'PENDING_REVIEW') && product.suggestedPrice && (
           <p className="text-[#9CA3AF] text-sm font-medium">Suggested: ${product.suggestedPrice?.toFixed(2)}</p>
         )}
         {product.status === 'REJECTED' && (

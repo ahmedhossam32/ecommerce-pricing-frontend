@@ -25,10 +25,10 @@ const FILTERS = [
 
 const FILTER_STYLES = {
   ALL:            { active: 'bg-[#1C1F2E] text-white',  inactive: 'hover:border-[#1C1F2E]'  },
-  LIVE:           { active: 'bg-green-500 text-white',   inactive: 'hover:border-green-400'  },
+  LIVE:           { active: 'bg-green-600 text-white',   inactive: 'hover:border-green-400'  },
   DRAFT:          { active: 'bg-[#1C1F2E] text-white',  inactive: 'hover:border-[#1C1F2E]'  },
-  PENDING_REVIEW: { active: 'bg-amber-400 text-white',   inactive: 'hover:border-amber-400'  },
-  REJECTED:       { active: 'bg-red-500 text-white',     inactive: 'hover:border-red-400'    },
+  PENDING_REVIEW: { active: 'bg-[#C9A96E] text-[#1C1F2E]', inactive: 'hover:border-[#C9A96E]'  },
+  REJECTED:       { active: 'bg-red-700 text-white',     inactive: 'hover:border-red-400'    },
 }
 
 const draftCount = SELLER_PRODUCTS.filter(p => p.status === 'DRAFT').length
@@ -65,7 +65,7 @@ function SellerProducts() {
             </nav>
             <Link
               to="/seller/products/new"
-              className="inline-flex items-center gap-1.5 bg-[#C9A96E] hover:bg-[#b8935a] text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
+              className="inline-flex items-center gap-1.5 bg-[#1C1F2E] hover:bg-[#2E3452] text-white border border-white/20 text-xs font-bold px-4 py-2 rounded-full transition-colors"
             >
               <FiPlus className="w-3.5 h-3.5" /> List New Product
             </Link>

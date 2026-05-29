@@ -32,7 +32,7 @@ function SellerDecisions() {
             </nav>
             <Link
               to="/seller/products/new"
-              className="inline-flex items-center gap-1.5 bg-[#C9A96E] hover:bg-[#b8935a] text-white text-xs font-bold px-4 py-2 rounded-full transition-colors"
+              className="inline-flex items-center gap-1.5 bg-[#1C1F2E] hover:bg-[#2E3452] text-white border border-white/20 text-xs font-bold px-4 py-2 rounded-full transition-colors"
             >
               <FiZap className="w-3.5 h-3.5" /> List New Product
             </Link>

@@ -66,7 +66,7 @@ function SellerSidebar() {
         }
       `}</style>
 
-      <aside className="w-[210px] bg-[#191D2E] border-r border-white/[0.06] flex flex-col sticky top-[88px] h-[calc(100dvh-88px)] overflow-hidden">
+      <aside className="w-56 bg-[#191D2E] border-r border-white/[0.06] flex flex-col sticky top-[88px] h-[calc(100dvh-88px)] overflow-hidden">
 
         {/* Subtle top glow accent */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A96E]/40 to-transparent" />
