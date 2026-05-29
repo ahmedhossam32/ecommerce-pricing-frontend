@@ -7,7 +7,7 @@ import {
   FiArrowLeft, FiArrowRight, FiCheck, FiImage,
 } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
-import { listProduct, acceptPrice, disputePrice } from '../../api/seller'
+import { listProduct, previewPrice, acceptPrice, disputePrice } from '../../api/seller'
 import api from '../../api/axiosInstance'
 import Cropper from 'react-easy-crop'
 
@@ -115,7 +115,7 @@ function ListProduct() {
     if (!allDone) { toast.error('Fill all fields first to compute price'); return }
     setLoading(true)
     try {
-      const res = await listProduct({
+      const res = await previewPrice({
         name: form.name,
         category: form.category,
         description: form.description,

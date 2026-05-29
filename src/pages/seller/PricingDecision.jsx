@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FiCheckCircle, FiClock, FiAlertCircle, FiMessageSquare, FiPackage, FiZap } from 'react-icons/fi'
 import { toast } from 'react-toastify'
-import { getSellerProducts, acceptPrice, disputePrice } from '../../api/seller'
+import { getSellerProductById, acceptPrice, disputePrice } from '../../api/seller'
 
 const confidenceStyle = {
   HIGH:   'bg-[#C9A96E]/10 text-[#C9A96E] border-[#C9A96E]/30',
@@ -20,13 +20,11 @@ function PricingDecision() {
   const [pageLoading, setPageLoading] = useState(true)
 
   useEffect(() => {
-    getSellerProducts()
+    getSellerProductById(id)
       .then(res => {
-        const found = (res.data || []).find(p => String(p.productId) === String(id))
-        if (found) {
-          setDecisionData(found)
-          setPageStatus(found.status === 'DRAFT' ? 'PENDING_SELLER' : found.status)
-        }
+        const product = res.data
+        setDecisionData(product)
+        setPageStatus(product.status === 'DRAFT' ? 'PENDING_SELLER' : product.status)
       })
       .catch(() => toast.error('Failed to load product'))
       .finally(() => setPageLoading(false))
@@ -462,7 +460,7 @@ function PricingDecision() {
 
             <div className="bg-[#C9A96E]/5 border border-[#C9A96E]/20 rounded-2xl p-5 text-left mb-8 max-w-md mx-auto">
               {[
-                { label: 'Product',     value: decisionData.productName },
+                { label: 'Product',     value: decisionData.name },
                 { label: 'Final Price', value: `$${chosenPrice || decisionData.suggestedPrice}`, cls: 'text-[#C9A96E] font-bold' },
                 { label: 'Status',      value: 'Live',                                           cls: 'text-[#C9A96E] font-bold' },
               ].map(({ label, value, cls }, i, arr) => (

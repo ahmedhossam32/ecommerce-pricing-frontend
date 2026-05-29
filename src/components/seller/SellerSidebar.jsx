@@ -1,20 +1,30 @@
+import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { FiGrid, FiPackage, FiPlus, FiTag, FiUser, FiLogOut, FiTrendingUp } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
-
-const DRAFT_COUNT = 2
-
-const NAV_ITEMS = [
-  { to: '/seller/dashboard', icon: FiGrid, label: 'Dashboard', end: true, badge: null },
-  { to: '/seller/products', icon: FiPackage, label: 'My Products', end: false, badge: null },
-  { to: '/seller/products/new', icon: FiPlus, label: 'List Product', end: true, badge: null },
-  { to: '/seller/decisions', icon: FiTag, label: 'Decisions', end: true, badge: DRAFT_COUNT },
-  { to: '/seller/profile', icon: FiUser, label: 'Profile', end: true, badge: null },
-]
+import { getSellerProducts } from '../../api/seller'
 
 function SellerSidebar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+
+  const [draftCount, setDraftCount] = useState(0)
+  useEffect(() => {
+    getSellerProducts()
+      .then(res => {
+        const drafts = (res.data || []).filter(p => p.status === 'DRAFT').length
+        setDraftCount(drafts)
+      })
+      .catch(() => {})
+  }, [])
+
+  const NAV_ITEMS = [
+    { to: '/seller/dashboard', icon: FiGrid, label: 'Dashboard', end: true, badge: null },
+    { to: '/seller/products', icon: FiPackage, label: 'My Products', end: false, badge: null },
+    { to: '/seller/products/new', icon: FiPlus, label: 'List Product', end: true, badge: null },
+    { to: '/seller/decisions', icon: FiTag, label: 'Decisions', end: true, badge: draftCount || null },
+    { to: '/seller/profile', icon: FiUser, label: 'Profile', end: true, badge: null },
+  ]
 
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
