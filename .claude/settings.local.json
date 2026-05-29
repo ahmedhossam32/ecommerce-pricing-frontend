@@ -17,7 +17,8 @@
       "Bash(node -e \"require\\('date-fns'\\)\")",
       "Bash(Test-Path \"e:\\\\Uni\\\\GP\\\\ecommerce-frontend\\\\src\\\\pages\\\\buyer\\\\Cart.jsx\")",
       "Bash(ls -la \"e:\\\\Uni\\\\GP\")",
-      "Read(//e/Uni/GP/**)"
+      "Read(//e/Uni/GP/**)",
+      "Bash(Remove-Item \"e:\\\\Uni\\\\GP\\\\ecommerce-frontend\\\\src\\\\data\\\\dummyData.js\")"
     ]
   }
 }

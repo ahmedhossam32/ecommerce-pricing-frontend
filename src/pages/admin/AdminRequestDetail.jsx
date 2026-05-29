@@ -35,12 +35,10 @@ function AdminRequestDetail() {
     setLoading(true)
     setError(null)
     try {
-      const res = await api.get('/admin/requests')
-      const found = (res.data || []).find(r => String(r.requestId) === String(requestId))
-      if (!found) throw new Error('Request not found')
-      setRequest(found)
+      const res = await api.get(`/admin/requests/${requestId}`)
+      setRequest(res.data)
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || 'Something went wrong')
+      setError(err?.response?.data?.message || 'Request not found')
     } finally {
       setLoading(false)
     }
