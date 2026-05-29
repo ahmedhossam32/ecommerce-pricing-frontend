@@ -182,6 +182,7 @@ function ProductCard({ product, confidence = 'HIGH' }) {
         </div>
 
         {/* Slide-up Add to Cart overlay */}
+        {isBuyer && (
         <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out px-4 pb-3">
           <button
             onClick={handleAddToCart}
@@ -197,6 +198,7 @@ function ProductCard({ product, confidence = 'HIGH' }) {
             }
           </button>
         </div>
+        )}
 
         {/* Subtle bottom gradient for depth */}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />

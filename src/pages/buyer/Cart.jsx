@@ -333,7 +333,13 @@ function Cart() {
       {itemOrderModal && selectedItem && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4"
-          onClick={() => !itemOrderLoading && !itemOrderConfirmed && setItemOrderModal(false)}
+          onClick={() => {
+            if (itemOrderLoading) return
+            setItemOrderModal(false)
+            setItemOrderConfirmed(false)
+            setItemOrderData(null)
+            setSelectedItem(null)
+          }}
         >
           <div
             className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4"

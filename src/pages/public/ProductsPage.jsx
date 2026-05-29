@@ -419,7 +419,7 @@ function ProductsPage() {
 
               {/* Next button */}
               <button
-                onClick={() => setPage(p => Math.min(5, p + 1))}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E8E0D5] bg-white text-xs font-semibold text-[#6B6560] hover:border-[#1C1F2E] hover:text-[#1C1F2E] hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
               >

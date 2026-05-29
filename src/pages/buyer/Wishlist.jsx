@@ -45,7 +45,7 @@ function WishlistCard({ item, onRemove, onAddToCart, isInCart }) {
               )}
               <img
                 src={item.imageUrls[0]}
-                alt={item.name}
+                alt={item.productName || item.name}
                 onLoad={() => setImgLoaded(true)}
                 className={`w-full h-full object-cover ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
               />
@@ -77,7 +77,7 @@ function WishlistCard({ item, onRemove, onAddToCart, isInCart }) {
             {item.category?.replace(/_/g, ' ')}
           </p>
           <h3 className="text-[#1C1F2E] font-bold text-sm leading-snug mb-1.5 line-clamp-2 flex-1">
-            {item.name}
+            {item.productName || item.name}
           </h3>
 
           {/* Brand + seller row */}
@@ -106,7 +106,7 @@ function WishlistCard({ item, onRemove, onAddToCart, isInCart }) {
               </span>
             </div>
             <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAddToCart(item.productId, item.name) }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAddToCart(item.productId, item.productName || item.name) }}
               className={`text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1.5 transition-colors ${
                 isInCart
                   ? 'bg-[#1C1F2E] hover:bg-[#2E3452]'

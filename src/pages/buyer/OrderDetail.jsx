@@ -4,7 +4,7 @@ import { FiCheck, FiPackage, FiTrendingUp, FiTag, FiUser, FiCalendar } from 'rea
 import { format } from 'date-fns'
 import BackButton from '../../components/BackButton'
 import { toast } from 'react-toastify'
-import { getMyOrders } from '../../api/orders'
+import { getOrderById } from '../../api/orders'
 
 const categoryEmojis = {
   telephony: '📱', audio: '🎧', computers: '💻',
@@ -24,11 +24,8 @@ function OrderDetail() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getMyOrders()
-      .then(res => {
-        const found = (res.data || []).find(o => String(o.orderId) === String(orderId))
-        setOrder(found || null)
-      })
+    getOrderById(orderId)
+      .then(res => setOrder(res.data))
       .catch(() => toast.error('Failed to load order'))
       .finally(() => setLoading(false))
   }, [orderId])

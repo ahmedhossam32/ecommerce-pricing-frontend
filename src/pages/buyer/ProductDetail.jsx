@@ -304,6 +304,7 @@ function ProductDetail() {
             <div className="flex flex-col gap-3 mt-auto pt-4">
 
               {/* Action buttons */}
+              {isBuyer && (
               <div className="flex flex-col gap-3">
                 <button
                   onClick={handleBuyNow}
@@ -336,6 +337,7 @@ function ProductDetail() {
                   </button>
                 </div>
               </div>
+              )}
 
             </div>
           </div>

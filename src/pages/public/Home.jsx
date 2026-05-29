@@ -8,7 +8,7 @@ import catComputers from '../../assets/cat-computers.jpg'
 import catWatches from '../../assets/cat-watches1.jpg'
 import { FiShield, FiTrendingUp, FiStar, FiArrowRight, FiPackage, FiCheckCircle } from 'react-icons/fi'
 import ProductCard from '../../components/ProductCard'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
+import { getAllProducts } from '../../api/products'
 
 
 function AnimatedCounter({ target, suffix = '', duration = 1500, delay = 800 }) {
@@ -45,6 +45,11 @@ function AnimatedCounter({ target, suffix = '', duration = 1500, delay = 800 }) 
 
 function Home() {
   const [authModal, setAuthModal] = useState(null)
+  const [featuredProducts, setFeaturedProducts] = useState([])
+
+  useEffect(() => {
+    getAllProducts().then(res => setFeaturedProducts(res.data || [])).catch(() => {})
+  }, [])
 
     return (
         <div className="min-h-screen bg-[#FAF8F5] text-[#1C1F2E]">
@@ -235,7 +240,7 @@ function Home() {
 
                     {/* Products Grid */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                        {DUMMY_PRODUCTS.slice(0, 4).map(product => (
+                        {featuredProducts.slice(0, 4).map(product => (
                             <ProductCard key={product.productId} product={product} />
                         ))}
                     </div>

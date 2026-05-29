@@ -70,9 +70,7 @@ function AuthModal({ onClose, initialTab = 'login', initialRole = 'BUYER' }) {
       onClose()
       if (role === 'SELLER') navigate('/seller/dashboard')
       else if (role === 'ADMIN') navigate('/admin/dashboard')
-      else if (role === 'BUYER') {
-        if (window.location.pathname === '/') navigate('/products')
-      }
+      else navigate('/products')
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Invalid email or password')
     } finally {
