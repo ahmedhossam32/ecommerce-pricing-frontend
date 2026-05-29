@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { FiHeart, FiShoppingCart, FiPackage, FiTag, FiTrendingUp, FiChevronLeft, FiChevronRight, FiCheckCircle, FiZap } from 'react-icons/fi'
 import BackButton from '../../components/BackButton'
@@ -8,13 +8,8 @@ import { useCart } from '../../context/CartContext'
 import { useWishlist } from '../../context/WishlistContext'
 import { format } from 'date-fns'
 import PriceHistoryChart from '../../components/PriceHistoryChart'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
-
-const DUMMY_HISTORY = [
-  { price: 850, event: 'Seller accepted', date: '2026-04-25T10:00:00.000Z' },
-  { price: 920, event: 'Admin approved',  date: '2026-05-05T10:00:00.000Z' },
-  { price: 977, event: 'Admin override',  date: '2026-05-20T10:00:00.000Z' },
-]
+import { getProductById, getPriceHistory } from '../../api/products'
+import { placeOrder } from '../../api/orders'
 
 const categoryEmojis = {
   telephony: '📱', audio: '🎧', computers: '💻',
@@ -33,12 +28,40 @@ function ProductDetail() {
   const [buyLoading, setBuyLoading] = useState(false)
   const [orderConfirmed, setOrderConfirmed] = useState(false)
   const [orderData, setOrderData] = useState(null)
+  const [product, setProduct] = useState(null)
+  const [history, setHistory] = useState([])
+  const [pageLoading, setPageLoading] = useState(true)
 
   const { user } = useAuth()
   const { isInCart, addItem: addToCartCtx } = useCart()
   const { isInWishlist, addItem: addToWishlistCtx, removeItem: removeFromWishlistCtx } = useWishlist()
 
-  const product = DUMMY_PRODUCTS.find(p => p.productId === parseInt(id)) || DUMMY_PRODUCTS[0]
+  useEffect(() => {
+    if (!id) return
+    setPageLoading(true)
+    Promise.all([
+      getProductById(id),
+      getPriceHistory(id)
+    ])
+      .then(([productRes, historyRes]) => {
+        setProduct(productRes.data)
+        setHistory(historyRes.data || [])
+      })
+      .catch(() => toast.error('Failed to load product'))
+      .finally(() => setPageLoading(false))
+  }, [id])
+
+  if (pageLoading) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+  if (!product) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <p className="text-[#6B6560]">Product not found</p>
+    </div>
+  )
+
   const emoji = categoryEmojis[product.category] || categoryEmojis.default
   const hasImages = product.imageUrls?.length > 0
   const multiImage = product.imageUrls?.length > 1
@@ -58,21 +81,16 @@ function ProductDetail() {
 
   const confirmBuyNow = async () => {
     setBuyLoading(true)
-    await new Promise(r => setTimeout(r, 800))
-    setOrderData({
-      orderId: `ORD-${Date.now().toString().slice(-8)}`,
-      productId: product.productId,
-      productName: product.name,
-      price: product.price,
-      sellerName: product.sellerName,
-      category: product.category,
-      brand: product.brand,
-      imageUrls: product.imageUrls,
-      createdAt: new Date().toISOString(),
-      message: 'Your order has been placed and is being processed.',
-    })
-    setOrderConfirmed(true)
-    setBuyLoading(false)
+    try {
+      const res = await placeOrder(product.productId)
+      setOrderData(res.data)
+      setOrderConfirmed(true)
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to place order')
+      closeBuyModal()
+    } finally {
+      setBuyLoading(false)
+    }
   }
 
   const closeBuyModal = () => {
@@ -105,11 +123,6 @@ function ProductDetail() {
       else toast.error(result.message || 'Failed to save')
     }
   }
-
-  const historyPrices = DUMMY_HISTORY.map(h => h.price)
-  const lowest  = Math.min(...historyPrices).toFixed(2)
-  const highest = Math.max(...historyPrices).toFixed(2)
-  const average = (historyPrices.reduce((a, b) => a + b, 0) / historyPrices.length).toFixed(2)
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -342,16 +355,16 @@ function ProductDetail() {
                 <p className="text-[#9E9590] text-xs">How this price was determined by the AI engine</p>
               </div>
             </div>
-            {DUMMY_HISTORY.length > 0 && (
+            {history.length > 0 && (
               <span className="text-xs text-[#6B6560] bg-[#FAF8F5] border border-[#E8E0D5] px-3 py-1.5 rounded-full hidden sm:block">
-                Last updated {format(new Date(DUMMY_HISTORY[DUMMY_HISTORY.length - 1].date), 'MMM d, yyyy')}
+                Last updated {format(new Date(history[history.length - 1].date), 'MMM d, yyyy')}
               </span>
             )}
           </div>
 
           {/* Chart */}
           <div className="p-8">
-            <PriceHistoryChart history={DUMMY_HISTORY} />
+            <PriceHistoryChart history={history} />
           </div>
         </div>
       </div>

@@ -290,10 +290,10 @@ function Navbar() {
                 onMouseLeave={() => setAvatarOpen(false)}
               >
                 <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                  {user.profilePicture ? (
-                    <img src={user.profilePicture} alt={user.name} className="w-8 h-8 rounded-full object-cover border-2 border-[#E8E0D5]" />
+                  {user.profilePictureUrl ? (
+                    <img src={user.profilePictureUrl} alt={user.name} className="w-10 h-10 rounded-full object-cover border-2 border-[#C9A96E]" />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-[#C9A96E] text-white text-xs font-bold flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-[#C9A96E] text-white text-xs font-bold flex items-center justify-center">
                       {user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
                     </div>
                   )}

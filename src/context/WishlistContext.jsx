@@ -1,25 +1,14 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useAuth } from './AuthContext'
 import { getWishlist, saveToWishlist, removeFromWishlist } from '../api/wishlist'
-import { DUMMY_PRODUCTS } from '../data/dummyData'
 
 const WishlistContext = createContext()
 
 export function WishlistProvider({ children }) {
   const { user } = useAuth()
-  const [wishlistItems, setWishlistItems] = useState([
-    { savedId: 1, productId: DUMMY_PRODUCTS[0].productId, ...DUMMY_PRODUCTS[0], savedAt: new Date().toISOString() },
-    { savedId: 2, productId: DUMMY_PRODUCTS[3].productId, ...DUMMY_PRODUCTS[3], savedAt: new Date().toISOString() },
-    { savedId: 3, productId: DUMMY_PRODUCTS[8].productId, ...DUMMY_PRODUCTS[8], savedAt: new Date().toISOString() },
-    { savedId: 4, productId: DUMMY_PRODUCTS[7].productId, ...DUMMY_PRODUCTS[7], savedAt: new Date().toISOString() },
-  ])
-  const [wishlistIds, setWishlistIds] = useState(new Set([
-    DUMMY_PRODUCTS[0].productId,
-    DUMMY_PRODUCTS[3].productId,
-    DUMMY_PRODUCTS[8].productId,
-    DUMMY_PRODUCTS[7].productId,
-  ]))
-  const [wishlistCount, setWishlistCount] = useState(4)
+  const [wishlistItems, setWishlistItems] = useState([])
+  const [wishlistIds, setWishlistIds] = useState(new Set())
+  const [wishlistCount, setWishlistCount] = useState(0)
   const [loading, setLoading] = useState(false)
 
   const fetchWishlist = useCallback(async () => {

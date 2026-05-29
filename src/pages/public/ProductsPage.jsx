@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { FiSearch, FiX, FiGrid, FiList, FiChevronLeft, FiChevronRight, FiArrowRight, FiSmartphone, FiMonitor, FiZap, FiWatch, FiShoppingBag, FiHeadphones, FiStar, FiActivity, FiHome, FiMusic, FiBookOpen, FiHeart, FiCoffee } from 'react-icons/fi'
 import { MdPets } from 'react-icons/md'
 import ProductCardComponent from '../../components/ProductCard'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
+import { getAllProducts } from '../../api/products'
+import { toast } from 'react-toastify'
 
 const MemoProductCard = React.memo(ProductCardComponent)
 
@@ -45,13 +46,16 @@ function ProductsPage() {
   const [search, setSearch]   = useState('')
   const [category, setCategory] = useState('all')
   const [sort, setSort]       = useState('newest')
+  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [view, setView]       = useState('grid')
   const [page, setPage]       = useState(1)
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200)
-    return () => clearTimeout(timer)
+    getAllProducts()
+      .then(res => setProducts(res.data || []))
+      .catch(() => toast.error('Failed to load products'))
+      .finally(() => setLoading(false))
   }, [])
 
   const handleSearch = useCallback((val) => {
@@ -76,7 +80,7 @@ function ProductsPage() {
   }, [searchInput, handleSearch])
 
   const filtered = useMemo(() => {
-    let result = [...DUMMY_PRODUCTS]
+    let result = [...products]
     if (search.trim()) {
       const q = search.toLowerCase()
       result = result.filter(p =>

@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FiCheck, FiPackage, FiTrendingUp, FiTag, FiUser, FiCalendar } from 'react-icons/fi'
 import { format } from 'date-fns'
 import BackButton from '../../components/BackButton'
-import { DUMMY_ORDERS } from '../../data/dummyData'
+import { toast } from 'react-toastify'
+import { getMyOrders } from '../../api/orders'
 
 const categoryEmojis = {
   telephony: '📱', audio: '🎧', computers: '💻',
@@ -19,9 +20,29 @@ function OrderDetail() {
 
   const handleThumb = (i) => { setImgLoaded(false); setActiveImg(i) }
 
-  // Dummy: find order by orderId match
-  // When connecting backend: replace with useEffect calling GET /api/orders/:orderId
-  const order = DUMMY_ORDERS.find(o => String(o.orderId) === String(orderId)) || DUMMY_ORDERS[0]
+  const [order, setOrder] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getMyOrders()
+      .then(res => {
+        const found = (res.data || []).find(o => String(o.orderId) === String(orderId))
+        setOrder(found || null)
+      })
+      .catch(() => toast.error('Failed to load order'))
+      .finally(() => setLoading(false))
+  }, [orderId])
+
+  if (loading) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+  if (!order) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <p className="text-[#6B6560]">Order not found</p>
+    </div>
+  )
 
   const emoji = categoryEmojis[order.category] || categoryEmojis.default
   const hasImage = order.imageUrls?.length > 0

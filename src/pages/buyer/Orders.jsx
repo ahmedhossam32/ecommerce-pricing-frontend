@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiPackage, FiCheck, FiTrendingUp } from 'react-icons/fi'
 import { format } from 'date-fns'
 import BackButton from '../../components/BackButton'
-import { DUMMY_ORDERS } from '../../data/dummyData'
+import { toast } from 'react-toastify'
+import { getMyOrders } from '../../api/orders'
 
 const categoryEmojis = {
   telephony: '📱', audio: '🎧', computers: '💻',
@@ -11,8 +12,6 @@ const categoryEmojis = {
   fashion_bags_accessories: '👜', consoles_games: '🎮',
   health_beauty: '💄', default: '📦',
 }
-
-const totalSpent = DUMMY_ORDERS.reduce((sum, o) => sum + o.price, 0)
 
 function OrderCard({ order }) {
   const [imgLoaded, setImgLoaded] = useState(false)
@@ -105,6 +104,24 @@ function OrderCard({ order }) {
 }
 
 function Orders() {
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getMyOrders()
+      .then(res => setOrders(res.data || []))
+      .catch(() => toast.error('Failed to load orders'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const totalSpent = orders.reduce((sum, o) => sum + (o.price || 0), 0)
+
+  if (loading) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <style>{`
@@ -128,7 +145,7 @@ function Orders() {
             <div className="flex items-center gap-3 mt-2">
               <h1 className="text-2xl font-extrabold text-white">My Orders</h1>
               <span className="bg-[#C9A96E]/20 text-[#C9A96E] text-xs font-bold px-2.5 py-1 rounded-full border border-[#C9A96E]/30">
-                {DUMMY_ORDERS.length} orders
+                {orders.length} orders
               </span>
             </div>
           </div>
@@ -141,7 +158,7 @@ function Orders() {
 
       {/* ── MAIN CONTENT ────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {DUMMY_ORDERS.length === 0 ? (
+        {orders.length === 0 ? (
 
           /* Empty state */
           <div className="text-center py-20">
@@ -160,7 +177,7 @@ function Orders() {
           <>
             {/* Orders list */}
             <div className="flex flex-col gap-4">
-              {DUMMY_ORDERS.map(order => (
+              {orders.map(order => (
                 <OrderCard key={order.orderId} order={order} />
               ))}
             </div>
@@ -179,7 +196,7 @@ function Orders() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-white/40 text-xs">{DUMMY_ORDERS.length} purchases</p>
+                <p className="text-white/40 text-xs">{orders.length} purchases</p>
                 <p className="text-[#C9A96E] font-extrabold text-2xl">${totalSpent.toFixed(2)}</p>
               </div>
             </div>

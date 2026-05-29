@@ -4,12 +4,11 @@ import { useAuth } from '../context/AuthContext'
 import { toast } from 'react-toastify'
 import { FiX, FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiAlertCircle } from 'react-icons/fi'
 import { FiTrendingUp } from 'react-icons/fi'
-// import { login as loginApi, register as registerApi } from '../api/auth'
+import { login as loginApi, register as registerApi } from '../api/auth'
+import { uploadProfilePicture } from '../api/user'
 import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import { FiCamera } from 'react-icons/fi'
-// import { register as registerApi } from '../api/auth'
-// import { uploadProfilePicture } from '../api/user'
 
 function AuthModal({ onClose, initialTab = 'login', initialRole = 'BUYER' }) {
   const { login } = useAuth()
@@ -63,26 +62,15 @@ function AuthModal({ onClose, initialTab = 'login', initialRole = 'BUYER' }) {
     e.preventDefault()
     if (!validateLogin()) return
     setLoading(true)
-    await new Promise(r => setTimeout(r, 700))
     try {
-      // TODO: replace with real API
-      // const res = await loginApi({ email: loginForm.email, password: loginForm.password })
-      // const { token, accessToken, user, name, role } = res.data
-      // const userData = user || { name, email: loginForm.email, role }
-      // login(userData, token || accessToken)
-      const userData = {
-        name: loginForm.email.split('@')[0],
-        email: loginForm.email,
-        role: loginForm.email.includes('admin') ? 'ADMIN'
-            : loginForm.email.includes('seller') ? 'SELLER' : 'BUYER',
-        profilePicture: null,
-      }
-      login(userData, 'dummy-token')
-      toast.success(`Welcome back, ${userData.name}!`)
+      const res = await loginApi({ email: loginForm.email, password: loginForm.password })
+      const { accessToken, name, email, role, profilePictureUrl } = res.data
+      login({ name, email, role, profilePictureUrl }, accessToken)
+      toast.success(`Welcome back, ${name}!`)
       onClose()
-      if (userData.role === 'SELLER') navigate('/seller/dashboard')
-      else if (userData.role === 'ADMIN') navigate('/admin/dashboard')
-      else if (userData.role === 'BUYER') {
+      if (role === 'SELLER') navigate('/seller/dashboard')
+      else if (role === 'ADMIN') navigate('/admin/dashboard')
+      else if (role === 'BUYER') {
         if (window.location.pathname === '/') navigate('/products')
       }
     } catch (err) {
@@ -103,8 +91,8 @@ function AuthModal({ onClose, initialTab = 'login', initialRole = 'BUYER' }) {
     const canvas = document.createElement('canvas')
     const scaleX = imgRef.current.naturalWidth / imgRef.current.width
     const scaleY = imgRef.current.naturalHeight / imgRef.current.height
-    canvas.width = 300
-    canvas.height = 300
+    canvas.width = 600
+    canvas.height = 600
     const ctx = canvas.getContext('2d')
     ctx.imageSmoothingEnabled = true
     ctx.imageSmoothingQuality = 'high'
@@ -115,44 +103,32 @@ function AuthModal({ onClose, initialTab = 'login', initialRole = 'BUYER' }) {
       completedCrop.width * scaleX,
       completedCrop.height * scaleY,
       0, 0,
-      300,
-      300
+      600,
+      600
     )
     canvas.toBlob((blob) => {
       setCroppedBlob(blob)
       setCroppedPreview(URL.createObjectURL(blob))
       setImgSrc('')
-    }, 'image/jpeg', 0.95)
+    }, 'image/jpeg', 1.0)
   }
 
   const handleFinishRegister = async () => {
     setLoading(true)
-    await new Promise(r => setTimeout(r, 700))
     try {
-      // TODO: replace with real API when connecting backend
-      // STEP 1: register user
-      // const res = await registerApi(registerForm)
-      // const { accessToken, name, email, role, profilePictureUrl } = res.data
-      //
-      // STEP 2: log them in immediately so the next call has auth token
-      // login({ name, email, role, profilePictureUrl }, accessToken)
-      //
-      // STEP 3: upload profile picture if user picked one
-      // if (croppedBlob) {
-      //   const uploadRes = await uploadProfilePicture(croppedBlob)
-      //   const newUrl = uploadRes.data  // backend returns raw string URL, not JSON object
-      //   login({ name, email, role, profilePictureUrl: newUrl }, accessToken)
-      // }
-
-      // DUMMY for now:
-      toast.success('Account created! Please sign in.')
-      setTab('login')
-      setRegisterStep(1)
-      setErrors({})
-      setImgSrc('')
-      setCroppedPreview(null)
-      setCroppedBlob(null)
-      setLoginForm({ email: registerForm.email, password: '' })
+      const res = await registerApi(registerForm)
+      const { accessToken, name, email, role, profilePictureUrl } = res.data
+      login({ name, email, role, profilePictureUrl }, accessToken)
+      if (croppedBlob) {
+        const uploadRes = await uploadProfilePicture(croppedBlob)
+        const newUrl = uploadRes.data
+        login({ name, email, role, profilePictureUrl: newUrl }, accessToken)
+      }
+      toast.success('Account created! Welcome to DynaMart 🎉')
+      onClose()
+      if (role === 'SELLER') navigate('/seller/dashboard')
+      else if (role === 'ADMIN') navigate('/admin/dashboard')
+      else navigate('/products')
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Registration failed. Try again.')
     } finally {
@@ -455,7 +431,7 @@ function AuthModal({ onClose, initialTab = 'login', initialRole = 'BUYER' }) {
 
                   {croppedPreview && !imgSrc && (
                     <div className="flex flex-col items-center gap-3">
-                      <img src={croppedPreview} alt="preview" className="w-28 h-28 rounded-full object-cover border-4 border-[#C9A96E]/30" />
+                      <img src={croppedPreview} alt="preview" className="w-36 h-36 rounded-full object-cover border-4 border-[#C9A96E]/30" />
                       <button
                         type="button"
                         onClick={() => { setCroppedPreview(null); setCroppedBlob(null) }}

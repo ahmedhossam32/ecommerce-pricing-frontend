@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { placeOrder } from '../../api/orders'
 import { Link } from 'react-router-dom'
 import { FiShoppingCart, FiTrash2, FiHeart, FiTrendingUp, FiCheckCircle } from 'react-icons/fi'
 import BackButton from '../../components/BackButton'
@@ -32,20 +33,17 @@ function Cart() {
 
   const confirmItemOrder = async () => {
     setItemOrderLoading(true)
-    await new Promise(r => setTimeout(r, 800))
-    const dummyOrder = {
-      orderId: Math.floor(Math.random() * 90000) + 10000,
-      productName: selectedItem?.name || selectedItem?.productName,
-      price: selectedItem?.price,
-      sellerName: selectedItem?.sellerName,
-      category: selectedItem?.category,
-      brand: selectedItem?.brand,
-      imageUrls: selectedItem?.imageUrls,
+    try {
+      const res = await placeOrder(selectedItem.productId)
+      setItemOrderData(res.data)
+      setItemOrderConfirmed(true)
+      removeItem(selectedItem.productId)
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to place order')
+      setItemOrderModal(false)
+    } finally {
+      setItemOrderLoading(false)
     }
-    setItemOrderData(dummyOrder)
-    setItemOrderConfirmed(true)
-    setItemOrderLoading(false)
-    removeItem(selectedItem.productId)
   }
 
   return (

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { FiUser, FiCamera, FiUpload, FiLock, FiShoppingBag, FiShoppingCart, FiHeart, FiTrendingUp, FiPackage, FiTag } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
+import { uploadProfilePicture } from '../../api/user'
 
 const roleBadge = {
   BUYER:  'bg-[#1C1F2E]/10 text-[#1C1F2E] border border-[#1C1F2E]/20',
@@ -11,7 +12,7 @@ const roleBadge = {
 }
 
 function Profile() {
-  const { user, login } = useAuth()
+  const { user, token, login } = useAuth()
 
   const [selectedFile, setSelectedFile] = useState(null)
   const [preview, setPreview] = useState(null)
@@ -29,18 +30,18 @@ function Profile() {
   const handleSavePhoto = async () => {
     if (!selectedFile) return
     setUploading(true)
-    await new Promise(r => setTimeout(r, 800))
-    // TODO: replace with real API call
-    // POST /api/user/profile-picture — multipart file, key=file
-    // Returns plain string URL (not JSON)
-    // const formData = new FormData()
-    // formData.append('file', selectedFile)
-    // const url = await uploadProfilePicture(formData)
-    // login({ ...user, profilePicture: url }, token)
-    toast.success('Profile picture updated! (dummy)')
-    setUploading(false)
-    setSelectedFile(null)
-    setPreview(null)
+    try {
+      const res = await uploadProfilePicture(selectedFile)
+      const newUrl = res.data
+      login({ ...user, profilePictureUrl: newUrl }, token)
+      toast.success('Profile picture updated!')
+      setSelectedFile(null)
+      setPreview(null)
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to upload photo')
+    } finally {
+      setUploading(false)
+    }
   }
 
   const initials = user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'

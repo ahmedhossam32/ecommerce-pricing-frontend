@@ -1,25 +1,14 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useAuth } from './AuthContext'
 import { addToCart, getCart, removeFromCart, clearCart } from '../api/cart'
-import { DUMMY_PRODUCTS } from '../data/dummyData'
 
 const CartContext = createContext()
 
 export function CartProvider({ children }) {
   const { user } = useAuth()
-  const [cartItems, setCartItems] = useState([
-    { cartItemId: 1, productId: DUMMY_PRODUCTS[0].productId, ...DUMMY_PRODUCTS[0], addedAt: new Date().toISOString() },
-    { cartItemId: 2, productId: DUMMY_PRODUCTS[1].productId, ...DUMMY_PRODUCTS[1], addedAt: new Date().toISOString() },
-    { cartItemId: 3, productId: DUMMY_PRODUCTS[5].productId, ...DUMMY_PRODUCTS[5], addedAt: new Date().toISOString() },
-    { cartItemId: 4, productId: DUMMY_PRODUCTS[2].productId, ...DUMMY_PRODUCTS[2], addedAt: new Date().toISOString() },
-  ])
-  const [cartIds, setCartIds] = useState(new Set([
-    DUMMY_PRODUCTS[0].productId,
-    DUMMY_PRODUCTS[1].productId,
-    DUMMY_PRODUCTS[5].productId,
-    DUMMY_PRODUCTS[2].productId,
-  ]))
-  const [cartCount, setCartCount] = useState(4)
+  const [cartItems, setCartItems] = useState([])
+  const [cartIds, setCartIds] = useState(new Set())
+  const [cartCount, setCartCount] = useState(0)
   const [loading, setLoading] = useState(false)
 
   const fetchCart = useCallback(async () => {
