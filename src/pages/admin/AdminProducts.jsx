@@ -8,22 +8,7 @@ import {
   FiMail, FiInbox, FiChevronLeft, FiChevronRight,
 } from 'react-icons/fi'
 import { categoryEmojis, categoryGradients } from '../../data/adminDummyData'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
-
-const ADMIN_DUMMY_PRODUCTS = [
-  { productId: 1,  requestId: null, productName: 'iPhone 17 Pro Max',          category: 'telephony',                brand: 'Apple',   status: 'LIVE',           price: 977.00,   suggestedPrice: 960.00,  sellerName: 'Tech Store',      sellerEmail: 'techstore@example.com',   sellerProfilePictureUrl: null, createdAt: '2026-05-20T10:00:00', imageUrls: DUMMY_PRODUCTS[0].imageUrls },
-  { productId: 2,  requestId: null, productName: 'Sony WH-1000XM5 Headphones', category: 'audio',                    brand: 'Sony',    status: 'LIVE',           price: 280.00,   suggestedPrice: 275.00,  sellerName: 'Audio World',     sellerEmail: 'audioworld@example.com',  sellerProfilePictureUrl: null, createdAt: '2026-05-19T10:00:00', imageUrls: DUMMY_PRODUCTS[1].imageUrls },
-  { productId: 3,  requestId: null, productName: 'MacBook Pro 14 M3',           category: 'computers',                brand: 'Apple',   status: 'LIVE',           price: 1999.00,  suggestedPrice: 1980.00, sellerName: 'Apple Store',     sellerEmail: 'applestore@example.com',  sellerProfilePictureUrl: null, createdAt: '2026-05-18T10:00:00', imageUrls: DUMMY_PRODUCTS[2].imageUrls },
-  { productId: 4,  requestId: null, productName: 'Rolex Submariner',            category: 'watches_gifts',            brand: 'Rolex',   status: 'LIVE',           price: 7500.00,  suggestedPrice: 7200.00, sellerName: 'Luxury Watch Co', sellerEmail: 'luxury@example.com',       sellerProfilePictureUrl: null, createdAt: '2026-05-17T10:00:00', imageUrls: DUMMY_PRODUCTS[3].imageUrls },
-  { productId: 5,  requestId: null, productName: 'Nike Air Force 1 White',      category: 'fashion_shoes',            brand: 'Nike',    status: 'LIVE',           price: 120.00,   suggestedPrice: 115.00,  sellerName: 'Sneaker Hub',     sellerEmail: 'sneaker@example.com',      sellerProfilePictureUrl: null, createdAt: '2026-05-16T10:00:00', imageUrls: DUMMY_PRODUCTS[4].imageUrls },
-  { productId: 6,  requestId: 5,    productName: 'PlayStation 5 Console',       category: 'consoles_games',           brand: 'Sony',    status: 'PENDING_REVIEW', price: null,     suggestedPrice: 499.00,  sellerName: 'Game Zone',       sellerEmail: 'gamezone@example.com',    sellerProfilePictureUrl: null, createdAt: '2026-05-15T10:00:00', imageUrls: DUMMY_PRODUCTS[5].imageUrls },
-  { productId: 7,  requestId: 6,    productName: 'Samsung Galaxy S25 Ultra',    category: 'telephony',                brand: 'Samsung', status: 'PENDING_REVIEW', price: null,     suggestedPrice: 850.00,  sellerName: 'Mobile World',    sellerEmail: 'mobile@example.com',       sellerProfilePictureUrl: null, createdAt: '2026-05-14T10:00:00', imageUrls: DUMMY_PRODUCTS[6].imageUrls },
-  { productId: 8,  requestId: null, productName: 'Apple Watch Series 10',       category: 'watches_gifts',            brand: 'Apple',   status: 'REJECTED',       price: null,     suggestedPrice: 399.00,  sellerName: 'Tech Store',      sellerEmail: 'techstore@example.com',   sellerProfilePictureUrl: null, createdAt: '2026-05-13T10:00:00', imageUrls: DUMMY_PRODUCTS[7].imageUrls },
-  { productId: 9,  requestId: null, productName: 'Premium Leather Bag',         category: 'fashion_bags_accessories', brand: 'Gucci',   status: 'REJECTED',       price: null,     suggestedPrice: 320.00,  sellerName: 'Fashion Hub',     sellerEmail: 'fashion@example.com',      sellerProfilePictureUrl: null, createdAt: '2026-05-12T10:00:00', imageUrls: DUMMY_PRODUCTS[8].imageUrls },
-  { productId: 10, requestId: null, productName: 'AirPods Pro 3rd Gen',         category: 'audio',                    brand: 'Apple',   status: 'LIVE',           price: 249.00,   suggestedPrice: 245.00,  sellerName: 'Tech Store',      sellerEmail: 'techstore@example.com',   sellerProfilePictureUrl: null, createdAt: '2026-05-11T10:00:00', imageUrls: DUMMY_PRODUCTS[9].imageUrls },
-  { productId: 11, requestId: null, productName: 'Adidas Ultraboost 22',        category: 'fashion_shoes',            brand: 'Adidas',  status: 'DRAFT',          price: null,     suggestedPrice: null,    sellerName: 'Sneaker Hub',     sellerEmail: 'sneaker@example.com',      sellerProfilePictureUrl: null, createdAt: '2026-05-10T10:00:00', imageUrls: DUMMY_PRODUCTS[10].imageUrls },
-  { productId: 12, requestId: null, productName: 'Dyson V15 Vacuum',            category: 'health_beauty',            brand: 'Dyson',   status: 'DRAFT',          price: null,     suggestedPrice: null,    sellerName: 'Home Essentials', sellerEmail: 'home@example.com',         sellerProfilePictureUrl: null, createdAt: '2026-05-09T10:00:00', imageUrls: [] },
-]
+import api from '../../api/axiosInstance'
 
 const TABS = [
   { key: 'ALL',            label: 'All'            },
@@ -232,25 +217,19 @@ function AdminProducts() {
     setLoading(true)
     setError(null)
     try {
-      // TODO: uncomment fetch when API ready
-      // const token = localStorage.getItem('accessToken')
-      // const res = await fetch('http://localhost:8080/api/admin/products', {
-      //   headers: { Authorization: `Bearer ${token}` }
-      // })
-      // if (!res.ok) throw new Error('Failed to load products')
-      // setProducts(await res.json())
-
-      await new Promise(r => setTimeout(r, 700))
-      setProducts(ADMIN_DUMMY_PRODUCTS)
+      const res = await api.get('/admin/products', {
+        params: activeTab !== 'ALL' ? { status: activeTab } : {}
+      })
+      setProducts(res.data || [])
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      setError(err?.response?.data?.message || 'Failed to load products')
       toast.error('Failed to load products')
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => { fetchProducts() }, [])
+  useEffect(() => { fetchProducts() }, [activeTab])
 
   const q = search.trim().toLowerCase()
 
@@ -267,20 +246,10 @@ function AdminProducts() {
   const handleOverride = async () => {
     setOverrideLoading(true)
     try {
-      // TODO: uncomment when API ready
-      // const token = localStorage.getItem('accessToken')
-      // const res = await fetch(`http://localhost:8080/api/admin/override/${overrideModal.product.productId}`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      //   body: JSON.stringify({ newPrice: Number(newPrice), adminNote: adminNote.trim() || undefined })
-      // })
-      // if (!res.ok) {
-      //   const err = await res.json()
-      //   if (err.errors) throw new Error(Object.values(err.errors).join(', '))
-      //   throw new Error(err.message || 'Failed to override price')
-      // }
-
-      await new Promise(r => setTimeout(r, 800))
+      await api.post(`/admin/override/${overrideModal.product.productId}`, {
+        newPrice: Number(newPrice),
+        adminNote: adminNote.trim() || undefined
+      })
       setProducts(prev =>
         prev.map(p =>
           p.productId === overrideModal.product.productId
@@ -294,9 +263,9 @@ function AdminProducts() {
       setNewPrice('')
       setAdminNote('')
     } catch (err) {
-      setOverrideError(err.message || 'Failed to override. Try again.')
+      setOverrideError(err?.response?.data?.message || 'Failed to override. Try again.')
       setConfirmOverride(false)
-      toast.error(err.message || 'Failed to override price')
+      toast.error(err?.response?.data?.message || 'Failed to override price')
     } finally {
       setOverrideLoading(false)
     }

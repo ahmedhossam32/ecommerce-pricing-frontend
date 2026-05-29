@@ -7,50 +7,39 @@ import {
 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import AdminRequestRow from '../../components/admin/AdminRequestRow'
-import { DUMMY_REQUESTS } from '../../data/adminDummyData'
-
-const DUMMY_STATS = {
-  totalProducts: 47,
-  liveProducts: 31,
-  pendingReview: 6,
-  rejectedProducts: 5,
-  totalSellers: 12,
-  totalApprovedDecisions: 24,
-  totalBuyers: 89,
-  totalOrders: 143,
-}
+import { useAuth } from '../../context/AuthContext'
+import api from '../../api/axiosInstance'
 
 function AdminDashboard() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [recentRequests, setRecentRequests] = useState([])
 
-  const name = localStorage.getItem('name') || 'Admin'
+  const name = user?.name || 'Admin'
 
   const fetchStats = async () => {
     setLoading(true)
     setError(null)
     try {
-      // TODO: uncomment fetch when API is ready
-      // const token = localStorage.getItem('accessToken')
-      // const res = await fetch('/api/admin/stats', {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // })
-      // if (!res.ok) throw new Error('Failed to load stats')
-      // setStats(await res.json())
-
-      await new Promise(r => setTimeout(r, 700))
-      setStats(DUMMY_STATS)
+      const res = await api.get('/admin/stats')
+      setStats(res.data)
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      setError(err?.response?.data?.message || 'Failed to load stats')
       toast.error('Failed to load dashboard stats')
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => { fetchStats() }, [])
+  useEffect(() => {
+    fetchStats()
+    api.get('/admin/requests')
+      .then(res => setRecentRequests((res.data || []).slice(0, 3)))
+      .catch(() => {})
+  }, [])
 
   const statCards = stats ? [
     { label: 'Total Products', value: stats.totalProducts, icon: FiPackage, color: 'text-[#1C1F2E]', bg: 'bg-[#1C1F2E]/5', hero: false, hoverBorder: 'hover:border-[#1C1F2E]/30', hoverShadow: 'hover:shadow-[#1C1F2E]/10', navigateTo: '/admin/products', accentColor: '#1C1F2E' },
@@ -267,7 +256,7 @@ function AdminDashboard() {
             </Link>
           </div>
           <div className="flex flex-col gap-3">
-            {DUMMY_REQUESTS.map(req => (
+            {recentRequests.map(req => (
               <AdminRequestRow key={req.requestId} request={req} />
             ))}
           </div>

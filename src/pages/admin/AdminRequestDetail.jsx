@@ -6,12 +6,8 @@ import {
   FiCheckCircle, FiXCircle, FiAlertCircle, FiMail,
   FiMessageSquare, FiRefreshCw,
 } from 'react-icons/fi'
-import {
-  DUMMY_REQUESTS,
-  getRoutingReason,
-  categoryEmojis,
-  categoryGradients,
-} from '../../data/adminDummyData'
+import { categoryEmojis, categoryGradients, getRoutingReason } from '../../data/adminDummyData'
+import api from '../../api/axiosInstance'
 
 function AdminRequestDetail() {
   const { requestId } = useParams()
@@ -39,20 +35,12 @@ function AdminRequestDetail() {
     setLoading(true)
     setError(null)
     try {
-      // TODO: uncomment when API ready
-      // const token = localStorage.getItem('accessToken')
-      // const res = await fetch(`http://localhost:8080/api/admin/requests/${requestId}`, {
-      //   headers: { Authorization: `Bearer ${token}` }
-      // })
-      // if (!res.ok) throw new Error('Request not found')
-      // setRequest(await res.json())
-
-      await new Promise(r => setTimeout(r, 600))
-      const found = DUMMY_REQUESTS.find(r => r.requestId === Number(requestId))
+      const res = await api.get('/admin/requests')
+      const found = (res.data || []).find(r => String(r.requestId) === String(requestId))
       if (!found) throw new Error('Request not found')
       setRequest(found)
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      setError(err?.response?.data?.message || err.message || 'Something went wrong')
     } finally {
       setLoading(false)
     }
@@ -74,25 +62,15 @@ function AdminRequestDetail() {
     setApproveLoading(true)
     setApproveError(null)
     try {
-      // TODO: uncomment when API ready
-      // const token = localStorage.getItem('accessToken')
-      // const res = await fetch(`http://localhost:8080/api/admin/approve/${requestId}`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      //   body: JSON.stringify({ approvedPrice: Number(approvedPrice), adminNote: adminNote.trim() || undefined })
-      // })
-      // if (!res.ok) {
-      //   const err = await res.json()
-      //   if (err.errors) throw new Error(Object.values(err.errors).join(', '))
-      //   throw new Error(err.message || 'Failed to approve')
-      // }
-
-      await new Promise(r => setTimeout(r, 800))
+      await api.post(`/admin/approve/${requestId}`, {
+        approvedPrice: Number(approvedPrice),
+        adminNote: adminNote.trim() || undefined
+      })
       toast.success('Request approved successfully!')
       setDecision('APPROVED')
     } catch (err) {
-      setApproveError(err.message || 'Failed to approve. Try again.')
-      toast.error(err.message || 'Failed to approve')
+      setApproveError(err?.response?.data?.message || 'Failed to approve. Try again.')
+      toast.error(err?.response?.data?.message || 'Failed to approve')
     } finally {
       setApproveLoading(false)
     }
@@ -110,25 +88,14 @@ function AdminRequestDetail() {
     setRejectLoading(true)
     setRejectError(null)
     try {
-      // TODO: uncomment when API ready
-      // const token = localStorage.getItem('accessToken')
-      // const res = await fetch(`http://localhost:8080/api/admin/reject/${requestId}`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      //   body: JSON.stringify({ rejectionReason: rejectionReason.trim() })
-      // })
-      // if (!res.ok) {
-      //   const err = await res.json()
-      //   if (err.errors) throw new Error(Object.values(err.errors).join(', '))
-      //   throw new Error(err.message || 'Failed to reject')
-      // }
-
-      await new Promise(r => setTimeout(r, 800))
+      await api.post(`/admin/reject/${requestId}`, {
+        rejectionReason: rejectionReason.trim()
+      })
       toast.success('Request rejected.')
       setDecision('REJECTED')
     } catch (err) {
-      setRejectError(err.message || 'Failed to reject. Try again.')
-      toast.error(err.message || 'Failed to reject')
+      setRejectError(err?.response?.data?.message || 'Failed to reject. Try again.')
+      toast.error(err?.response?.data?.message || 'Failed to reject')
     } finally {
       setRejectLoading(false)
     }

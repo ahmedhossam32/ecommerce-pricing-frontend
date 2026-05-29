@@ -1,10 +1,19 @@
+import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { FiGrid, FiClock, FiLayers, FiUser, FiLogOut, FiShield } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../api/axiosInstance'
 
-function AdminSidebar({ pendingCount }) {
+function AdminSidebar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [pendingCount, setPendingCount] = useState(0)
+
+  useEffect(() => {
+    api.get('/admin/stats')
+      .then(res => setPendingCount(res.data?.pendingReview || 0))
+      .catch(() => {})
+  }, [])
 
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -118,8 +127,11 @@ function AdminSidebar({ pendingCount }) {
 
           <div className="flex items-center gap-3 px-2 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05] min-w-0">
             <div className="relative shrink-0">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#C9A96E]/30 to-[#C9A96E]/10 flex items-center justify-center ring-1 ring-[#C9A96E]/30">
-                <span className="text-[#C9A96E] text-xs font-bold">{initials}</span>
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#C9A96E]/30 to-[#C9A96E]/10 flex items-center justify-center ring-1 ring-[#C9A96E]/30 overflow-hidden">
+                {user?.profilePictureUrl
+                  ? <img src={user.profilePictureUrl} alt={user?.name} className="w-full h-full object-cover" />
+                  : <span className="text-[#C9A96E] text-xs font-bold">{initials}</span>
+                }
               </div>
               <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#21253A]" />
             </div>

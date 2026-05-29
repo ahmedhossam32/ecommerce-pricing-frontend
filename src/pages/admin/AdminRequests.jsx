@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { FiClock, FiRefreshCw, FiSearch, FiX, FiXCircle, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import AdminRequestRow from '../../components/admin/AdminRequestRow'
-import { DUMMY_REQUESTS } from '../../data/adminDummyData'
+import api from '../../api/axiosInstance'
 
 const FILTERS = [
   { key: 'ALL',         label: 'All'          },
@@ -38,18 +38,10 @@ function AdminRequests() {
     setLoading(true)
     setError(null)
     try {
-      // TODO: uncomment when API is ready
-      // const token = localStorage.getItem('accessToken')
-      // const res = await fetch('http://localhost:8080/api/admin/requests', {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // })
-      // if (!res.ok) throw new Error('Failed to load requests')
-      // setRequests(await res.json())
-
-      await new Promise(r => setTimeout(r, 700))
-      setRequests(DUMMY_REQUESTS)
+      const res = await api.get('/admin/requests')
+      setRequests(res.data || [])
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      setError(err?.response?.data?.message || 'Failed to load requests')
       toast.error('Failed to load requests')
     } finally {
       setLoading(false)
