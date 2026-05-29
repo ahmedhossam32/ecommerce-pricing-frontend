@@ -1,27 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiPlus, FiPackage, FiAlertCircle, FiArrowRight, FiChevronLeft, FiChevronRight, FiTag } from 'react-icons/fi'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
+import { toast } from 'react-toastify'
+import { getSellerProducts } from '../../api/seller'
 import SellerProductRow from '../../components/seller/SellerProductRow'
-
-const SELLER_PRODUCTS = [
-  { ...DUMMY_PRODUCTS[0], status: 'LIVE',           price: 977,  suggestedPrice: 950  },
-  { ...DUMMY_PRODUCTS[1], status: 'LIVE',           price: 280,  suggestedPrice: 275  },
-  { ...DUMMY_PRODUCTS[2], status: 'PENDING_REVIEW', price: null, suggestedPrice: 1999 },
-  { ...DUMMY_PRODUCTS[3], status: 'DRAFT',          price: null, suggestedPrice: 7500 },
-  { ...DUMMY_PRODUCTS[4], status: 'REJECTED',       price: null, suggestedPrice: 120  },
-  { ...DUMMY_PRODUCTS[5], status: 'LIVE',           price: 499,  suggestedPrice: 480  },
-  { ...DUMMY_PRODUCTS[6], status: 'DRAFT',          price: null, suggestedPrice: 850  },
-  { ...DUMMY_PRODUCTS[7], status: 'PENDING_REVIEW', price: null, suggestedPrice: 399  },
-]
-
-const FILTERS = [
-  { key: 'ALL',            label: 'All',            count: SELLER_PRODUCTS.length },
-  { key: 'LIVE',           label: 'Live',           count: SELLER_PRODUCTS.filter(p => p.status === 'LIVE').length },
-  { key: 'DRAFT',          label: 'Action Needed',  count: SELLER_PRODUCTS.filter(p => p.status === 'DRAFT').length },
-  { key: 'PENDING_REVIEW', label: 'Pending Review', count: SELLER_PRODUCTS.filter(p => p.status === 'PENDING_REVIEW').length },
-  { key: 'REJECTED',       label: 'Rejected',       count: SELLER_PRODUCTS.filter(p => p.status === 'REJECTED').length },
-]
 
 const FILTER_STYLES = {
   ALL:            { active: 'bg-[#1C1F2E] text-white',  inactive: 'hover:border-[#1C1F2E]'  },
@@ -31,17 +13,38 @@ const FILTER_STYLES = {
   REJECTED:       { active: 'bg-red-700 text-white',     inactive: 'hover:border-red-400'    },
 }
 
-const draftCount = SELLER_PRODUCTS.filter(p => p.status === 'DRAFT').length
 const ITEMS_PER_PAGE = 5
 
-
 function SellerProducts() {
-  const [activeFilter, setActiveFilter]   = useState('ALL')
-  const [currentPage,  setCurrentPage]    = useState(1)
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [activeFilter, setActiveFilter] = useState('ALL')
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const filtered = activeFilter === 'ALL'
-    ? SELLER_PRODUCTS
-    : SELLER_PRODUCTS.filter(p => p.status === activeFilter)
+  useEffect(() => {
+    getSellerProducts()
+      .then(res => setProducts(res.data || []))
+      .catch(() => toast.error('Failed to load products'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const FILTERS = [
+    { key: 'ALL',            label: 'All',            count: products.length },
+    { key: 'LIVE',           label: 'Live',           count: products.filter(p => p.status === 'LIVE').length },
+    { key: 'DRAFT',          label: 'Action Needed',  count: products.filter(p => p.status === 'DRAFT').length },
+    { key: 'PENDING_REVIEW', label: 'Pending Review', count: products.filter(p => p.status === 'PENDING_REVIEW').length },
+    { key: 'REJECTED',       label: 'Rejected',       count: products.filter(p => p.status === 'REJECTED').length },
+  ]
+
+  const draftCount = products.filter(p => p.status === 'DRAFT').length
+
+  const filtered = activeFilter === 'ALL' ? products : products.filter(p => p.status === activeFilter)
+
+  if (loading) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const paginated  = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
@@ -73,7 +76,7 @@ function SellerProducts() {
           <h1 className="text-3xl font-extrabold text-white">My Products</h1>
           <p className="text-[#C9A96E] text-sm mt-1">
             {activeFilter === 'ALL'
-              ? `${SELLER_PRODUCTS.length} total listings`
+              ? `${products.length} total listings`
               : `${filtered.length} ${FILTERS.find(f => f.key === activeFilter)?.label} listings`}
           </p>
         </div>

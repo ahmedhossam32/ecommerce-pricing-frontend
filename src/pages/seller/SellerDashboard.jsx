@@ -1,45 +1,13 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FiPackage, FiCheckCircle, FiClock, FiFileText,
   FiXCircle, FiDollarSign, FiPlus, FiList, FiUser, FiTrendingUp, FiChevronRight, FiArrowRight, FiShoppingBag,
 } from 'react-icons/fi'
+import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
+import { getSellerDashboard, getSellerProducts } from '../../api/seller'
 import SellerProductRow from '../../components/seller/SellerProductRow'
-
-const DUMMY_STATS = {
-  total: 12,
-  live: 7,
-  pending: 2,
-  draft: 1,
-  rejected: 2,
-  revenue: 14820.50,
-  totalOrders: 38,
-}
-
-const RECENT_PRODUCTS = DUMMY_PRODUCTS.slice(0, 5).map((p, i) => ({
-  ...p,
-  status: ['LIVE', 'LIVE', 'PENDING_REVIEW', 'REJECTED', 'LIVE'][i],
-}))
-
-
-const statCards = [
-  { label: 'Total Products', value: DUMMY_STATS.total,    icon: FiPackage,     color: 'text-[#1C1F2E]',  bg: 'bg-[#1C1F2E]/[0.06]', accent: '#1C1F2E' },
-  { label: 'Live',           value: DUMMY_STATS.live,     icon: FiCheckCircle, color: 'text-green-500',   bg: 'bg-green-50',          accent: '#22c55e' },
-  { label: 'Pending Review', value: DUMMY_STATS.pending,  icon: FiClock,       color: 'text-[#C9A96E]',   bg: 'bg-[#C9A96E]/10',      accent: '#C9A96E', isPending: true },
-  { label: 'Drafts',         value: DUMMY_STATS.draft,    icon: FiFileText,    color: 'text-gray-400',    bg: 'bg-[#1C1F2E]/[0.06]', accent: '#9CA3AF' },
-  { label: 'Rejected',       value: DUMMY_STATS.rejected,     icon: FiXCircle,     color: 'text-red-400',   bg: 'bg-red-50',        accent: '#ef4444' },
-  { label: 'Total Orders',  value: DUMMY_STATS.totalOrders,  icon: FiShoppingBag, color: 'text-[#1C1F2E]', bg: 'bg-[#1C1F2E]/[0.06]', accent: '#1C1F2E' },
-  {
-    label: 'Total Revenue',
-    value: `$${DUMMY_STATS.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-    icon: FiDollarSign,
-    color: 'text-[#C9A96E]',
-    bg: 'bg-[#C9A96E]/10',
-    accent: '#C9A96E',
-    isRevenue: true,
-  },
-]
 
 
 function getGreeting() {
@@ -51,6 +19,36 @@ function getGreeting() {
 
 function SellerDashboard() {
   const { user } = useAuth()
+
+  const [stats, setStats] = useState(null)
+  const [recentProducts, setRecentProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    Promise.all([getSellerDashboard(), getSellerProducts()])
+      .then(([dashRes, productsRes]) => {
+        setStats(dashRes.data)
+        setRecentProducts((productsRes.data || []).slice(0, 5))
+      })
+      .catch(() => toast.error('Failed to load dashboard'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const statCards = stats ? [
+    { label: 'Total Products', value: stats.totalProducts,  icon: FiPackage,     color: 'text-[#1C1F2E]',  bg: 'bg-[#1C1F2E]/[0.06]', accent: '#1C1F2E' },
+    { label: 'Live',           value: stats.liveProducts,   icon: FiCheckCircle, color: 'text-green-500',   bg: 'bg-green-50',          accent: '#22c55e' },
+    { label: 'Pending Review', value: stats.pendingReview,  icon: FiClock,       color: 'text-[#C9A96E]',   bg: 'bg-[#C9A96E]/10',      accent: '#C9A96E', isPending: true },
+    { label: 'Drafts',         value: stats.draft,          icon: FiFileText,    color: 'text-gray-400',    bg: 'bg-[#1C1F2E]/[0.06]', accent: '#9CA3AF' },
+    { label: 'Rejected',       value: stats.rejected,       icon: FiXCircle,     color: 'text-red-400',     bg: 'bg-red-50',            accent: '#ef4444' },
+    { label: 'Total Orders',   value: stats.totalOrders || 0, icon: FiShoppingBag, color: 'text-[#1C1F2E]', bg: 'bg-[#1C1F2E]/[0.06]', accent: '#1C1F2E' },
+    { label: 'Total Revenue', value: `$${(stats.totalRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: FiDollarSign, color: 'text-[#C9A96E]', bg: 'bg-[#C9A96E]/10', accent: '#C9A96E', isRevenue: true },
+  ] : []
+
+  if (loading) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -147,8 +145,8 @@ function SellerDashboard() {
               {/* Avatar */}
               <div className="relative shrink-0">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C9A96E]/20 to-[#C9A96E]/5 ring-2 ring-[#C9A96E]/40 flex items-center justify-center overflow-hidden">
-                  {user?.profilePicture ? (
-                    <img src={user.profilePicture} className="w-full h-full object-cover" alt={user?.name} />
+                  {user?.profilePictureUrl ? (
+                    <img src={user.profilePictureUrl} className="w-full h-full object-cover" alt={user?.name} />
                   ) : (
                     <span className="text-white text-xl font-bold">{initials}</span>
                   )}
@@ -178,20 +176,20 @@ function SellerDashboard() {
           <div className="flex flex-wrap gap-3 mt-5">
             <div className="seller-pill-1 flex items-center gap-2.5 bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] border-l-2 border-l-green-400 hover:bg-white/[0.10] hover:border-white/[0.15] px-4 py-2 rounded-xl transition-all cursor-default">
               <FiCheckCircle size={14} className="text-green-400 shrink-0" />
-              <span className="text-white/80 text-xs font-medium">{DUMMY_STATS.live} Live listings</span>
+              <span className="text-white/80 text-xs font-medium">{stats?.liveProducts ?? '—'} Live listings</span>
             </div>
             <div className="seller-pill-2 flex items-center gap-2.5 bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] border-l-2 border-l-[#C9A96E] hover:bg-white/[0.10] hover:border-white/[0.15] px-4 py-2 rounded-xl transition-all cursor-default">
               <FiTrendingUp size={14} className="text-[#C9A96E] shrink-0" />
-              <span className="text-white/80 text-xs font-medium">${DUMMY_STATS.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })} earned</span>
+              <span className="text-white/80 text-xs font-medium">${(stats?.totalRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} earned</span>
             </div>
             <div className="seller-pill-3 flex items-center gap-2.5 bg-white/[0.06] backdrop-blur-sm border border-white/[0.08] border-l-2 border-l-amber-400 hover:bg-white/[0.10] hover:border-white/[0.15] px-4 py-2 rounded-xl transition-all cursor-default">
               <span className="relative flex shrink-0">
                 <FiClock size={14} className="text-amber-400" />
-                {DUMMY_STATS.pending > 0 && (
+                {(stats?.pendingReview ?? 0) > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-amber-400 rounded-full seller-pending-dot" />
                 )}
               </span>
-              <span className="text-white/80 text-xs font-medium">{DUMMY_STATS.pending} pending review</span>
+              <span className="text-white/80 text-xs font-medium">{stats?.pendingReview ?? '—'} pending review</span>
             </div>
           </div>
         </div>
@@ -245,8 +243,8 @@ function SellerDashboard() {
             </div>
 
             <div className="flex flex-col gap-2">
-              {RECENT_PRODUCTS.length > 0 ? (
-                RECENT_PRODUCTS.map(product => (
+              {recentProducts.length > 0 ? (
+                recentProducts.map(product => (
                   <SellerProductRow key={product.productId} product={product} />
                 ))
               ) : (

@@ -1,23 +1,29 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiZap, FiPackage, FiCheckCircle } from 'react-icons/fi'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
+import { toast } from 'react-toastify'
+import { getSellerProducts } from '../../api/seller'
 import SellerProductRow from '../../components/seller/SellerProductRow'
 
-const ALL_PRODUCTS = [
-  { ...DUMMY_PRODUCTS[0], status: 'LIVE', price: 977, suggestedPrice: 950 },
-  { ...DUMMY_PRODUCTS[1], status: 'LIVE', price: 280, suggestedPrice: 275 },
-  { ...DUMMY_PRODUCTS[2], status: 'PENDING_REVIEW', price: null, suggestedPrice: 1999 },
-  { ...DUMMY_PRODUCTS[3], status: 'DRAFT', price: null, suggestedPrice: 7500 },
-  { ...DUMMY_PRODUCTS[4], status: 'REJECTED', price: null, suggestedPrice: 120 },
-  { ...DUMMY_PRODUCTS[5], status: 'LIVE', price: 499, suggestedPrice: 480 },
-  { ...DUMMY_PRODUCTS[6], status: 'DRAFT', price: null, suggestedPrice: 850 },
-  { ...DUMMY_PRODUCTS[7], status: 'PENDING_REVIEW', price: null, suggestedPrice: 399 },
-]
-
-const DRAFT_PRODUCTS = ALL_PRODUCTS.filter(p => p.status === 'DRAFT')
-
 function SellerDecisions() {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getSellerProducts()
+      .then(res => setProducts(res.data || []))
+      .catch(() => toast.error('Failed to load products'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const draftProducts = products.filter(p => p.status === 'DRAFT')
+
+  if (loading) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
 
@@ -39,9 +45,9 @@ function SellerDecisions() {
           </div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-extrabold text-white">Price Decisions</h1>
-            {DRAFT_PRODUCTS.length > 0 && (
+            {draftProducts.length > 0 && (
               <span className="bg-[#C9A96E] text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                {DRAFT_PRODUCTS.length}
+                {draftProducts.length}
               </span>
             )}
           </div>
@@ -53,7 +59,7 @@ function SellerDecisions() {
 
       <div className="max-w-7xl mx-auto px-6 py-6">
 
-        {DRAFT_PRODUCTS.length === 0 ? (
+        {draftProducts.length === 0 ? (
           /* Empty state */
           <div className="py-20 flex flex-col items-center text-center gap-4">
             <div className="w-16 h-16 bg-green-50 border border-green-200 rounded-full flex items-center justify-center">
@@ -78,7 +84,7 @@ function SellerDecisions() {
                 <FiZap className="w-4 h-4 text-[#C9A96E]" />
               </div>
               <div>
-                <p className="text-[#1C1F2E] font-bold text-sm">Action required on {DRAFT_PRODUCTS.length} product{DRAFT_PRODUCTS.length > 1 ? 's' : ''}</p>
+                <p className="text-[#1C1F2E] font-bold text-sm">Action required on {draftProducts.length} product{draftProducts.length > 1 ? 's' : ''}</p>
                 <p className="text-[#6B6560] text-xs mt-1 leading-relaxed">
                   The AI has suggested a price for each product below.
                   <span className="text-red-500 font-semibold"> Act quickly</span> —
@@ -93,7 +99,7 @@ function SellerDecisions() {
 
             {/* Product list */}
             <div className="flex flex-col gap-3">
-              {DRAFT_PRODUCTS.map(product => (
+              {draftProducts.map(product => (
                 <SellerProductRow key={product.productId} product={product} />
               ))}
             </div>

@@ -1,25 +1,8 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { FiCheckCircle, FiClock, FiAlertCircle, FiMessageSquare, FiPackage, FiZap } from 'react-icons/fi'
 import { toast } from 'react-toastify'
-import { DUMMY_PRODUCTS } from '../../data/dummyData'
-
-const DUMMY_PRODUCT = DUMMY_PRODUCTS[1]
-
-const DUMMY_DECISION = {
-  productId: 99,
-  productName: 'Sony WH-1000XM5 Headphones',
-  suggestedPrice: 280,
-  minRange: 238,
-  maxRange: 322,
-  confidence: 'MEDIUM',
-  status: 'PENDING_SELLER',
-  message: 'Please review the suggested price and accept or dispute.',
-  brand: 'Sony',
-  mlBaselinePrice: 265,
-  marketPriceMin: 220,
-  marketPriceMax: 380,
-}
+import { getSellerProducts, acceptPrice, disputePrice } from '../../api/seller'
 
 const confidenceStyle = {
   HIGH:   'bg-[#C9A96E]/10 text-[#C9A96E] border-[#C9A96E]/30',
@@ -31,24 +14,55 @@ const inputCls = 'w-full bg-[#FAF8F5] border border-[#E8E0D5] focus:border-[#1C1
 const inputErrCls = 'w-full bg-[#FAF8F5] border border-red-400 focus:border-red-500 rounded-xl px-4 py-3 text-sm text-[#1C1F2E] focus:outline-none transition-colors'
 
 function PricingDecision() {
-  const [decisionData] = useState(DUMMY_DECISION)
-  const [pageStatus, setPageStatus] = useState(decisionData.status)
+  const { id } = useParams()
+  const [decisionData, setDecisionData] = useState(null)
+  const [pageStatus, setPageStatus] = useState('PENDING_SELLER')
+  const [pageLoading, setPageLoading] = useState(true)
+
+  useEffect(() => {
+    getSellerProducts()
+      .then(res => {
+        const found = (res.data || []).find(p => String(p.productId) === String(id))
+        if (found) {
+          setDecisionData(found)
+          setPageStatus(found.status === 'DRAFT' ? 'PENDING_SELLER' : found.status)
+        }
+      })
+      .catch(() => toast.error('Failed to load product'))
+      .finally(() => setPageLoading(false))
+  }, [id])
 
   const [acceptMode, setAcceptMode] = useState(false)
   const [chosenPrice, setChosenPrice] = useState('')
   const [accepting, setAccepting] = useState(false)
-
   const [disputeMode, setDisputeMode] = useState(false)
   const [disputeForm, setDisputeForm] = useState({ sellerPrice: '', sellerReasoning: '' })
   const [disputeErrors, setDisputeErrors] = useState({})
   const [disputing, setDisputing] = useState(false)
 
+  if (pageLoading) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+  if (!decisionData) return (
+    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <p className="text-[#6B6560]">Product not found</p>
+    </div>
+  )
+
   const handleAccept = async () => {
     setAccepting(true)
-    await new Promise(r => setTimeout(r, 1000))
-    toast.success('Price accepted! Your product is now live.')
-    setPageStatus('LIVE')
-    setAccepting(false)
+    try {
+      const body = chosenPrice ? { chosenPrice: parseFloat(chosenPrice) } : {}
+      await acceptPrice(decisionData.productId, body)
+      toast.success('Price accepted! Your product is now live.')
+      setPageStatus('LIVE')
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to accept price')
+    } finally {
+      setAccepting(false)
+    }
   }
 
   const validateDispute = () => {
@@ -62,10 +76,18 @@ function PricingDecision() {
   const handleDispute = async () => {
     if (!validateDispute()) return
     setDisputing(true)
-    await new Promise(r => setTimeout(r, 1000))
-    toast.success('Dispute submitted! Admin will review your request.')
-    setPageStatus('PENDING_ADMIN')
-    setDisputing(false)
+    try {
+      await disputePrice(decisionData.productId, {
+        sellerPrice: parseFloat(disputeForm.sellerPrice),
+        sellerReasoning: disputeForm.sellerReasoning,
+      })
+      toast.success('Dispute submitted! Admin will review your request.')
+      setPageStatus('PENDING_ADMIN')
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to submit dispute')
+    } finally {
+      setDisputing(false)
+    }
   }
 
   const priceOutOfRange = chosenPrice !== '' && (
@@ -146,11 +168,11 @@ function PricingDecision() {
             {/* Product info card */}
             <div className="bg-white border border-[#E8E0D5] rounded-3xl p-5 flex gap-5 items-center">
               <div className="w-24 h-24 rounded-2xl overflow-hidden bg-[#FAF8F5] shrink-0">
-                {DUMMY_PRODUCT.imageUrls[0] ? (
+                {decisionData.imageUrls?.[0] ? (
                   <img
-                    src={DUMMY_PRODUCT.imageUrls[0]}
+                    src={decisionData.imageUrls?.[0]}
                     className="w-full h-full object-cover"
-                    alt={DUMMY_PRODUCT.name}
+                    alt={decisionData.name}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -161,17 +183,17 @@ function PricingDecision() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                   <span className="bg-[#1C1F2E]/5 text-[#1C1F2E] text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                    {DUMMY_PRODUCT.brand}
+                    {decisionData.brand}
                   </span>
                   <span className="bg-[#C9A96E]/10 text-[#C9A96E] text-[10px] font-bold px-2.5 py-0.5 rounded-full capitalize">
-                    {DUMMY_PRODUCT.category.replace(/_/g, ' ')}
+                    {decisionData.category?.replace(/_/g, ' ')}
                   </span>
                   <span className="bg-[#FAF8F5] text-[#6B6560] text-[10px] px-2.5 py-0.5 rounded-full border border-[#E8E0D5]">
-                    {DUMMY_PRODUCT.weight}g
+                    {decisionData.weight}g
                   </span>
                 </div>
-                <p className="text-[#1C1F2E] font-bold text-lg leading-snug">{DUMMY_PRODUCT.name}</p>
-                <p className="text-[#6B6560] text-xs mt-1 line-clamp-2">{DUMMY_PRODUCT.description}</p>
+                <p className="text-[#1C1F2E] font-bold text-lg leading-snug">{decisionData.name}</p>
+                <p className="text-[#6B6560] text-xs mt-1 line-clamp-2">{decisionData.description}</p>
               </div>
             </div>
 

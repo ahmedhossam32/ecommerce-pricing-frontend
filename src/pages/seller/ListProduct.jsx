@@ -7,6 +7,8 @@ import {
   FiArrowLeft, FiArrowRight, FiCheck, FiImage,
 } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
+import { listProduct, acceptPrice, disputePrice } from '../../api/seller'
+import api from '../../api/axiosInstance'
 import Cropper from 'react-easy-crop'
 
 const CATEGORIES = [
@@ -31,36 +33,6 @@ const CATEGORIES = [
   { value: 'pet_shop',                 label: 'Pet Shop' },
 ]
 
-const DUMMY_RESULT_PENDING_SELLER = {
-  productId: 'p-demo',
-  suggestedPrice: 280,
-  minRange: 238,
-  maxRange: 322,
-  confidence: 'MEDIUM',
-  brand: 'Sony',
-  mlBaselinePrice: 265,
-  marketPriceMin: 220,
-  marketPriceMax: 380,
-  status: 'PENDING_SELLER',
-  message: 'Price suggestion ready',
-}
-
-const DUMMY_RESULT_PENDING_ADMIN = {
-  productId: 'p-demo-admin',
-  suggestedPrice: 7500,
-  minRange: 6000,
-  maxRange: 9000,
-  confidence: 'LOW',
-  brand: 'Rolex',
-  mlBaselinePrice: 7200,
-  marketPriceMin: 6000,
-  marketPriceMax: 9500,
-  status: 'PENDING_ADMIN',
-  message: 'Submitted for admin review',
-}
-
-// Change this to test each scenario
-const DUMMY_RESULT = { ...DUMMY_RESULT_PENDING_SELLER, confidence: 'HIGH' }
 
 function ListProduct() {
   const navigate = useNavigate()
@@ -142,18 +114,50 @@ function ListProduct() {
   const handleComputePrice = async () => {
     if (!allDone) { toast.error('Fill all fields first to compute price'); return }
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1500))
-    setLoading(false)
-    setComputeResult(DUMMY_RESULT)
+    try {
+      const res = await listProduct({
+        name: form.name,
+        category: form.category,
+        description: form.description,
+        weight: parseFloat(form.weight),
+        freightValue: parseFloat(form.freightValue),
+        photosQty: images.length || 1,
+      })
+      setComputeResult(res.data)
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to get price preview')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleSubmit = async () => {
     if (!allDone) { toast.error('Please fill all required fields'); return }
     setLoading(true)
-    await new Promise(r => setTimeout(r, 2000))
-    setPricingResult(DUMMY_RESULT)
-    setCurrentStep(3)
-    setLoading(false)
+    try {
+      const res = await listProduct({
+        name: form.name,
+        category: form.category,
+        description: form.description,
+        weight: parseFloat(form.weight),
+        freightValue: parseFloat(form.freightValue),
+        photosQty: images.length || 1,
+      })
+      const result = res.data
+      if (images.length > 0) {
+        const formData = new FormData()
+        images.forEach(file => formData.append('files', file))
+        await api.post(`/products/${result.productId}/images`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+      }
+      setPricingResult(result)
+      setCurrentStep(3)
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to list product')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -637,13 +641,19 @@ function ListProduct() {
                             </p>
                           </div>
                           <button
-                            onClick={() => {
-                              const price = chosenPrice ? Number(chosenPrice) : pricingResult.suggestedPrice
-                              if (chosenPrice && (price < pricingResult.minRange || price > pricingResult.maxRange)) {
+                            onClick={async () => {
+                              const price = chosenPrice ? Number(chosenPrice) : null
+                              if (price && (price < pricingResult.minRange || price > pricingResult.maxRange)) {
                                 toast.error(`Price must be between $${pricingResult.minRange} and $${pricingResult.maxRange}`)
                                 return
                               }
-                              setAccepted(true)
+                              try {
+                                const body = price ? { chosenPrice: price } : {}
+                                await acceptPrice(pricingResult.productId, body)
+                                setAccepted(true)
+                              } catch (err) {
+                                toast.error(err?.response?.data?.message || 'Failed to accept price')
+                              }
                             }}
                             className="w-full py-3 rounded-xl bg-[#C9A96E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#b8935a] transition-colors"
                           >
@@ -910,9 +920,17 @@ function ListProduct() {
                           toast.error('Reasoning must be at least 10 characters'); return
                         }
                         setDisputeLoading(true)
-                        await new Promise(r => setTimeout(r, 1500))
-                        setDisputeLoading(false)
-                        setDisputeSubmitted(true)
+                        try {
+                          await disputePrice(pricingResult.productId, {
+                            sellerPrice: parseFloat(disputeForm.sellerPrice),
+                            sellerReasoning: disputeForm.sellerReasoning,
+                          })
+                          setDisputeSubmitted(true)
+                        } catch (err) {
+                          toast.error(err?.response?.data?.message || 'Failed to submit dispute')
+                        } finally {
+                          setDisputeLoading(false)
+                        }
                       }}
                       disabled={disputeLoading || !disputeForm.sellerPrice || disputeForm.sellerReasoning.length < 10}
                       className="flex-1 py-3 rounded-xl bg-[#1C1F2E] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#2E3452] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

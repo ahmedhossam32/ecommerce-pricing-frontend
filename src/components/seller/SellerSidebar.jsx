@@ -140,8 +140,12 @@ function SellerSidebar() {
           <div className="flex items-center gap-3 px-2 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05] min-w-0">
             {/* Avatar with gold ring */}
             <div className="relative shrink-0">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#C9A96E]/30 to-[#C9A96E]/10 flex items-center justify-center ring-1 ring-[#C9A96E]/30">
-                <span className="text-[#C9A96E] text-xs font-bold">{initials}</span>
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#C9A96E]/30 to-[#C9A96E]/10 flex items-center justify-center ring-1 ring-[#C9A96E]/30 overflow-hidden">
+                {user?.profilePictureUrl ? (
+                  <img src={user.profilePictureUrl} className="w-full h-full object-cover rounded-xl" alt={user?.name} />
+                ) : (
+                  <span className="text-[#C9A96E] text-xs font-bold">{initials}</span>
+                )}
               </div>
               {/* Online dot */}
               <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#191D2E]" />
