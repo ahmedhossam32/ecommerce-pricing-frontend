@@ -35,7 +35,7 @@ function Navbar() {
     <header className="sticky top-0 z-50 w-full">
 
       {/* TOP BAR */}
-      <div className="bg-black border-b border-[#2E3452] text-gray-300 text-xs">
+      <div className="bg-[#1C1F2E] border-b border-[#2E3452] text-gray-300 text-xs">
         <div className="max-w-7xl mx-auto px-6 h-9 flex items-center justify-between">
 
           {/* Left — tagline */}
