@@ -72,6 +72,15 @@ function PricingDecision() {
   }
 
   const handleDispute = async () => {
+    const disputePrice = parseFloat(disputeForm.sellerPrice)
+    const withinRange = disputePrice >= decisionData.minRange && disputePrice <= decisionData.maxRange
+    if (!isNaN(disputePrice) && withinRange) {
+      toast.warning(
+        `Your price $${disputePrice.toFixed(2)} is already within the accepted range ($${decisionData.minRange} – $${decisionData.maxRange}). You can accept the suggested price instead.`,
+        { autoClose: 6000 }
+      )
+      return
+    }
     if (!validateDispute()) return
     setDisputing(true)
     try {
@@ -229,14 +238,22 @@ function PricingDecision() {
                 {/* Data grid */}
                 <div className="grid grid-cols-2 gap-4">
                   {[
+                    { label: 'Confidence',     value: decisionData.confidence },
                     { label: 'Brand Detected', value: decisionData.brand },
-                    { label: 'ML Baseline',    value: `$${decisionData.mlBaselinePrice}` },
-                    { label: 'Market Min',     value: `$${decisionData.marketPriceMin}` },
-                    { label: 'Market Max',     value: `$${decisionData.marketPriceMax}` },
+                    { label: 'ML Baseline',    value: decisionData.mlBaselinePrice ? `$${decisionData.mlBaselinePrice}` : 'N/A' },
+                    { label: 'Market Min',     value: decisionData.marketPriceMin ? `$${decisionData.marketPriceMin}` : 'N/A' },
+                    { label: 'Market Max',     value: decisionData.marketPriceMax ? `$${decisionData.marketPriceMax}` : 'N/A' },
                   ].map(({ label, value }) => (
                     <div key={label} className="bg-[#FAF8F5] rounded-2xl p-4">
                       <p className="text-[#9E9590] text-xs mb-1">{label}</p>
-                      <p className="text-[#1C1F2E] font-bold text-sm">{value}</p>
+                      <p className={`font-bold text-sm ${
+                        label === 'Confidence'
+                          ? value === 'HIGH'   ? 'text-green-600'
+                          : value === 'MEDIUM' ? 'text-yellow-600'
+                          : value === 'LOW'    ? 'text-red-500'
+                          : 'text-[#1C1F2E]'
+                          : 'text-[#1C1F2E]'
+                      }`}>{value}</p>
                     </div>
                   ))}
                 </div>

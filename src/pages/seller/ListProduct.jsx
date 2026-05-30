@@ -919,6 +919,15 @@ function ListProduct() {
                         if (disputeForm.sellerReasoning.length < 10) {
                           toast.error('Reasoning must be at least 10 characters'); return
                         }
+                        const price = parseFloat(disputeForm.sellerPrice)
+                        const withinRange = price >= pricingResult.minRange && price <= pricingResult.maxRange
+                        if (withinRange) {
+                          toast.warning(
+                            `Your price $${price.toFixed(2)} is already within the AI accepted range ($${pricingResult.minRange} – $${pricingResult.maxRange}). Consider accepting the suggested price instead.`,
+                            { autoClose: 6000 }
+                          )
+                          return
+                        }
                         setDisputeLoading(true)
                         try {
                           await disputePrice(pricingResult.productId, {

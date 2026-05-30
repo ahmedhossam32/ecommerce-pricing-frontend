@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useAuth } from './AuthContext'
-import { getWishlist, saveToWishlist, removeFromWishlist } from '../api/wishlist'
+import { getWishlist, saveToWishlist, removeFromWishlist, clearWishlist } from '../api/wishlist'
 
 const WishlistContext = createContext()
 
@@ -58,10 +58,15 @@ export function WishlistProvider({ children }) {
     return { success: true }
   }, [])
 
-  const clearAll = useCallback(() => {
+  const clearAll = useCallback(async () => {
     setWishlistItems([])
     setWishlistIds(new Set())
     setWishlistCount(0)
+    try {
+      await clearWishlist()
+    } catch {
+    }
+    return { success: true }
   }, [])
 
   const isInWishlist = useCallback((productId) => wishlistIds.has(productId), [wishlistIds])

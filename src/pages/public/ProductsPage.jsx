@@ -97,7 +97,7 @@ function ProductsPage() {
       default:           result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     }
     return result
-  }, [search, category, sort])
+  }, [products, search, category, sort])
 
   const activeFilters = (search ? 1 : 0) + (category !== 'all' ? 1 : 0)
 
