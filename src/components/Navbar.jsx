@@ -6,6 +6,15 @@ import { FiShoppingCart, FiHeart, FiUser, FiChevronDown, FiLogOut, FiPackage, Fi
 import { useState } from 'react'
 import AuthModal from './AuthModal'
 
+const NAV_CATEGORIES = [
+  { label: 'Phones & Tablets', value: 'telephony' },
+  { label: 'Computers',        value: 'computers' },
+  { label: 'Fashion',          value: 'fashion_male_clothing' },
+  { label: 'Gaming',           value: 'consoles_games' },
+  { label: 'Home & Living',    value: 'furniture_decor' },
+  { label: 'Watches',          value: 'watches_gifts' },
+]
+
 function Navbar() {
   const { user, logout } = useAuth()
   const { cartCount } = useCart()
@@ -169,14 +178,14 @@ function Navbar() {
                 Categories <FiChevronDown className="w-3.5 h-3.5" />
               </button>
               <div className="absolute top-full left-0 mt-3 bg-white border border-[#E8E0D5] shadow-lg rounded-xl w-48 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                {['Phones & Tablets', 'Computers', 'Fashion', 'Gaming', 'Home & Living', 'Watches'].map((cat, i) => (
-                  <Link
-                    key={i}
-                    to="/products"
-                    className="block px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] text-sm transition-colors"
+                {NAV_CATEGORIES.map(cat => (
+                  <button
+                    key={cat.value}
+                    onClick={() => navigate(`/products?category=${cat.value}`)}
+                    className="block w-full text-left px-4 py-2.5 text-[#6B6560] hover:text-[#1C1F2E] hover:bg-[#FAF8F5] text-sm transition-colors"
                   >
-                    {cat}
-                  </Link>
+                    {cat.label}
+                  </button>
                 ))}
               </div>
             </div>

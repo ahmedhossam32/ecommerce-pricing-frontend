@@ -32,6 +32,7 @@ function Cart() {
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price || 0), 0)
 
   const confirmItemOrder = async () => {
+    if (itemOrderLoading) return
     setItemOrderLoading(true)
     try {
       const res = await placeOrder(selectedItem.productId)

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { FiSearch, FiX, FiGrid, FiList, FiChevronLeft, FiChevronRight, FiArrowRight, FiSmartphone, FiMonitor, FiZap, FiWatch, FiShoppingBag, FiHeadphones, FiStar, FiActivity, FiHome, FiMusic, FiBookOpen, FiHeart, FiCoffee } from 'react-icons/fi'
 import { MdPets } from 'react-icons/md'
 import ProductCardComponent from '../../components/ProductCard'
@@ -42,9 +42,10 @@ const SORT_OPTIONS = [
 ]
 
 function ProductsPage() {
+  const [searchParams] = useSearchParams()
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch]   = useState('')
-  const [category, setCategory] = useState('all')
+  const [category, setCategory] = useState(searchParams.get('category') || 'all')
   const [sort, setSort]       = useState('newest')
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -57,6 +58,12 @@ function ProductsPage() {
       .catch(() => toast.error('Failed to load products'))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    const cat = searchParams.get('category')
+    if (cat) setCategory(cat)
+    else setCategory('all')
+  }, [searchParams])
 
   const handleSearch = useCallback((val) => {
     setSearch(val)
