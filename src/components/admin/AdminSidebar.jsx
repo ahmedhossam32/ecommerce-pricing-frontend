@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { FiGrid, FiClock, FiLayers, FiUser, FiLogOut, FiShield } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../api/axiosInstance'
@@ -7,13 +7,14 @@ import api from '../../api/axiosInstance'
 function AdminSidebar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [pendingCount, setPendingCount] = useState(0)
 
   useEffect(() => {
     api.get('/admin/stats')
       .then(res => setPendingCount(res.data?.pendingReview || 0))
       .catch(() => {})
-  }, [])
+  }, [location.pathname])
 
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)

@@ -55,6 +55,7 @@ function ListProduct() {
   const [disputeForm, setDisputeForm] = useState({ sellerPrice: '', sellerReasoning: '' })
   const [disputeSubmitted, setDisputeSubmitted] = useState(false)
   const [disputeLoading, setDisputeLoading] = useState(false)
+  const [disputePriceError, setDisputePriceError] = useState('')
 
   const [cropModalOpen, setCropModalOpen] = useState(false)
   const [currentCropFile, setCurrentCropFile] = useState(null)
@@ -724,10 +725,10 @@ function ListProduct() {
       {/* ── DISPUTE MODAL ── */}
       {disputeModalOpen && (
         <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#FAF8F5] rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-[#E8E0D5]">
+          <div className="bg-[#FAF8F5] rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-[#E8E0D5] max-h-[90vh] overflow-y-auto">
 
             {/* Modal Header */}
-            <div className="bg-[#1C1F2E] px-8 py-6">
+            <div className="bg-[#1C1F2E] px-6 py-4">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-[#C9A96E]/20 rounded-xl flex items-center justify-center border border-[#C9A96E]/30">
@@ -744,6 +745,7 @@ function ListProduct() {
                       setDisputeModalOpen(false)
                       setDisputeForm({ sellerPrice: '', sellerReasoning: '' })
                       setDisputeSubmitted(false)
+                      setDisputePriceError('')
                     }}
                     className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
                   >
@@ -778,7 +780,7 @@ function ListProduct() {
             </div>
 
             {/* Modal Body */}
-            <div className="px-8 py-6">
+            <div className="px-6 py-4">
               {!disputeSubmitted ? (
                 <>
                   {/* Info note */}
@@ -802,19 +804,22 @@ function ListProduct() {
                         <input
                           type="number"
                           value={disputeForm.sellerPrice}
-                          onChange={e => setDisputeForm(prev => ({ ...prev, sellerPrice: e.target.value }))}
+                          onChange={e => { setDisputeForm(prev => ({ ...prev, sellerPrice: e.target.value })); setDisputePriceError('') }}
                           placeholder="e.g. 350"
                           min={0}
                           className="w-full pl-7 pr-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-white focus:outline-none focus:border-[#C9A96E] transition-colors"
                         />
                       </div>
                       <p className="text-[10px] text-[#9CA3AF] mt-1">No range restriction — enter what you think is fair</p>
+                      {disputePriceError && (
+                        <p className="text-red-400 text-[10px] mt-1 leading-relaxed">{disputePriceError}</p>
+                      )}
 
                       {/* Price comparison */}
                       {disputeForm.sellerPrice && pricingResult && (
-                        <div className="mt-3 bg-white border border-[#E8E0D5] rounded-xl p-3">
+                        <div className="mt-3 bg-white border border-[#E8E0D5] rounded-xl p-2">
                           <p className="text-[10px] text-[#6B6560] mb-2 font-semibold uppercase tracking-wide">Price Comparison</p>
-                          <div className="flex flex-col gap-2">
+                          <div className="flex flex-col gap-1.5">
                             <div className="flex justify-between items-center">
                               <span className="text-xs text-[#9CA3AF]">AI Suggested</span>
                               <span className="text-xs text-[#1C1F2E] font-semibold">${pricingResult.suggestedPrice.toFixed(2)}</span>
@@ -858,7 +863,7 @@ function ListProduct() {
                         onChange={e => setDisputeForm(prev => ({ ...prev, sellerReasoning: e.target.value }))}
                         placeholder="Explain why you think your price is fair — e.g. rare limited edition, includes accessories, local market demand, better condition than typical..."
                         maxLength={500}
-                        className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-white focus:outline-none focus:border-[#C9A96E] transition-colors resize-none h-[120px]"
+                        className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-white focus:outline-none focus:border-[#C9A96E] transition-colors resize-none h-[80px]"
                       />
                       {disputeForm.sellerReasoning.length > 0 && disputeForm.sellerReasoning.length < 10 && (
                         <p className="text-red-400 text-[10px] mt-1">
@@ -871,28 +876,12 @@ function ListProduct() {
                         </p>
                       )}
 
-                      {/* Tips */}
-                      <div className="mt-3 bg-white border border-[#E8E0D5] rounded-xl p-3">
-                        <p className="text-[10px] text-[#6B6560] font-semibold mb-2">Tips for approval:</p>
-                        <ul className="flex flex-col gap-1.5">
-                          {[
-                            'Mention condition (new, like new, used)',
-                            'Reference comparable market prices',
-                            'Note any included accessories',
-                            'Explain rarity or limited availability',
-                          ].map(tip => (
-                            <li key={tip} className="text-[10px] text-[#9CA3AF] flex items-start gap-1.5">
-                              <span className="text-[#C9A96E] mt-0.5 shrink-0">·</span> {tip}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
                     </div>
                   </div>
 
                   {/* Validation summary */}
                   {disputeForm.sellerPrice && disputeForm.sellerReasoning.length >= 10 && (
-                    <div className="mt-5 bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2">
+                    <div className="mt-3 bg-green-50 border border-green-200 rounded-xl p-2 flex items-center gap-2">
                       <FiCheckCircle className="w-4 h-4 text-green-500 shrink-0" />
                       <p className="text-green-700 text-xs">
                         Ready to submit — ${Number(disputeForm.sellerPrice).toFixed(2)} with {disputeForm.sellerReasoning.length} chars of reasoning
@@ -901,11 +890,12 @@ function ListProduct() {
                   )}
 
                   {/* Action buttons */}
-                  <div className="flex gap-3 mt-5">
+                  <div className="flex gap-3 mt-3">
                     <button
                       onClick={() => {
                         setDisputeModalOpen(false)
                         setDisputeForm({ sellerPrice: '', sellerReasoning: '' })
+                        setDisputePriceError('')
                       }}
                       className="flex-1 py-3 rounded-xl border border-[#E8E0D5] text-[#6B6560] text-sm font-semibold hover:border-[#1C1F2E] hover:text-[#1C1F2E] transition-colors bg-white"
                     >
@@ -922,12 +912,10 @@ function ListProduct() {
                         const price = parseFloat(disputeForm.sellerPrice)
                         const withinRange = price >= pricingResult.minRange && price <= pricingResult.maxRange
                         if (withinRange) {
-                          toast.warning(
-                            `Your price $${price.toFixed(2)} is already within the AI accepted range ($${pricingResult.minRange} – $${pricingResult.maxRange}). Consider accepting the suggested price instead.`,
-                            { autoClose: 6000 }
-                          )
+                          setDisputePriceError(`This price is already within the accepted range ($${pricingResult.minRange} – $${pricingResult.maxRange}). Use Accept Price instead.`)
                           return
                         }
+                        setDisputePriceError('')
                         setDisputeLoading(true)
                         try {
                           await disputePrice(pricingResult.productId, {
@@ -985,6 +973,7 @@ function ListProduct() {
                       setDisputeModalOpen(false)
                       setDisputeSubmitted(false)
                       setDisputeForm({ sellerPrice: '', sellerReasoning: '' })
+                      setDisputePriceError('')
                       navigate('/seller/products')
                     }}
                     className="w-full max-w-xs py-3 rounded-xl bg-[#C9A96E] text-white text-sm font-bold hover:bg-[#b8935a] transition-colors"

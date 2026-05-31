@@ -26,7 +26,7 @@ export default function SellerProductRow({ product }) {
   const cfg = STATUS_CONFIG[product.status] ?? STATUS_CONFIG.DRAFT
   const hasImage = product.imageUrls?.length > 0
   const emoji = categoryEmojis[product.category] ?? categoryEmojis.default
-  const isClickable = product.status === 'DRAFT' || product.status === 'REJECTED'
+  const isClickable = product.status === 'DRAFT' || product.status === 'REJECTED' || product.status === 'LIVE'
 
   const handleClick = () => {
     if (product.status === 'DRAFT') {
@@ -34,6 +34,8 @@ export default function SellerProductRow({ product }) {
     } else if (product.status === 'REJECTED') {
       toast.info('You can relist this product.')
       navigate('/seller/products/new')
+    } else if (product.status === 'LIVE') {
+      navigate(`/products/${product.productId}`)
     }
   }
 
@@ -71,6 +73,11 @@ export default function SellerProductRow({ product }) {
         {product.status === 'DRAFT' && (
           <span className="text-[#C9A96E] text-xs font-semibold flex items-center gap-1 mt-1">
             <FiArrowRight size={11} /> Price decision needed — click to review
+          </span>
+        )}
+        {product.status === 'LIVE' && (
+          <span className="text-green-500 text-xs font-semibold flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <FiArrowRight size={11} /> View public listing
           </span>
         )}
         {product.status === 'REJECTED' && (
