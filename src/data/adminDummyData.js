@@ -29,12 +29,10 @@ export const categoryGradients = {
 }
 
 export const getRoutingReason = (request) => {
-  const { suggestedPrice, marketPriceMin, marketPriceMax, requestType } = request
+  const { requestType, routingReason, llmConfidence } = request
   if (requestType === 'DISPUTE') return null
-  const isOutOfBounds =
-    suggestedPrice != null &&
-    marketPriceMin != null &&
-    marketPriceMax != null &&
-    (suggestedPrice < marketPriceMin || suggestedPrice > marketPriceMax)
-  return isOutOfBounds ? 'Price outside category bounds' : 'Low AI confidence'
+  if (routingReason === 'OUTSIDE_BOUNDS') return 'Price outside category bounds'
+  if (llmConfidence === 'LOW') return 'Low AI confidence'
+  if (llmConfidence === 'MEDIUM') return 'Medium AI confidence'
+  return 'Sent for admin review'
 }

@@ -217,9 +217,7 @@ function AdminProducts() {
     setLoading(true)
     setError(null)
     try {
-      const res = await api.get('/admin/products', {
-        params: activeTab !== 'ALL' ? { status: activeTab } : {}
-      })
+      const res = await api.get('/admin/products')
       setProducts(res.data || [])
     } catch (err) {
       setError(err?.response?.data?.message || 'Failed to load products')
@@ -229,7 +227,7 @@ function AdminProducts() {
     }
   }
 
-  useEffect(() => { fetchProducts() }, [activeTab])
+  useEffect(() => { fetchProducts() }, [])
 
   const q = search.trim().toLowerCase()
 
