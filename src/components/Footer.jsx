@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { FiFacebook, FiInstagram, FiTwitter, FiLinkedin, FiMail, FiPhone, FiTrendingUp } from 'react-icons/fi'
+import { FiFacebook, FiInstagram, FiTwitter, FiLinkedin, FiMail, FiPhone } from 'react-icons/fi'
+import dynamartLogo from '../assets/dynamartlogo_final.png'
 import { useState } from 'react'
 
 function Footer() {
@@ -23,13 +24,13 @@ function Footer() {
 
           {/* Column 1 — Brand Info */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-[#1C1F2E] rounded-lg flex items-center justify-center">
-                <FiTrendingUp className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-xl">
-                <span className="text-white">Dyna</span><span className="text-[#C9A96E]">Mart</span>
-              </span>
+            <div className="mb-4">
+              <img
+                src={dynamartLogo}
+                alt="DynaMart"
+                className="h-14 w-auto object-contain"
+                style={{ filter: 'brightness(0) saturate(100%) invert(85%) sepia(30%) saturate(400%) hue-rotate(5deg)' }}
+              />
             </div>
             <p className="text-gray-500 text-sm leading-relaxed mb-6">
               A smarter marketplace where every price is AI-verified and fair.

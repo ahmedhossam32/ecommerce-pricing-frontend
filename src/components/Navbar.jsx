@@ -2,9 +2,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
-import { FiShoppingCart, FiHeart, FiUser, FiChevronDown, FiLogOut, FiPackage, FiMenu, FiX, FiTrendingUp } from 'react-icons/fi'
+import { FiShoppingCart, FiHeart, FiUser, FiChevronDown, FiLogOut, FiPackage, FiMenu, FiX } from 'react-icons/fi'
 import { useState } from 'react'
 import AuthModal from './AuthModal'
+import dynamartLogo from '../assets/dynamartlogo_final.png'
 
 const NAV_CATEGORIES = [
   { label: 'Phones & Tablets', value: 'telephony' },
@@ -145,13 +146,12 @@ function Navbar() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 bg-[#1C1F2E] rounded-lg flex items-center justify-center">
-              <FiTrendingUp className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-[#1C1F2E] font-bold text-lg tracking-tight">
-              Dyna<span className="text-[#C9A96E]">Mart</span>
-            </span>
+          <Link to="/" className="flex items-center shrink-0">
+            <img
+              src={dynamartLogo}
+              alt="DynaMart"
+              className="h-14 w-auto object-contain"
+            />
           </Link>
 
           {/* Center nav links */}
