@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import {
   FiUpload, FiX, FiZap, FiCheckCircle, FiCircle, FiMessageSquare,
   FiTrendingUp, FiClock, FiAlertCircle, FiPackage, FiTruck,
-  FiArrowLeft, FiArrowRight, FiCheck, FiImage,
+  FiArrowLeft, FiArrowRight, FiCheck, FiImage, FiTag,
 } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { listProduct, previewPrice, acceptPrice, disputePrice } from '../../api/seller'
@@ -43,6 +43,7 @@ function ListProduct() {
   const [form, setForm] = useState({
     name: '', category: '', description: '',
     weight: '', freightValue: '',
+    condition: '', conditionNotes: '',
   })
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -64,14 +65,18 @@ function ListProduct() {
   const [zoom, setZoom] = useState(1)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
 
-  const checks = [
+  const step2Checks = [
     { label: 'Name entered',       done: form.name.length >= 2 },
     { label: 'Category selected',  done: form.category !== '' },
     { label: 'Description filled', done: form.description.length >= 10 },
-    { label: 'Weight entered',       done: form.weight !== '' && Number(form.weight) > 0 },
+  ]
+  const step3Checks = [
+    { label: 'Condition selected',    done: form.condition !== '' },
+    { label: 'Weight entered',        done: form.weight !== '' && Number(form.weight) > 0 },
     { label: 'Freight value entered', done: form.freightValue !== '' && Number(form.freightValue) >= 0 },
   ]
-  const allDone = checks.every(c => c.done)
+  const step2Done = step2Checks.every(c => c.done)
+  const step3Done = step3Checks.every(c => c.done)
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -113,7 +118,7 @@ function ListProduct() {
   }
 
   const handleComputePrice = async () => {
-    if (!allDone) { toast.error('Fill all fields first to compute price'); return }
+    if (!step2Done) { toast.error('Fill all fields first to compute price'); return }
     setLoading(true)
     try {
       const res = await previewPrice({
@@ -123,6 +128,8 @@ function ListProduct() {
         weight: parseFloat(form.weight),
         freightValue: parseFloat(form.freightValue),
         photosQty: images.length || 1,
+        condition: form.condition,
+        conditionNotes: form.conditionNotes,
       })
       setComputeResult(res.data)
     } catch (err) {
@@ -133,7 +140,7 @@ function ListProduct() {
   }
 
   const handleSubmit = async () => {
-    if (!allDone) { toast.error('Please fill all required fields'); return }
+    if (!step3Done) { toast.error('Please fill all required fields'); return }
     setLoading(true)
     try {
       const res = await listProduct({
@@ -143,6 +150,8 @@ function ListProduct() {
         weight: parseFloat(form.weight),
         freightValue: parseFloat(form.freightValue),
         photosQty: images.length || 1,
+        condition: form.condition,
+        conditionNotes: form.conditionNotes,
       })
       const result = res.data
       if (images.length > 0) {
@@ -153,7 +162,7 @@ function ListProduct() {
         })
       }
       setPricingResult(result)
-      setCurrentStep(3)
+      setCurrentStep(4)
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to list product')
     } finally {
@@ -185,7 +194,8 @@ function ListProduct() {
           {[
             { num: 1, label: 'Product Images' },
             { num: 2, label: 'Product Details' },
-            { num: 3, label: 'AI Pricing' },
+            { num: 3, label: 'Condition & Ship' },
+            { num: 4, label: 'AI Pricing' },
           ].map(({ num, label }, idx) => (
             <div key={num} className="flex items-center flex-1">
               <div className="flex flex-col items-center gap-1.5">
@@ -204,7 +214,7 @@ function ListProduct() {
                   {label}
                 </span>
               </div>
-              {idx < 2 && (
+              {idx < 3 && (
                 <div className={`flex-1 h-[2px] mx-2 mb-5 rounded-full transition-all duration-500 ${
                   currentStep > num ? 'bg-green-400' : 'bg-[#E8E0D5]'
                 }`} />
@@ -371,7 +381,112 @@ function ListProduct() {
               </div>
             </div>
 
-            {/* Shipping Details */}
+            {/* Progress checklist */}
+            <div className="grid grid-cols-2 gap-2 my-6 p-4 bg-[#FAF8F5] rounded-xl border border-[#E8E0D5]">
+              {step2Checks.map(({ label, done }) => (
+                <div key={label} className={`flex items-center gap-2 text-xs ${done ? 'text-green-600' : 'text-[#9CA3AF]'}`}>
+                  {done
+                    ? <FiCheckCircle size={12} className="text-green-500 shrink-0" />
+                    : <FiCircle size={12} className="shrink-0" />
+                  }
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between pt-4 border-t border-[#E8E0D5]">
+              <button
+                onClick={() => setCurrentStep(1)}
+                className="flex items-center gap-2 border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] font-semibold px-5 py-2.5 rounded-xl text-sm transition-all"
+              >
+                <FiArrowLeft size={15} /> Back
+              </button>
+              <button
+                onClick={() => setCurrentStep(3)}
+                disabled={!step2Done}
+                className="flex items-center gap-2 bg-[#1C1F2E] hover:bg-[#2E3452] disabled:opacity-50 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all"
+              >
+                Continue <FiArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 3: Condition & Ship ── */}
+        {currentStep === 3 && (
+          <div className="bg-white border border-[#E8E0D5] rounded-2xl p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#C9A96E]/10 flex items-center justify-center">
+                <FiTag className="text-[#C9A96E]" size={20} />
+              </div>
+              <div>
+                <h2 className="text-[#1C1F2E] font-bold text-lg">Condition & Shipping</h2>
+                <p className="text-[#9CA3AF] text-xs">Tell us the product condition and shipping details.</p>
+              </div>
+            </div>
+
+            {/* Section 1 — Product Condition */}
+            <div className="bg-white border border-[#E8E0D5] rounded-xl p-5 space-y-4 mb-4">
+              <h3 className="text-[#1C1F2E] font-bold text-sm flex items-center gap-2">
+                <FiTag className="w-4 h-4 text-[#C9A96E]" /> Product Condition
+              </h3>
+              <div>
+                <label className="block text-xs font-semibold text-[#6B6560] mb-2">
+                  Product Condition <span className="text-red-400">*</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  {[
+                    { value: 'NEW',         label: 'New' },
+                    { value: 'USED',        label: 'Used' },
+                    { value: 'REFURBISHED', label: 'Refurbished' },
+                  ].map(({ value, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setForm(prev => ({ ...prev, condition: value, conditionNotes: '' }))}
+                      className={`px-5 py-2.5 rounded-xl font-semibold text-sm border transition-all ${
+                        form.condition === value
+                          ? 'bg-[#1C1F2E] text-white border-[#1C1F2E]'
+                          : 'bg-white text-[#6B6560] border-[#E8E0D5] hover:border-[#1C1F2E]'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {form.condition === 'NEW' && (
+                  <p className="text-[#9CA3AF] text-xs mt-2">Brand new, sealed or never used</p>
+                )}
+                {form.condition === 'USED' && (
+                  <p className="text-[#9CA3AF] text-xs mt-2">Previously owned, may show signs of wear</p>
+                )}
+                {form.condition === 'REFURBISHED' && (
+                  <p className="text-[#9CA3AF] text-xs mt-2">Restored to working condition</p>
+                )}
+              </div>
+              {(form.condition === 'USED' || form.condition === 'REFURBISHED') && (
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-semibold text-[#6B6560]">
+                      Condition Notes <span className="text-[#9CA3AF] font-normal">(optional)</span>
+                    </label>
+                    <span className="text-[10px] text-[#9CA3AF]">{form.conditionNotes.length} / 100</span>
+                  </div>
+                  <textarea
+                    name="conditionNotes"
+                    value={form.conditionNotes}
+                    onChange={handleChange}
+                    placeholder="e.g. minor scratches on back, screen is perfect, includes original box"
+                    maxLength={100}
+                    className="w-full px-3 py-2.5 border border-[#E8E0D5] rounded-xl text-sm text-[#1C1F2E] bg-[#FAF8F5] focus:outline-none focus:border-[#C9A96E] transition-colors resize-none h-20"
+                  />
+                  <p className="text-[10px] text-[#9CA3AF] mt-1">Helps the AI price your product more accurately</p>
+                </div>
+              )}
+            </div>
+
+            {/* Section 2 — Shipping Details */}
             <div className="bg-white border border-[#E8E0D5] rounded-xl p-5 space-y-4 mb-6">
               <h3 className="text-[#1C1F2E] font-bold text-sm flex items-center gap-2">
                 <FiTruck className="w-4 h-4 text-[#C9A96E]" /> Shipping Details
@@ -403,7 +518,7 @@ function ListProduct() {
 
             {/* Progress checklist */}
             <div className="grid grid-cols-2 gap-2 my-6 p-4 bg-[#FAF8F5] rounded-xl border border-[#E8E0D5]">
-              {checks.map(({ label, done }) => (
+              {step3Checks.map(({ label, done }) => (
                 <div key={label} className={`flex items-center gap-2 text-xs ${done ? 'text-green-600' : 'text-[#9CA3AF]'}`}>
                   {done
                     ? <FiCheckCircle size={12} className="text-green-500 shrink-0" />
@@ -417,7 +532,7 @@ function ListProduct() {
             {/* Preview price (optional) */}
             <button
               onClick={handleComputePrice}
-              disabled={loading || !allDone}
+              disabled={loading || !step3Done}
               className="w-full py-2.5 border border-[#C9A96E]/40 rounded-xl bg-[#C9A96E]/10 text-[#C9A96E] text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#C9A96E]/20 transition-colors disabled:opacity-40 mb-3"
             >
               <FiZap size={15} /> Preview AI Price (optional)
@@ -453,14 +568,14 @@ function ListProduct() {
             {/* Navigation */}
             <div className="flex items-center justify-between pt-4 border-t border-[#E8E0D5]">
               <button
-                onClick={() => setCurrentStep(1)}
+                onClick={() => setCurrentStep(2)}
                 className="flex items-center gap-2 border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] hover:text-[#1C1F2E] font-semibold px-5 py-2.5 rounded-xl text-sm transition-all"
               >
                 <FiArrowLeft size={15} /> Back
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={loading || !allDone}
+                disabled={loading || !step3Done}
                 className="flex items-center gap-2 bg-[#C9A96E] hover:bg-[#b8935a] disabled:opacity-50 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_4px_20px_rgba(201,169,110,0.4)]"
               >
                 {loading ? (
@@ -476,8 +591,8 @@ function ListProduct() {
           </div>
         )}
 
-        {/* ── STEP 3: AI Pricing Result ── */}
-        {currentStep === 3 && pricingResult && (
+        {/* ── STEP 4: AI Pricing Result ── */}
+        {currentStep === 4 && pricingResult && (
           <div className="bg-white border border-[#E8E0D5] rounded-2xl overflow-hidden">
             {/* Confidence top bar */}
             <div className={`h-1.5 w-full ${
@@ -516,7 +631,7 @@ function ListProduct() {
                     </p>
                     {pricingResult.status === 'PENDING_SELLER' && !acceptMode && (
                       <button
-                        onClick={() => { setPricingResult(null); setAcceptMode(false); setChosenPrice(''); setCurrentStep(2) }}
+                        onClick={() => { setPricingResult(null); setAcceptMode(false); setChosenPrice(''); setCurrentStep(3) }}
                         className="text-[#9CA3AF] hover:text-[#6B6560] text-xs transition-colors"
                       >
                         ← Back
