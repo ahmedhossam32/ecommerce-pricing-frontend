@@ -11,8 +11,8 @@ function AdminSidebar() {
   const [pendingCount, setPendingCount] = useState(0)
 
   useEffect(() => {
-    api.get('/admin/stats')
-      .then(res => setPendingCount(res.data?.pendingReview || 0))
+    api.get('/admin/requests')
+      .then(res => setPendingCount(res.data?.length || 0))
       .catch(() => {})
   }, [location.pathname])
 
