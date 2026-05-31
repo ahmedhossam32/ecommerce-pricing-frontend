@@ -699,7 +699,12 @@ function ListProduct() {
                       <p className="text-[#1C1F2E] font-bold text-sm">${pricingResult.mlBaselinePrice}</p>
                     </div>
                     <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-3">
-                      <p className="text-[#9CA3AF] text-[10px] mb-1">Market Range</p>
+                      <p className="text-[#9CA3AF] text-[10px] mb-1 flex items-center gap-1">
+                        Market Range
+                        <span className="bg-blue-50 text-blue-500 border border-blue-200 text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                          NEW
+                        </span>
+                      </p>
                       <p className="text-[#1C1F2E] font-bold text-sm">
                         ${pricingResult.marketPriceMin}–${pricingResult.marketPriceMax}
                       </p>

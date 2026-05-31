@@ -283,6 +283,28 @@ function AdminRequestDetail() {
                     </p>
                   )}
 
+                  {request.condition && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[#6B6560] text-sm">Condition:</span>
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
+                        request.condition === 'NEW'
+                          ? 'bg-green-50 text-green-600 border-green-200'
+                          : request.condition === 'USED'
+                          ? 'bg-amber-50 text-amber-600 border-amber-200'
+                          : request.condition === 'REFURBISHED'
+                          ? 'bg-blue-50 text-blue-600 border-blue-200'
+                          : 'bg-gray-50 text-gray-500 border-gray-200'
+                      }`}>
+                        {request.condition}
+                      </span>
+                      {request.conditionNotes && request.conditionNotes.trim() !== '' && (
+                        <span className="text-[#6B6560] text-xs italic">
+                          "{request.conditionNotes}"
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {/* Seller row */}
                   <div className="flex items-center gap-3 p-4 bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl">
                     {request.sellerProfilePictureUrl ? (
@@ -329,7 +351,12 @@ function AdminRequestDetail() {
                       </p>
                     </div>
                     <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-4 text-center">
-                      <p className="text-[#9CA3AF] text-xs font-medium mb-1">Market Range</p>
+                      <p className="text-[#9CA3AF] text-xs font-medium mb-1 flex items-center justify-center gap-1">
+                        Market Range
+                        <span className="bg-blue-50 text-blue-500 border border-blue-200 text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                          NEW
+                        </span>
+                      </p>
                       <p className="text-[#1C1F2E] font-bold text-sm leading-snug">
                         {request.marketPriceMin && request.marketPriceMax
                           ? `$${request.marketPriceMin} – $${request.marketPriceMax}`
@@ -337,6 +364,18 @@ function AdminRequestDetail() {
                       </p>
                     </div>
                   </div>
+
+                  {/* AI Reasoning */}
+                  {request.reasoning && request.reasoning !== 'LLM unavailable' && (
+                    <div className="bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl p-4 space-y-2">
+                      <p className="text-[#6B6560] text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5">
+                        🤖 AI Reasoning
+                      </p>
+                      <p className="text-[#1C1F2E] text-sm leading-relaxed">
+                        {request.reasoning}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Dispute seller card */}
                   {request.requestType === 'DISPUTE' && request.sellerPrice && (

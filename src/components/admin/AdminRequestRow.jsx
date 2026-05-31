@@ -52,6 +52,20 @@ function AdminRequestRow({ request }) {
           {brand ?? 'Unknown'} · {category?.replace(/_/g, ' ')}
         </p>
 
+        {request.condition && (
+          <span className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full border mt-1 ${
+            request.condition === 'NEW'
+              ? 'bg-green-50 text-green-600 border-green-200'
+              : request.condition === 'USED'
+              ? 'bg-amber-50 text-amber-600 border-amber-200'
+              : request.condition === 'REFURBISHED'
+              ? 'bg-blue-50 text-blue-600 border-blue-200'
+              : 'bg-gray-50 text-gray-500 border-gray-200'
+          }`}>
+            {request.condition}
+          </span>
+        )}
+
         {/* Seller row */}
         <div className="flex items-center gap-2 mt-1.5">
           {sellerProfilePictureUrl ? (
