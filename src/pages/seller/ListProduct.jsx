@@ -43,7 +43,7 @@ function ListProduct() {
   const [form, setForm] = useState({
     name: '', category: '', description: '',
     weight: '', freightValue: '',
-    condition: '', conditionNotes: '',
+    condition: '', conditionGrade: '', conditionNotes: '',
   })
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(false)
@@ -72,6 +72,7 @@ function ListProduct() {
   ]
   const step3Checks = [
     { label: 'Condition selected',    done: form.condition !== '' },
+    { label: 'Condition grade',       done: form.condition !== 'USED' || form.conditionGrade !== '' },
     { label: 'Weight entered',        done: form.weight !== '' && Number(form.weight) > 0 },
     { label: 'Freight value entered', done: form.freightValue !== '' && Number(form.freightValue) >= 0 },
   ]
@@ -129,6 +130,7 @@ function ListProduct() {
         freightValue: parseFloat(form.freightValue),
         photosQty: images.length || 1,
         condition: form.condition,
+        conditionGrade: form.conditionGrade,
         conditionNotes: form.conditionNotes,
       })
       setComputeResult(res.data)
@@ -151,6 +153,7 @@ function ListProduct() {
         freightValue: parseFloat(form.freightValue),
         photosQty: images.length || 1,
         condition: form.condition,
+        conditionGrade: form.conditionGrade,
         conditionNotes: form.conditionNotes,
       })
       const result = res.data
@@ -444,7 +447,7 @@ function ListProduct() {
                     <button
                       key={value}
                       type="button"
-                      onClick={() => setForm(prev => ({ ...prev, condition: value, conditionNotes: '' }))}
+                      onClick={() => setForm(prev => ({ ...prev, condition: value, conditionGrade: '', conditionNotes: '' }))}
                       className={`px-5 py-2.5 rounded-xl font-semibold text-sm border transition-all ${
                         form.condition === value
                           ? 'bg-[#1C1F2E] text-white border-[#1C1F2E]'
@@ -459,7 +462,38 @@ function ListProduct() {
                   <p className="text-[#9CA3AF] text-xs mt-2">Brand new, sealed or never used</p>
                 )}
                 {form.condition === 'USED' && (
-                  <p className="text-[#9CA3AF] text-xs mt-2">Previously owned, may show signs of wear</p>
+                  <>
+                    <p className="text-[#9CA3AF] text-xs mt-2">Previously owned, may show signs of wear</p>
+                    <div className="mt-3">
+                      <label className="block text-xs font-semibold text-[#6B6560] mb-2">
+                        Condition Grade <span className="text-red-400">*</span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {[
+                          { value: 'MINOR', label: 'Minor Wear',   desc: 'Light scratches, fully functional' },
+                          { value: 'HEAVY', label: 'Heavy Damage', desc: 'Cracks, broken parts, faults' },
+                        ].map(({ value, label, desc }) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setForm(prev => ({ ...prev, conditionGrade: value }))}
+                            className={`flex-1 px-4 py-3 rounded-xl border-2 text-left transition-all ${
+                              form.conditionGrade === value
+                                ? 'bg-[#1C1F2E] text-white border-[#1C1F2E]'
+                                : 'bg-white text-[#6B6560] border-[#E8E0D5] hover:border-[#1C1F2E]'
+                            }`}
+                          >
+                            <p className="font-semibold text-sm">{label}</p>
+                            <p className={`text-[10px] mt-0.5 ${
+                              form.conditionGrade === value ? 'text-white/60' : 'text-[#9CA3AF]'
+                            }`}>
+                              {desc}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
                 {form.condition === 'REFURBISHED' && (
                   <p className="text-[#9CA3AF] text-xs mt-2">Restored to working condition</p>
