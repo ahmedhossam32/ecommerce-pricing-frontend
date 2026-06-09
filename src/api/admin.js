@@ -6,3 +6,4 @@ export const overridePrice = (id, data) => api.post(`/admin/override/${id}`, dat
 export const getAdminStats = () => api.get('/admin/stats')
 export const getRequestById = (id) => api.get(`/admin/requests/${id}`)
 export const getAllProducts = (status) => api.get('/admin/products', { params: { status } })
+export const deleteAdminProduct = (id) => api.delete(`/admin/products/${id}`)

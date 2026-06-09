@@ -125,6 +125,19 @@ function AdminProductRow({ product, onOverrideClick, navigate }) {
           <p className="text-[#9E9590] text-xs truncate">{sellerEmail}</p>
         </div>
 
+        {product.condition && (
+          <span className={`inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full border mt-1 ${
+            product.condition === 'NEW'
+              ? 'bg-green-50 text-green-600 border-green-200'
+              : product.condition === 'USED'
+              ? 'bg-amber-50 text-amber-600 border-amber-200'
+              : product.condition === 'REFURBISHED'
+              ? 'bg-blue-50 text-blue-600 border-blue-200'
+              : 'bg-gray-50 text-gray-500 border-gray-200'
+          }`}>
+            {product.condition}
+          </span>
+        )}
         <p className="text-[#9CA3AF] text-[10px] mt-1">
           {new Date(createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </p>

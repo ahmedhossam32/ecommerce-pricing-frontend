@@ -14,7 +14,7 @@ function AdminRequestRow({ request }) {
   const emoji = categoryEmojis[category] || categoryEmojis.default
   const gradient = categoryGradients[category] || categoryGradients.default
   const hasImage = imageUrls?.length > 0
-  const routingReason = getRoutingReason(request)
+  const routingReason = request.routingReason || getRoutingReason(request)
   const sellerInitial = sellerName?.[0]?.toUpperCase() || '?'
 
   const rowBg =
