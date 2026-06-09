@@ -4,11 +4,12 @@ import { toast } from 'react-toastify'
 import {
   FiPackage, FiClock, FiXCircle,
   FiFileText, FiSearch, FiX, FiRefreshCw,
-  FiAlertCircle, FiDollarSign, FiArrowRight,
+  FiAlertCircle, FiDollarSign, FiArrowRight, FiTrash2,
   FiMail, FiInbox, FiChevronLeft, FiChevronRight,
 } from 'react-icons/fi'
 import { categoryEmojis, categoryGradients } from '../../data/adminDummyData'
 import api from '../../api/axiosInstance'
+import { deleteAdminProduct } from '../../api/admin'
 
 const TABS = [
   { key: 'ALL',            label: 'All'            },
@@ -54,7 +55,9 @@ const getStatusLabel = (status) => {
   }
 }
 
-function AdminProductRow({ product, onOverrideClick, navigate }) {
+function AdminProductRow({ product, onOverrideClick, navigate, onDelete }) {
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const {
     productId, productName, category, brand,
     sellerName, sellerEmail, sellerProfilePictureUrl,
@@ -77,10 +80,11 @@ function AdminProductRow({ product, onOverrideClick, navigate }) {
   }
 
   return (
+    <>
     <div
       onClick={isClickable ? handleClick : undefined}
-      className={`relative overflow-hidden border rounded-2xl p-4 flex items-center gap-4 transition-all duration-200 ${
-        isClickable ? 'cursor-pointer hover:shadow-md group' : 'cursor-default'
+      className={`group relative overflow-hidden border rounded-2xl p-4 flex items-center gap-4 transition-all duration-200 ${
+        isClickable ? 'cursor-pointer hover:shadow-md' : 'cursor-default'
       } ${
         status === 'LIVE'           ? 'bg-white border-[#E8E0D5] hover:border-green-300' :
         status === 'PENDING_REVIEW' ? 'bg-[#C9A96E]/5 border-[#C9A96E]/20 hover:border-[#C9A96E]/40' :
@@ -145,6 +149,13 @@ function AdminProductRow({ product, onOverrideClick, navigate }) {
 
       {/* Right side */}
       <div className="flex flex-col items-end gap-2 shrink-0">
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowConfirm(true) }}
+          className="opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50"
+          title="Delete product"
+        >
+          <FiTrash2 size={14} />
+        </button>
         <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${getStatusBadge(status)}`}>
           {getStatusLabel(status)}
         </span>
@@ -189,6 +200,59 @@ function AdminProductRow({ product, onOverrideClick, navigate }) {
         )}
       </div>
     </div>
+
+    {showConfirm && (
+      <div
+        className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4"
+        onClick={() => !deleting && setShowConfirm(false)}
+      >
+        <div
+          className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full space-y-4"
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="w-12 h-12 rounded-full bg-red-50 border border-red-200 mx-auto flex items-center justify-center">
+            <FiTrash2 className="w-6 h-6 text-red-400" />
+          </div>
+          <h3 className="font-extrabold text-lg text-[#1C1F2E] text-center">Delete Product?</h3>
+          <p className="text-sm text-[#6B6560] text-center">
+            This will permanently remove <span className="font-semibold">{productName}</span> from the platform. Orders referencing it will be preserved.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowConfirm(false)}
+              disabled={deleting}
+              className="flex-1 bg-[#FAF8F5] border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] font-bold py-2.5 rounded-xl text-sm transition-all disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={async () => {
+                setDeleting(true)
+                try {
+                  await deleteAdminProduct(productId)
+                  toast.success('Product deleted successfully')
+                  setShowConfirm(false)
+                  onDelete?.(productId)
+                } catch {
+                  toast.error('Failed to delete product')
+                  setDeleting(false)
+                }
+              }}
+              disabled={deleting}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-sm transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+            >
+              {deleting ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Deleting...
+                </>
+              ) : 'Delete'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 
@@ -224,6 +288,10 @@ function AdminProducts() {
     setCurrentPage(1)
     if (key === 'ALL') setSearchParams({})
     else setSearchParams({ tab: key })
+  }
+
+  const handleDelete = (productId) => {
+    setProducts(prev => prev.filter(p => p.productId !== productId))
   }
 
   const fetchProducts = async () => {
@@ -461,6 +529,7 @@ function AdminProducts() {
                       setOverrideImgIndex(0)
                     }}
                     navigate={navigate}
+                    onDelete={handleDelete}
                   />
                 </div>
               ))}
