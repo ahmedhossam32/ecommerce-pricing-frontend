@@ -55,9 +55,7 @@ const getStatusLabel = (status) => {
   }
 }
 
-function AdminProductRow({ product, onOverrideClick, navigate, onDelete }) {
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [deleting, setDeleting] = useState(false)
+function AdminProductRow({ product, onOverrideClick, navigate, onDeleteClick }) {
   const {
     productId, productName, category, brand,
     sellerName, sellerEmail, sellerProfilePictureUrl,
@@ -80,7 +78,6 @@ function AdminProductRow({ product, onOverrideClick, navigate, onDelete }) {
   }
 
   return (
-    <>
     <div
       onClick={isClickable ? handleClick : undefined}
       className={`group relative overflow-hidden border rounded-2xl p-4 flex items-center gap-4 transition-all duration-200 ${
@@ -150,7 +147,7 @@ function AdminProductRow({ product, onOverrideClick, navigate, onDelete }) {
       {/* Right side */}
       <div className="flex flex-col items-end gap-2 shrink-0">
         <button
-          onClick={(e) => { e.stopPropagation(); setShowConfirm(true) }}
+          onClick={(e) => { e.stopPropagation(); onDeleteClick(product) }}
           className="opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50"
           title="Delete product"
         >
@@ -201,58 +198,6 @@ function AdminProductRow({ product, onOverrideClick, navigate, onDelete }) {
       </div>
     </div>
 
-    {showConfirm && (
-      <div
-        className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4"
-        onClick={() => !deleting && setShowConfirm(false)}
-      >
-        <div
-          className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full space-y-4"
-          onClick={e => e.stopPropagation()}
-        >
-          <div className="w-12 h-12 rounded-full bg-red-50 border border-red-200 mx-auto flex items-center justify-center">
-            <FiTrash2 className="w-6 h-6 text-red-400" />
-          </div>
-          <h3 className="font-extrabold text-lg text-[#1C1F2E] text-center">Delete Product?</h3>
-          <p className="text-sm text-[#6B6560] text-center">
-            This will permanently remove <span className="font-semibold">{productName}</span> from the platform. Orders referencing it will be preserved.
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowConfirm(false)}
-              disabled={deleting}
-              className="flex-1 bg-[#FAF8F5] border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] font-bold py-2.5 rounded-xl text-sm transition-all disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={async () => {
-                setDeleting(true)
-                try {
-                  await deleteAdminProduct(productId)
-                  toast.success('Product deleted successfully')
-                  setShowConfirm(false)
-                  onDelete?.(productId)
-                } catch {
-                  toast.error('Failed to delete product')
-                  setDeleting(false)
-                }
-              }}
-              disabled={deleting}
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-sm transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
-            >
-              {deleting ? (
-                <>
-                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Deleting...
-                </>
-              ) : 'Delete'}
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
-    </>
   )
 }
 
@@ -275,6 +220,10 @@ function AdminProducts() {
   const [overrideError, setOverrideError]         = useState(null)
   const [confirmOverride, setConfirmOverride]     = useState(false)
   const [overrideImgIndex, setOverrideImgIndex]   = useState(0)
+
+  const [deleteModal, setDeleteModal]   = useState(null)
+  const [deleteReason, setDeleteReason] = useState('')
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   useEffect(() => {
     const tabFromUrl = searchParams.get('tab')
@@ -529,7 +478,7 @@ function AdminProducts() {
                       setOverrideImgIndex(0)
                     }}
                     navigate={navigate}
-                    onDelete={handleDelete}
+                    onDeleteClick={(product) => { setDeleteModal(product); setDeleteReason('') }}
                   />
                 </div>
               ))}
@@ -814,6 +763,74 @@ function AdminProducts() {
                   ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
                   : 'Yes, Override'
                 }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── DELETE PRODUCT MODAL ─────────────────────────────── */}
+      {deleteModal && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center px-4"
+          onClick={() => setDeleteModal(null)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full space-y-4"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-full bg-red-50 border border-red-200 mx-auto flex items-center justify-center">
+              <FiTrash2 className="w-6 h-6 text-red-400" />
+            </div>
+            <h3 className="font-extrabold text-lg text-[#1C1F2E] text-center">Delete Product?</h3>
+            <p className="text-sm text-[#6B6560] text-center">
+              This will permanently remove <span className="font-semibold">{deleteModal.productName}</span> from the platform. The seller will be notified by email.
+            </p>
+            <div>
+              <label className="block text-xs font-semibold text-[#1C1F2E] mb-1.5">
+                Reason for deletion <span className="text-[#9CA3AF] font-normal">(optional)</span>
+              </label>
+              <textarea
+                value={deleteReason}
+                onChange={e => setDeleteReason(e.target.value)}
+                placeholder="e.g. Counterfeit product, policy violation..."
+                rows={2}
+                maxLength={300}
+                className="w-full bg-[#FAF8F5] border border-[#E8E0D5] rounded-xl px-4 py-3 text-sm text-[#1C1F2E] placeholder-[#9E9590] focus:outline-none focus:border-red-400 transition-colors resize-none"
+              />
+              <p className="text-[#9CA3AF] text-xs text-right mt-1">{deleteReason.length}/300</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteModal(null)}
+                disabled={deleteLoading}
+                className="flex-1 bg-[#FAF8F5] border border-[#E8E0D5] hover:border-[#1C1F2E] text-[#6B6560] font-bold py-2.5 rounded-xl text-sm transition-all disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setDeleteLoading(true)
+                  try {
+                    await deleteAdminProduct(deleteModal.productId)
+                    toast.success('Product deleted successfully')
+                    handleDelete(deleteModal.productId)
+                    setDeleteModal(null)
+                  } catch {
+                    toast.error('Failed to delete product')
+                  } finally {
+                    setDeleteLoading(false)
+                  }
+                }}
+                disabled={deleteLoading}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-sm transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+              >
+                {deleteLoading ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Deleting...
+                  </>
+                ) : 'Delete'}
               </button>
             </div>
           </div>
