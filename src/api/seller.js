@@ -13,3 +13,4 @@ export const uploadProductImages = (id, files) => {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
 }
+export const deleteSellerProduct = (id) => api.delete(`/seller/products/${id}`)

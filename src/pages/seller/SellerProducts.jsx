@@ -40,6 +40,10 @@ function SellerProducts() {
 
   const filtered = activeFilter === 'ALL' ? products : products.filter(p => p.status === activeFilter)
 
+  const handleDelete = (productId) => {
+    setProducts(prev => prev.filter(p => p.productId !== productId))
+  }
+
   if (loading) return (
     <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-transparent rounded-full animate-spin" />
@@ -124,7 +128,7 @@ function SellerProducts() {
           <>
             <div className="flex flex-col gap-2">
               {paginated.map(product => (
-                <SellerProductRow key={product.productId} product={product} />
+                <SellerProductRow key={product.productId} product={product} onDelete={handleDelete} />
               ))}
             </div>
 

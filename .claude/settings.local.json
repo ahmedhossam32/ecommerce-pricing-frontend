@@ -18,7 +18,9 @@
       "Bash(Test-Path \"e:\\\\Uni\\\\GP\\\\ecommerce-frontend\\\\src\\\\pages\\\\buyer\\\\Cart.jsx\")",
       "Bash(ls -la \"e:\\\\Uni\\\\GP\")",
       "Read(//e/Uni/GP/**)",
-      "Bash(Remove-Item \"e:\\\\Uni\\\\GP\\\\ecommerce-frontend\\\\src\\\\data\\\\dummyData.js\")"
+      "Bash(Remove-Item \"e:\\\\Uni\\\\GP\\\\ecommerce-frontend\\\\src\\\\data\\\\dummyData.js\")",
+      "Bash(Get-ChildItem -Path \"e:\\\\Uni\\\\GP\\\\ecommerce-frontend\" -Recurse -Directory)",
+      "Bash(Select-Object -First 30 FullName)"
     ]
   }
 }

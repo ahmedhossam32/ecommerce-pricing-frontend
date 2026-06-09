@@ -245,7 +245,11 @@ function SellerDashboard() {
             <div className="flex flex-col gap-2">
               {recentProducts.length > 0 ? (
                 recentProducts.map(product => (
-                  <SellerProductRow key={product.productId} product={product} />
+                  <SellerProductRow
+                    key={product.productId}
+                    product={product}
+                    onDelete={(id) => setRecentProducts(prev => prev.filter(p => p.productId !== id))}
+                  />
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center py-14 text-center">
