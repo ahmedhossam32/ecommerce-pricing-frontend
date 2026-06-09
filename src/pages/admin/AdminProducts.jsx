@@ -41,6 +41,7 @@ const getStatusBadge = (status) => {
     case 'PENDING_REVIEW': return 'bg-[#C9A96E]/10 text-[#C9A96E] border border-[#C9A96E]/30'
     case 'REJECTED':       return 'bg-red-50 text-red-500 border border-red-200'
     case 'DRAFT':          return 'bg-gray-50 text-gray-500 border border-gray-200'
+    case 'DELETED':        return 'bg-red-50 text-red-400 border border-red-200'
     default:               return 'bg-gray-50 text-gray-500 border border-gray-200'
   }
 }
@@ -51,6 +52,7 @@ const getStatusLabel = (status) => {
     case 'PENDING_REVIEW': return 'Pending Review'
     case 'REJECTED':       return 'Rejected'
     case 'DRAFT':          return 'Draft'
+    case 'DELETED':        return 'Deleted'
     default:               return status
   }
 }
@@ -146,13 +148,15 @@ function AdminProductRow({ product, onOverrideClick, navigate, onDeleteClick }) 
 
       {/* Right side */}
       <div className="flex flex-col items-end gap-2 shrink-0">
-        <button
-          onClick={(e) => { e.stopPropagation(); onDeleteClick(product) }}
-          className="opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50"
-          title="Delete product"
-        >
-          <FiTrash2 size={14} />
-        </button>
+        {status !== 'DELETED' && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onDeleteClick(product) }}
+            className="opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50"
+            title="Delete product"
+          >
+            <FiTrash2 size={14} />
+          </button>
+        )}
         <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${getStatusBadge(status)}`}>
           {getStatusLabel(status)}
         </span>
