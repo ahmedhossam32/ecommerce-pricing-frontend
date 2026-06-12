@@ -102,7 +102,7 @@ function AdminRequestDetail() {
   const emoji        = categoryEmojis[request?.category]   || categoryEmojis.default
   const gradient     = categoryGradients[request?.category] || categoryGradients.default
   const hasImage     = request?.imageUrls?.length > 0
-  const routingReason = request ? getRoutingReason(request) : null
+  const routingReason = request?.routingReason || (request ? getRoutingReason(request) : null)
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
@@ -297,6 +297,11 @@ function AdminRequestDetail() {
                       }`}>
                         {request.condition}
                       </span>
+                      {request.conditionGrade && (
+                        <span className="text-xs text-[#6B6560] font-medium bg-[#FAF8F5] border border-[#E8E0D5] px-2 py-0.5 rounded-full">
+                          Grade: {request.conditionGrade}
+                        </span>
+                      )}
                       {request.conditionNotes && request.conditionNotes.trim() !== '' && (
                         <span className="text-[#6B6560] text-xs italic">
                           "{request.conditionNotes}"
