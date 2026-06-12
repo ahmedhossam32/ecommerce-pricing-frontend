@@ -280,10 +280,25 @@ function ProductDetail() {
                     <span>{product.weight}g</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1.5 text-sm text-[#6B6560] bg-green-50 border border-green-200 px-3 py-1 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                  <span className="text-green-700 text-xs font-medium">New</span>
-                </div>
+                {product.condition && (
+                  <div className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border ${
+                    product.condition === 'NEW'
+                      ? 'bg-green-50 border-green-200 text-green-700'
+                      : product.condition === 'USED'
+                      ? 'bg-amber-50 border-amber-200 text-amber-700'
+                      : product.condition === 'REFURBISHED'
+                      ? 'bg-blue-50 border-blue-200 text-blue-700'
+                      : 'bg-gray-50 border-gray-200 text-gray-600'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                      product.condition === 'NEW' ? 'bg-green-500'
+                      : product.condition === 'USED' ? 'bg-amber-500'
+                      : product.condition === 'REFURBISHED' ? 'bg-blue-500'
+                      : 'bg-gray-400'
+                    }`} />
+                    {product.condition.charAt(0) + product.condition.slice(1).toLowerCase()}
+                  </div>
+                )}
                 {product.createdAt && (
                   <div className="flex items-center gap-1.5 text-xs text-[#6B6560] bg-[#FAF8F5] border border-[#E8E0D5] px-3 py-1 rounded-full">
                     <FiTag className="w-3 h-3 text-[#C9A96E]" />

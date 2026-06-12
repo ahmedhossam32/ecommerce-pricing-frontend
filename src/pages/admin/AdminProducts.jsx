@@ -239,6 +239,7 @@ function AdminProducts() {
   const handleTabChange = (key) => {
     setActiveTab(key)
     setCurrentPage(1)
+    fetchProducts(key)
     if (key === 'ALL') setSearchParams({})
     else setSearchParams({ tab: key })
   }
@@ -247,11 +248,12 @@ function AdminProducts() {
     setProducts(prev => prev.filter(p => p.productId !== productId))
   }
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (status = activeTab) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await api.get('/admin/products')
+      const params = status !== 'ALL' ? { status } : {}
+      const res = await api.get('/admin/products', { params })
       setProducts(res.data || [])
     } catch (err) {
       setError(err?.response?.data?.message || 'Failed to load products')

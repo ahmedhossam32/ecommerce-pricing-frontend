@@ -191,7 +191,7 @@ function Profile() {
                   { label: 'Full Name',     value: user?.name },
                   { label: 'Email Address', value: user?.email },
                   { label: 'Account Type',  value: user?.role },
-                  { label: 'Member Since',  value: 'May 2026' },
+                  { label: 'Member Since', value: user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—' },
                 ].map(({ label, value }) => (
                   <div key={label}>
                     <p className="text-[#9E9590] text-xs font-medium mb-1.5">{label}</p>
