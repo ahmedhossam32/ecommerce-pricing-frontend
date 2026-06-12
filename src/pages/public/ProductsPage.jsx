@@ -54,7 +54,7 @@ function ProductsPage() {
 
   useEffect(() => {
     getAllProducts()
-      .then(res => setProducts(res.data || []))
+      .then(res => setProducts(res.data?.content || []))
       .catch(() => toast.error('Failed to load products'))
       .finally(() => setLoading(false))
   }, [])

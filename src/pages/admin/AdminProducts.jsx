@@ -254,7 +254,7 @@ function AdminProducts() {
     try {
       const params = status !== 'ALL' ? { status } : {}
       const res = await api.get('/admin/products', { params })
-      setProducts(res.data || [])
+      setProducts(res.data?.content || [])
     } catch (err) {
       setError(err?.response?.data?.message || 'Failed to load products')
       toast.error('Failed to load products')
