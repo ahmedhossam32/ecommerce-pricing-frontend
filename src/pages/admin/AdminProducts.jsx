@@ -349,7 +349,7 @@ function AdminProducts() {
               </div>
             </div>
             <button
-              onClick={fetchProducts}
+              onClick={() => fetchProducts()}
               disabled={loading}
               className="flex items-center gap-2 border border-[#E8E0D5]/20 hover:border-white/30 text-white/60 hover:text-white px-4 py-2 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
             >
@@ -434,7 +434,7 @@ function AdminProducts() {
               <p className="text-[#6B6560] text-sm mt-1">{error}</p>
             </div>
             <button
-              onClick={fetchProducts}
+              onClick={() => fetchProducts()}
               className="inline-flex items-center gap-2 bg-[#1C1F2E] text-white text-sm font-bold px-5 py-2.5 rounded-full hover:bg-[#2E3452] transition-colors"
             >
               <FiRefreshCw className="w-4 h-4" /> Retry
