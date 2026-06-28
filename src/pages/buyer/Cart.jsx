@@ -38,7 +38,8 @@ function Cart() {
       const res = await placeOrder(selectedItem.productId)
       setItemOrderData(res.data)
       setItemOrderConfirmed(true)
-      removeItem(selectedItem.productId)
+      const removeResult = await removeItem(selectedItem.productId)
+      if (!removeResult.success) toast.error('Order placed, but failed to update cart — please refresh')
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to place order')
       setItemOrderModal(false)
@@ -210,9 +211,10 @@ function Cart() {
                           {/* Remove */}
                           <div className="relative group/remove">
                             <button
-                              onClick={() => {
-                                removeItem(item.productId)
-                                toast.success(`${itemName} removed from cart`)
+                              onClick={async () => {
+                                const result = await removeItem(item.productId)
+                                if (result.success) toast.success(`${itemName} removed from cart`)
+                                else toast.error(result.message || 'Failed to remove from cart')
                               }}
                               className="w-7 h-7 rounded-full border border-[#E8E0D5] hover:border-[#1C1F2E] hover:bg-[#1C1F2E] text-[#9E9590] hover:text-white flex items-center justify-center transition-all"
                             >

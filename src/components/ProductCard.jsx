@@ -82,8 +82,9 @@ function ProductCard({ product, confidence = 'HIGH' }) {
     e.stopPropagation()
     if (!user) { toast.error('Please sign in to save products'); return }
     if (inWishlist) {
-      await removeFromWishlistCtx(productId)
-      toast.success(`${name} removed from wishlist`)
+      const result = await removeFromWishlistCtx(productId)
+      if (result.success) toast.success(`${name} removed from wishlist`)
+      else toast.error(result.message || 'Failed to remove from wishlist')
     } else {
       const result = await addToWishlistCtx(productId)
       if (result.success) toast.success(`${name} saved to wishlist!`)

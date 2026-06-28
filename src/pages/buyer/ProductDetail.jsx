@@ -115,8 +115,9 @@ function ProductDetail() {
   const handleWishlist = async () => {
     if (!user) { toast.error('Please sign in to save products'); return }
     if (inWishlist) {
-      await removeFromWishlistCtx(product.productId)
-      toast.success(`${product.name} removed from wishlist`)
+      const result = await removeFromWishlistCtx(product.productId)
+      if (result.success) toast.success(`${product.name} removed from wishlist`)
+      else toast.error(result.message || 'Failed to remove from wishlist')
     } else {
       const result = await addToWishlistCtx(product.productId)
       if (result.success) toast.success(`${product.name} saved to wishlist!`)

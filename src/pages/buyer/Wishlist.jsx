@@ -185,8 +185,9 @@ function Wishlist() {
                   key={item.savedId || item.productId}
                   item={item}
                   onRemove={async (productId) => {
-                    await removeFromWishlistCtx(productId)
-                    toast.success('Removed from wishlist')
+                    const result = await removeFromWishlistCtx(productId)
+                    if (result.success) toast.success('Removed from wishlist')
+                    else toast.error(result.message || 'Failed to remove from wishlist')
                   }}
                   onAddToCart={async (productId, name) => {
                     if (!user) { toast.error('Please sign in'); return }
