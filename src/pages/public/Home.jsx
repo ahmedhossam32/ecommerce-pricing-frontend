@@ -48,7 +48,7 @@ function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([])
 
   useEffect(() => {
-    getAllProducts().then(res => setFeaturedProducts(res.data || [])).catch(() => {})
+    getAllProducts().then(res => setFeaturedProducts(res.data?.content || [])).catch(() => {})
   }, [])
 
     return (
