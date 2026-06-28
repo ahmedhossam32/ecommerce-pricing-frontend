@@ -32,7 +32,6 @@ export function CartProvider({ children }) {
   useEffect(() => { fetchCart() }, [fetchCart])
 
   const addItem = useCallback(async (productId) => {
-    // Optimistic update first — works without backend
     setCartIds(prev => new Set([...prev, productId]))
     setCartCount(prev => prev + 1)
     try {
@@ -41,20 +40,28 @@ export function CartProvider({ children }) {
         setCartItems(prev => [...prev, res.data])
       }
     } catch {
-      // API not connected yet — optimistic state stays
+      setCartIds(prev => { const s = new Set(prev); s.delete(productId); return s })
+      setCartCount(prev => Math.max(0, prev - 1))
+      return { success: false, message: 'Failed to add item' }
     }
     return { success: true }
   }, [])
 
   const removeItem = useCallback(async (productId) => {
-    // Optimistic update first
+    let removedItem = null
     setCartIds(prev => { const s = new Set(prev); s.delete(productId); return s })
     setCartCount(prev => Math.max(0, prev - 1))
-    setCartItems(prev => prev.filter(i => i.productId !== productId))
+    setCartItems(prev => {
+      removedItem = prev.find(i => i.productId === productId) ?? null
+      return prev.filter(i => i.productId !== productId)
+    })
     try {
       await removeFromCart(productId)
     } catch {
-      // API not connected yet — optimistic state stays
+      setCartIds(prev => new Set([...prev, productId]))
+      setCartCount(prev => prev + 1)
+      if (removedItem) setCartItems(prev => [...prev, removedItem])
+      return { success: false, message: 'Failed to remove item' }
     }
     return { success: true }
   }, [])

@@ -31,7 +31,6 @@ export function WishlistProvider({ children }) {
   useEffect(() => { fetchWishlist() }, [fetchWishlist])
 
   const addItem = useCallback(async (productId) => {
-    // Optimistic update first
     setWishlistIds(prev => new Set([...prev, productId]))
     setWishlistCount(prev => prev + 1)
     try {
@@ -40,20 +39,28 @@ export function WishlistProvider({ children }) {
         setWishlistItems(prev => [...prev, res.data])
       }
     } catch {
-      // API not connected yet — optimistic state stays
+      setWishlistIds(prev => { const s = new Set(prev); s.delete(productId); return s })
+      setWishlistCount(prev => Math.max(0, prev - 1))
+      return { success: false, message: 'Failed to add item' }
     }
     return { success: true }
   }, [])
 
   const removeItem = useCallback(async (productId) => {
-    // Optimistic update first
+    let removedItem = null
     setWishlistIds(prev => { const s = new Set(prev); s.delete(productId); return s })
     setWishlistCount(prev => Math.max(0, prev - 1))
-    setWishlistItems(prev => prev.filter(i => i.productId !== productId))
+    setWishlistItems(prev => {
+      removedItem = prev.find(i => i.productId === productId) ?? null
+      return prev.filter(i => i.productId !== productId)
+    })
     try {
       await removeFromWishlist(productId)
     } catch {
-      // API not connected yet — optimistic state stays
+      setWishlistIds(prev => new Set([...prev, productId]))
+      setWishlistCount(prev => prev + 1)
+      if (removedItem) setWishlistItems(prev => [...prev, removedItem])
+      return { success: false, message: 'Failed to remove item' }
     }
     return { success: true }
   }, [])
