@@ -72,11 +72,11 @@ function PricingDecision() {
   }
 
   const handleDispute = async () => {
-    const disputePrice = parseFloat(disputeForm.sellerPrice)
-    const withinRange = disputePrice >= decisionData.minRange && disputePrice <= decisionData.maxRange
-    if (!isNaN(disputePrice) && withinRange) {
+    const parsedDisputePrice = parseFloat(disputeForm.sellerPrice)
+    const withinRange = parsedDisputePrice >= decisionData.minRange && parsedDisputePrice <= decisionData.maxRange
+    if (!isNaN(parsedDisputePrice) && withinRange) {
       toast.warning(
-        `Your price $${disputePrice.toFixed(2)} is already within the accepted range ($${decisionData.minRange} – $${decisionData.maxRange}). You can accept the suggested price instead.`,
+        `Your price $${parsedDisputePrice.toFixed(2)} is already within the accepted range ($${decisionData.minRange} – $${decisionData.maxRange}). You can accept the suggested price instead.`,
         { autoClose: 6000 }
       )
       return
